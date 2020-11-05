@@ -6684,7 +6684,7 @@ MonoBehaviour:
   AdditionalRows: 0
   Dificulty: 2
   DificultySeed: 0
-  MaxHits: 1
+  MaxHits: 4
   HitsToReset: 0
   Hits: 0
 --- !u!1 &1847951376

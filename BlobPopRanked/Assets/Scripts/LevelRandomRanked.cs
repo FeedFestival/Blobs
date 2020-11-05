@@ -103,7 +103,7 @@ public class LevelRandomRanked : MonoBehaviour, ILevel
         {
             DescendBlobs();
         }
-        Debug.Log("-----------------------------------------------------");
+        // Debug.Log("-----------------------------------------------------");
     }
 
     public void CreateBlob_Debug()
@@ -190,10 +190,7 @@ public class LevelRandomRanked : MonoBehaviour, ILevel
             _tryDestroyNeighbors = DestroyNeighbors(blob);
             StartCoroutine(_tryDestroyNeighbors);
         }
-        else
-        {
-            DificultyService.CheckIfAddingNewRow();
-        }
+        DificultyService.CheckIfAddingNewRow();
     }
 
     private IEnumerator DestroyNeighbors(Blob blob)
@@ -238,7 +235,10 @@ public class LevelRandomRanked : MonoBehaviour, ILevel
             Blobs.RemoveAt(index);
         }
 
-        Debug.Log(utils.DebugList(_toDestroy, "_toDestroy"));
+        if (debugLvl._destroyProcess)
+        {
+            Debug.Log(utils.DebugList(_toDestroy, "_toDestroy"));
+        }
 
         if (affectedCheck)
         {

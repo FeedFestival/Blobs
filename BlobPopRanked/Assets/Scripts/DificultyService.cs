@@ -117,16 +117,14 @@ public class DificultyService : MonoBehaviour
             float perc = (100 - colorPerc) + 10;
             // Debug.Log("perc: " + perc);
 
-            HitsToReset = (int)Mathf.Ceil(percent.Find(perc, _of: MaxHits));
-            HitsToReset = HitsToReset + (int)Mathf.Ceil(percent.Find(colorPerc, Dificulty));
+            HitsToReset = (int)Mathf.Floor(percent.Find(perc, _of: MaxHits));
+            // Debug.Log("HitsToReset: " + HitsToReset);
+            HitsToReset = HitsToReset + (int)Mathf.Floor(percent.Find(colorPerc, Dificulty));
+            Hits++;
             if (Hits >= HitsToReset)
             {
                 Hits = 0;
                 _levelRandomRanked.AddAnotherBlobLevel();
-            }
-            else
-            {
-                Hits++;
             }
         }
         else
