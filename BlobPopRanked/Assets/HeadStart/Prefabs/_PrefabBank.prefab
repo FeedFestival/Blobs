@@ -50,4 +50,8 @@ MonoBehaviour:
   TimerPrefab: {fileID: 5362190555284511845, guid: 0783c4afc08e364458e8e2a712d51b8e,
     type: 3}
   Blob: {fileID: 5860757720808198434, guid: 9d7cad3ca956a4a4983bb1907fb23121, type: 3}
-  NewBlob: {fileID: 8292909978408562881, guid: 82f4da5157fd42443b6ce3e65098c18c, type: 3}
+  NewBlob: {fileID: 485944421924740932, guid: 7be4a1cbef7bcc24c8bdb084012c56c7, type: 3}
+  DebugBlob: {fileID: 3922997895298855930, guid: fc1115851001adb499d6e1e4ab2a0167,
+    type: 3}
+  DebugNewBlob: {fileID: 8292909978408562881, guid: 82f4da5157fd42443b6ce3e65098c18c,
+    type: 3}

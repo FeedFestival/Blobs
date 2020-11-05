@@ -25,7 +25,7 @@ public class DificultyService : MonoBehaviour
             zeros += "0";
         }
         DificultySeed = System.Convert.ToInt32("1" + zeros);
-        if (_levelRandomRanked.DebugController.DebugDificulty)
+        if (_levelRandomRanked.debugLvl._dificulty)
         {
             Debug.Log("DificultySeed: " + DificultySeed);
         }
@@ -119,7 +119,7 @@ public class DificultyService : MonoBehaviour
 
             HitsToReset = (int)Mathf.Ceil(percent.Find(perc, _of: MaxHits));
             HitsToReset = HitsToReset + (int)Mathf.Ceil(percent.Find(colorPerc, Dificulty));
-            if (Hits == HitsToReset)
+            if (Hits >= HitsToReset)
             {
                 Hits = 0;
                 _levelRandomRanked.AddAnotherBlobLevel();

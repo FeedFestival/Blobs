@@ -34,9 +34,11 @@ public class HiddenSettings : MonoBehaviour
     public float WallStickLimit = 4.44f;
     public float NeighborTestDistance = 0.55f;
     public float NeighborProximity = 0.6f;
+    public int MinNeighborCountToDestroy = 2;
 
     [Header("ANIMATIONS")]
     public float BlobKillAnimationLength = 0.3f;
+    public float BlobExplodeAnimationLength = 0.3f;
 
     [Header("Colors")]
     public GameObject PrefabBankPrefab;

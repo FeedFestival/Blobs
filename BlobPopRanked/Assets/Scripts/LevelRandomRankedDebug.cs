@@ -10,16 +10,19 @@ public class LevelRandomRankedDebug : MonoBehaviour
     public LevelDebugState LevelDebugState;
     public Text TextHelper;
     [Header("Debug Console")]
-    public bool DebugDificulty;
-    public bool DebugStickingTo;
-    public bool DebugRemoveSticky;
-    public bool DebugProximity;
-    public bool DebugGameOver;
+    public bool _dificulty;
+    public bool _shooting;
+    public bool _stickingProcess;
+    public bool _proximity;
+    public bool _destroyProcess;
+    public bool _gameOver;
     [Header("Debug Settings")]
-    public bool DebugBlobGeneration;
-    public bool DebugNewLevel;
-    public bool NeighborDebug;
-    public bool NoFiring;
+    public bool _blobGen;
+    public bool _newLevel;
+    public bool _neighborsProcess;
+    public bool _noFiring;
+    public bool _blobKilling;
+    public List<Blob> DeadBlobs = new List<Blob>();
     [HideInInspector]
     public bool WhenFinishedAddingDescend;
 
@@ -40,7 +43,7 @@ public class LevelRandomRankedDebug : MonoBehaviour
             if (LevelDebugState == LevelDebugState.DebugSelecting)
             {
                 ChangeDebugState(LevelDebugState.CreatingBlobsIncremental);
-                if (DebugBlobGeneration == false)
+                if (_blobGen == false)
                 {
                     return;
                 }
@@ -48,7 +51,7 @@ public class LevelRandomRankedDebug : MonoBehaviour
             }
             else if (LevelDebugState == LevelDebugState.CreatingBlobsIncremental)
             {
-                if (DebugBlobGeneration == false)
+                if (_blobGen == false)
                 {
                     return;
                 }
@@ -60,7 +63,7 @@ public class LevelRandomRankedDebug : MonoBehaviour
         {
             if (LevelDebugState == LevelDebugState.CreatingBlobsIncremental)
             {
-                if (DebugNewLevel == false)
+                if (_newLevel == false)
                 {
                     return;
                 }
@@ -68,7 +71,7 @@ public class LevelRandomRankedDebug : MonoBehaviour
             }
             else if (LevelDebugState == LevelDebugState.AddNewRow)
             {
-                if (DebugNewLevel == false)
+                if (_newLevel == false)
                 {
                     return;
                 }
@@ -81,7 +84,7 @@ public class LevelRandomRankedDebug : MonoBehaviour
 
     public void ChangeDebugState(LevelDebugState levelDebugState)
     {
-        if (DebugBlobGeneration || DebugNewLevel)
+        if (_blobGen || _newLevel)
         {
             LevelDebugState = levelDebugState;
             switch (LevelDebugState)
@@ -93,8 +96,8 @@ public class LevelRandomRankedDebug : MonoBehaviour
                     break;
                 case LevelDebugState.CreatingBlobsIncremental:
                     TextHelper.text = "State [ " + LevelDebugState.CreatingBlobsIncremental.ToString() + " ]" +
-                    (DebugBlobGeneration ? "\n - Press A to add blob" : "") +
-                    (DebugNewLevel ? "\n - Press W to switch to Add New Row [State]" : "") +
+                    (_blobGen ? "\n - Press A to add blob" : "") +
+                    (_newLevel ? "\n - Press W to switch to Add New Row [State]" : "") +
                     "\n - Press C to Cancel";
                     break;
                 case LevelDebugState.AddNewRow:

@@ -45,6 +45,10 @@ public class Player : MonoBehaviour
         Game._.Player.Target.position = point;
         FirstBounceBlob.Shoot();
         BlobInMotion = true;
+        if (Game._.Level<LevelRandomRanked>().debugLvl._shooting)
+        {
+            Debug.Log("SHOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOT \n __________________________________________");
+        }
     }
 
     public void BlobHitSticky(float blobY, Blob blob, Blob otherBlob = null)
@@ -60,13 +64,11 @@ public class Player : MonoBehaviour
 
         blob.SetPosition(blob.transform.position, createdInRow: false);
 
-        if (otherBlob == null)
-        {
-            blob.StickedTo.Add(HiddenSettings._.CeilId);
-        }
         blob.CheckSurroundings(otherBlob);
 
         Game._.Level<LevelRandomRanked>().Blobs.Add(blob);
+        // ! important to try to destroy AFTER adding
+        Game._.Level<LevelRandomRanked>().TryDestroyNeighbors(blob);
 
         FirstBounceBlob = null;
         MakeBlob();
@@ -85,7 +87,7 @@ public class Player : MonoBehaviour
 
     private bool IsGameOver(float blobY)
     {
-        if (Game._.Level<LevelRandomRanked>().DebugController.DebugGameOver)
+        if (Game._.Level<LevelRandomRanked>().debugLvl._gameOver)
         {
             Debug.Log(blobY);
         }

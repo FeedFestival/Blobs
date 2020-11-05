@@ -7,12 +7,11 @@ using Assets.Scripts.utils;
 
 public class LevelRandomRanked : MonoBehaviour, ILevel
 {
-    public LevelRandomRankedDebug DebugController;
+    public LevelRandomRankedDebug debugLvl;
     public int BlobsPerRow;
     public Vector2 StartPos;
     public float Spacing;
     public List<Blob> Blobs;
-    public List<Blob> DeadBlobs = new List<Blob>();
     private float distance = 4.5f;
     public int _increment = -1;
     public bool FirstLevel = true;
@@ -38,7 +37,7 @@ public class LevelRandomRanked : MonoBehaviour, ILevel
 
         Game._.Player.MakeBlob(firstLevel: FirstLevel);
 
-        if (DebugController.DebugBlobGeneration == false)
+        if (debugLvl._blobGen == false)
         {
             GenerateBlobLevel();
         }
@@ -54,9 +53,12 @@ public class LevelRandomRanked : MonoBehaviour, ILevel
         {
             blob.Descend();
         }
-        foreach (Blob blob in DeadBlobs)
+        if (debugLvl._blobKilling)
         {
-            blob.Descend();
+            foreach (Blob blob in debugLvl.DeadBlobs)
+            {
+                blob.Descend();
+            }
         }
     }
 
@@ -65,9 +67,9 @@ public class LevelRandomRanked : MonoBehaviour, ILevel
         DificultyService.CalculateDificulty();
         DificultyService.CalculateDificultySeed();
 
-        if (DebugController.DebugBlobGeneration)
+        if (debugLvl._blobGen)
         {
-            DebugController.WhenFinishedAddingDescend = true;
+            debugLvl.WhenFinishedAddingDescend = true;
         }
         else
         {
@@ -80,7 +82,7 @@ public class LevelRandomRanked : MonoBehaviour, ILevel
         DificultyService.CalculateDificulty();
         DificultyService.CalculateDificultySeed();
 
-        if (DebugController.DebugBlobGeneration == false)
+        if (debugLvl._blobGen == false)
         {
             for (var i = 0; i < BlobsPerRow; i++)
             {
@@ -114,7 +116,7 @@ public class LevelRandomRanked : MonoBehaviour, ILevel
         bool reachedMax = (length - 2) < _increment;
         if (reachedMax)
         {
-            DebugController.ChangeDebugState(LevelDebugState.AddNewRow);
+            debugLvl.ChangeDebugState(LevelDebugState.AddNewRow);
             return;
         }
         else
@@ -126,9 +128,9 @@ public class LevelRandomRanked : MonoBehaviour, ILevel
 
     public void ResetIncrement_Debug()
     {
-        if (DebugController.WhenFinishedAddingDescend)
+        if (debugLvl.WhenFinishedAddingDescend)
         {
-            DebugController.WhenFinishedAddingDescend = false;
+            debugLvl.WhenFinishedAddingDescend = false;
             OnFinishedMakingBlobLevel();
         }
         else
@@ -153,7 +155,9 @@ public class LevelRandomRanked : MonoBehaviour, ILevel
         {
             i = _increment;
         }
-        GameObject go = HiddenSettings._.GetAnInstantiated(PrefabBank._.Blob);
+        GameObject go = HiddenSettings._.GetAnInstantiated(
+            debugLvl._neighborsProcess ? PrefabBank._.DebugBlob : PrefabBank._.Blob
+        );
         Vector3 pos;
         if (i == 0)
         {
@@ -179,9 +183,9 @@ public class LevelRandomRanked : MonoBehaviour, ILevel
         return Blobs[Blobs.FindIndex(b => b.Id == bId)];
     }
 
-    public void TryDestroyNeighbors(bool hasAnyNeighbors, bool canDestroyNeighbors, Blob blob)
+    public void TryDestroyNeighbors(Blob blob)
     {
-        if (hasAnyNeighbors && canDestroyNeighbors)
+        if (blob.HasAnyNeighbors && blob.CanDestroyNeighbors)
         {
             _tryDestroyNeighbors = DestroyNeighbors(blob);
             StartCoroutine(_tryDestroyNeighbors);
@@ -223,16 +227,18 @@ public class LevelRandomRanked : MonoBehaviour, ILevel
     public void DestroyBlobs(bool affectedCheck = false)
     {
         _toDestroy.Reverse();
-        List<Blob> blobsRef = Blobs;
         foreach (int bId in _toDestroy)
         {
-            int index = blobsRef.FindIndex(b => b.Id == bId);
-            blobsRef[index].Kill();
-            DeadBlobs.Add(blobsRef[index]);
+            int index = Blobs.FindIndex(b => b.Id == bId);
+            Blobs[index].Kill();
+            if (debugLvl._blobKilling)
+            {
+                debugLvl.DeadBlobs.Add(Blobs[index]);
+            }
             Blobs.RemoveAt(index);
         }
 
-        utils.DebugList(_toDestroy, "_toDestroy");
+        Debug.Log(utils.DebugList(_toDestroy, "_toDestroy"));
 
         if (affectedCheck)
         {
@@ -252,14 +258,20 @@ public class LevelRandomRanked : MonoBehaviour, ILevel
         }
         if (Affected == null || Affected.Count == 0)
         {
-            Debug.Log("Affected not found.");
+            if (debugLvl._destroyProcess)
+            {
+                Debug.Log("Affected not found.");
+            }
             return;
         }
 
         _toDestroy = new List<int>();
         _verified = new List<int>();
 
-        utils.DebugList(Affected, "Affected");
+        if (debugLvl._destroyProcess)
+        {
+            Debug.Log(utils.DebugList(Affected, "Affected"));
+        }
 
         foreach (int id in Affected)
         {
@@ -267,12 +279,18 @@ public class LevelRandomRanked : MonoBehaviour, ILevel
             var blob = Blobs[index];
             if (blob.StickedTo.Count == 0)
             {
-                Debug.Log("blob" + blob.Id + " is isolated so it get's destroyed.");
+                if (debugLvl._destroyProcess)
+                {
+                    Debug.Log("blob" + blob.Id + " is isolated so it get's destroyed.");
+                }
                 _toDestroy.Add(blob.Id);
             }
             else
             {
-                Debug.Log("blob" + blob.Id + " - checking To See If is touching ceil");
+                if (debugLvl._destroyProcess)
+                {
+                    Debug.Log("blob" + blob.Id + " - checking To See If is touching ceil");
+                }
                 _checked = new List<int>();
                 if (isTouchingCeil(blob) == false)
                 {
@@ -288,46 +306,67 @@ public class LevelRandomRanked : MonoBehaviour, ILevel
     private bool isTouchingCeil(Blob blob)
     {
         utils.AddIfNone(blob.Id, ref _checked,
-            debugAdd: "------------- blob" + blob.Id + " added to " + utils.DebugList(_checked, "_checked"));
+            debugAdd: debugLvl._destroyProcess ? "------------- blob" + blob.Id + " added to " + utils.DebugList(_checked, "_checked") : null);
         if (blob.StickedTo.Contains(HiddenSettings._.CeilId))
         {
-            Debug.Log("------------- blob" + blob.Id + " touches ceiling.");
+            if (debugLvl._destroyProcess)
+            {
+                Debug.Log("------------- blob" + blob.Id + " touches ceiling.");
+            }
             utils.AddIfNone(blob.Id, ref _verified,
-                debugAdd: "------------- blob" + blob.Id + " added to _verified.");
+                debugAdd: debugLvl._destroyProcess ? "------------- blob" + blob.Id + " added to _verified." : null);
             return true;
         }
-        Debug.Log("------------- " + utils.DebugList(blob.StickedTo, "blob" + blob.Id + ".StickedTo"));
+        if (debugLvl._destroyProcess)
+        {
+            Debug.Log("------------- " + utils.DebugList(blob.StickedTo, "blob" + blob.Id + ".StickedTo"));
+        }
         foreach (var blobId in blob.StickedTo)
         {
             if (_checked.Contains(blobId))
             {
-                Debug.Log("------------- " + utils.DebugList(_checked, "_checked") +
-                    " contains blob" + blobId + " so we are not checking him.");
+                if (debugLvl._destroyProcess)
+                {
+                    Debug.Log("------------- " + utils.DebugList(_checked, "_checked") +
+                        " contains blob" + blobId + " so we are not checking him.");
+                }
                 continue;
             }
             if (_verified.Contains(blobId))
             {
-                Debug.Log("------------- _verified contains blob" + blobId + " so it's touching Ceil.");
+                if (debugLvl._destroyProcess)
+                {
+                    Debug.Log("------------- _verified contains blob" + blobId + " so it's touching Ceil.");
+                }
                 return true;
             }
             var stickedBlob = GetBlobById(blobId);
-            Debug.Log("------------- blob" + stickedBlob.Id + " - checking To See If is touching ceil");
+            if (debugLvl._destroyProcess)
+            {
+                Debug.Log("------------- blob" + stickedBlob.Id + " - checking To See If is touching ceil");
+            }
             bool isTouching = isTouchingCeil(stickedBlob);
             if (isTouching)
             {
-                Debug.Log("------------- one of it's sticking blobs(" + stickedBlob.Id + ") touches ceil");
+                if (debugLvl._destroyProcess)
+                {
+                    Debug.Log("------------- one of it's sticking blobs(" + stickedBlob.Id + ") touches ceil");
+                }
                 utils.AddIfNone(blob.Id, ref _verified,
-                    debugAdd: "------------- blob" + blob.Id + " added to _verified.");
+                    debugAdd: debugLvl._destroyProcess ? "------------- blob" + blob.Id + " added to _verified." : null);
                 return true;
             }
         }
-        Debug.Log("------------- blob" + blob.Id + " doesn't touch ceiling.");
+        if (debugLvl._destroyProcess)
+        {
+            Debug.Log("------------- blob" + blob.Id + " doesn't touch ceiling.");
+        }
         return false;
     }
 
     public void CastRayToWorld()
     {
-        if (DebugController.NoFiring)
+        if (debugLvl._noFiring)
         {
             return;
         }

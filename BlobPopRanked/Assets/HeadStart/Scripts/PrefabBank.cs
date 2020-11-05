@@ -12,6 +12,8 @@ public class PrefabBank : MonoBehaviour
     public GameObject TimerPrefab;
     public GameObject Blob;
     public GameObject NewBlob;
+    public GameObject DebugBlob;
+    public GameObject DebugNewBlob;
 
     void Awake()
     {

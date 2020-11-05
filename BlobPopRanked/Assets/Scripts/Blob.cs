@@ -21,6 +21,9 @@ public class Blob : MonoBehaviour
     public List<int> StickedTo;
     public float Radius;
     private float? _radius;
+    public bool HasAnyNeighbors;
+    public bool CanDestroyNeighbors;
+    private int? _descendTweenId;
 
     internal float GetRadius()
     {
@@ -35,7 +38,10 @@ public class Blob : MonoBehaviour
     internal void SetPosition(Vector3 pos, bool createdInRow = true)
     {
         Id = Game._.GetUniqueId();
-        IdText.text = Id.ToString();
+        if (Game._.Level<LevelRandomRanked>().debugLvl._neighborsProcess)
+        {
+            IdText.text = Id.ToString();
+        }
         gameObject.name = "_Blob " + Id;
 
         StickedTo = new List<int>();
@@ -60,7 +66,18 @@ public class Blob : MonoBehaviour
         {
             RemoveSticked(HiddenSettings._.CeilId);
         }
-        gameObject.transform.position = Pos;
+
+        if (_descendTweenId.HasValue)
+        {
+            LeanTween.cancel(_descendTweenId.Value);
+            _descendTweenId = null;
+        }
+        _descendTweenId = LeanTween.move(gameObject,
+            Pos,
+            HiddenSettings._.BlobExplodeAnimationLength
+            ).id;
+        LeanTween.descr(_descendTweenId.Value).setEase(LeanTweenType.linear);
+        LeanTween.descr(_descendTweenId.Value).setOnComplete(() => { _descendTweenId = null; });
     }
 
     private void RemoveSticked(int id)
@@ -101,7 +118,7 @@ public class Blob : MonoBehaviour
 
         if (Neighbors.Contains(id.Value))
         {
-            if (Game._.Level<LevelRandomRanked>().DebugController.NeighborDebug == true)
+            if (Game._.Level<LevelRandomRanked>().debugLvl._neighborsProcess == true)
             {
                 Debug.LogWarning("      - blob(" + Id + ") has " + id + " as neighbor.");
             }
@@ -117,7 +134,11 @@ public class Blob : MonoBehaviour
         }
 
         Neighbors.Add(id.Value);
-        ShowNeighbors_Debug();
+
+        if (Game._.Level<LevelRandomRanked>().debugLvl._neighborsProcess)
+        {
+            ShowNeighbors_Debug();
+        }
     }
 
     internal void Kill()
@@ -126,7 +147,7 @@ public class Blob : MonoBehaviour
         string debug = "";
         foreach (var stickedTo in StickedTo)
         {
-            if (Game._.Level<LevelRandomRanked>().DebugController.DebugRemoveSticky)
+            if (Game._.Level<LevelRandomRanked>().debugLvl._stickingProcess)
             {
                 debug += stickedTo + ", ";
             }
@@ -138,22 +159,29 @@ public class Blob : MonoBehaviour
                 utils.AddIfNone(blobsRef[index].Id, ref Game._.Level<LevelRandomRanked>().Affected);
             }
         }
-        if (Game._.Level<LevelRandomRanked>().DebugController.DebugRemoveSticky)
+        if (Game._.Level<LevelRandomRanked>().debugLvl._stickingProcess)
         {
             Debug.Log("StickedTo: " + debug);
         }
 
         GetComponent<CircleCollider2D>().enabled = false;
-        float transparency = 0.15f;
-        Color color = HiddenSettings._.GetColorByBlobColor(BlobColor);
-        color.a = transparency;
-        Sprite.color = color;
-        color = HiddenSettings._.White;
-        color.a = transparency;
-        IdText.color = color;
-        color = HiddenSettings._.White;
-        color.a = transparency;
-        NeighborText.color = color;
+        if (Game._.Level<LevelRandomRanked>().debugLvl._blobKilling)
+        {
+            float transparency = 0.15f;
+            Color color = HiddenSettings._.GetColorByBlobColor(BlobColor);
+            color.a = transparency;
+            Sprite.color = color;
+            color = HiddenSettings._.White;
+            color.a = transparency;
+            IdText.color = color;
+            color = HiddenSettings._.White;
+            color.a = transparency;
+            NeighborText.color = color;
+        }
+        else
+        {
+            gameObject.SetActive(false);
+        }
     }
 
     internal void CalculateNeighbors(List<Blob> allBlobs)
@@ -181,7 +209,7 @@ public class Blob : MonoBehaviour
 
         if (areClose)
         {
-            if (Game._.Level<LevelRandomRanked>().DebugController.DebugStickingTo)
+            if (Game._.Level<LevelRandomRanked>().debugLvl._stickingProcess)
             {
                 Debug.Log("blob" + Id + " sticked to otherBlob" + otherBlob.Id);
             }
@@ -189,7 +217,7 @@ public class Blob : MonoBehaviour
             otherBlob.StickTo(this);
         }
 
-        if (Game._.Level<LevelRandomRanked>().DebugController.NeighborDebug == true)
+        if (Game._.Level<LevelRandomRanked>().debugLvl._neighborsProcess)
         {
             var pre = "NO ... distance: " + distance;
             if (areClose)
@@ -226,11 +254,16 @@ public class Blob : MonoBehaviour
 
     public void CheckSurroundings(Blob otherBlob = null)
     {
-        bool hasAnyNeighbors = otherBlob == null ? false
+        HasAnyNeighbors = otherBlob == null ? false
             : IfNeighborAdd(otherBlob: otherBlob);
-        bool canDestroyNeighbors = otherBlob == null ? false
-            : otherBlob.Neighbors.Count > 1;
+        CanDestroyNeighbors = otherBlob == null ? false
+            : MeetsRequirementsToDestroy(otherBlob);
+        // otherBlob.Neighbors.Count >= HiddenSettings._.MinNeighborCountToDestroy;
         bool canDestroy;
+        if (otherBlob == null)
+        {
+            StickedTo.Add(HiddenSettings._.CeilId);
+        }
 
         List<Blob> blobsRef = Game._.Level<LevelRandomRanked>().Blobs;
         foreach (var proximityBlob in blobsRef)
@@ -243,7 +276,7 @@ public class Blob : MonoBehaviour
             var inProximity = BlobService.AreClose(transform, proximityBlob.transform, ref distance, proximity: true);
             if (inProximity)
             {
-                if (Game._.Level<LevelRandomRanked>().DebugController.DebugProximity)
+                if (Game._.Level<LevelRandomRanked>().debugLvl._proximity)
                 {
                     Debug.Log("blob" + Id + " and proximityBlob" + proximityBlob.Id +
                     " distance: " + distance +
@@ -252,28 +285,39 @@ public class Blob : MonoBehaviour
                 }
 
                 bool areNeighbors = IfNeighborAdd(otherBlob: proximityBlob);
-                if (Game._.Level<LevelRandomRanked>().DebugController.DebugProximity && areNeighbors)
+                if (Game._.Level<LevelRandomRanked>().debugLvl._proximity && areNeighbors)
                 {
                     Debug.Log("From Proximity found blob" + proximityBlob.Id + " as neighbor");
                 }
-                if (areNeighbors && hasAnyNeighbors == false)
+                if (areNeighbors && HasAnyNeighbors == false)
                 {
-                    hasAnyNeighbors = true;
+                    HasAnyNeighbors = true;
                 }
-                canDestroy = proximityBlob.Neighbors.Count > 1;
-                if (canDestroy && canDestroyNeighbors == false)
+                // canDestroy = proximityBlob.Neighbors.Count >= HiddenSettings._.MinNeighborCountToDestroy;
+                canDestroy = MeetsRequirementsToDestroy(proximityBlob);
+                if (canDestroy && CanDestroyNeighbors == false)
                 {
-                    canDestroyNeighbors = true;
+                    CanDestroyNeighbors = true;
                 }
             }
         }
 
-        canDestroy = Neighbors.Count > 1;
-        if (canDestroy && canDestroyNeighbors == false)
+        canDestroy = Neighbors.Count >= HiddenSettings._.MinNeighborCountToDestroy;
+        if (canDestroy && CanDestroyNeighbors == false)
         {
-            canDestroyNeighbors = true;
+            CanDestroyNeighbors = true;
         }
+    }
 
-        Game._.Level<LevelRandomRanked>().TryDestroyNeighbors(hasAnyNeighbors, canDestroyNeighbors, this);
+    private bool MeetsRequirementsToDestroy(Blob blobB, Blob blobA = null)
+    {
+        if (blobA == null)
+        {
+            blobA = this;
+        }
+        bool canDestroy = false;
+        // Debug.Log("canDestroy: " + canDestroy + ", blob" + blobB.Id + ".Neighbors: " + blobB.Neighbors.Count);
+        canDestroy = blobA.BlobColor == blobB.BlobColor && blobB.Neighbors.Count >= HiddenSettings._.MinNeighborCountToDestroy;
+        return canDestroy;
     }
 }
