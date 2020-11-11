@@ -11,6 +11,7 @@ public class LevelRandomRankedDebug : MonoBehaviour
     public Text TextHelper;
     [Header("Debug Console")]
     public bool _dificulty;
+    public bool _colorDistribution;
     public bool _shooting;
     public bool _stickingProcess;
     public bool _proximity;

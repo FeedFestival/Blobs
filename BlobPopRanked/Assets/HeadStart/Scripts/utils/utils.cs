@@ -75,7 +75,17 @@ namespace Assets.Scripts.utils
             {
                 debug += bId + ",";
             }
-            return name + " (" + debug + ")[" + array.Count + "]";
+            return name + " [" + debug + "](" + array.Count + ")";
+        }
+
+        public static string DebugList<T>(List<T> array, string name)
+        {
+            string debug = string.Empty;
+            foreach (T bId in array)
+            {
+                debug += bId.ToString() + " ; ";
+            }
+            return name + " [" + debug + "](" + array.Count + ")";
         }
 
         public static string DebugQueue<T>(Queue<T> array, string name)

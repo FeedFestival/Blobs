@@ -67,6 +67,8 @@ public class Blob : MonoBehaviour
             RemoveSticked(HiddenSettings._.CeilId);
         }
 
+        Game._.Player.IsGameOver(Pos.y);
+
         if (_descendTweenId.HasValue)
         {
             LeanTween.cancel(_descendTweenId.Value);

@@ -1,6 +1,7 @@
 ﻿using System.Linq;
 using UnityEngine;
 using Assets.Scripts.utils;
+using System.Collections.Generic;
 
 public class DificultyService : MonoBehaviour
 {
@@ -11,10 +12,15 @@ public class DificultyService : MonoBehaviour
     public int HitsToReset;
     public int Hits;
     private LevelRandomRanked _levelRandomRanked;
+    public List<int> Colors;
 
     public void Init(LevelRandomRanked levelRandomRanked)
     {
         _levelRandomRanked = levelRandomRanked;
+
+        Colors = new List<int>();
+        Colors.Add(0);
+        Colors.Add(0);
     }
 
     public void CalculateDificultySeed()
@@ -55,43 +61,174 @@ public class DificultyService : MonoBehaviour
 
     public BlobColor GetColorByDificulty()
     {
-        var randomNumber = UnityEngine.Random.Range(0, DificultySeed);
-        int colorInt = 0;
-        if (Dificulty == 2)
+        if (Colors.Count < Dificulty)
         {
-            colorInt = (randomNumber > (DificultySeed / 2)) ? 2 : 1;
+            Colors.Add(0);
+        }
+
+        if (_levelRandomRanked.debugLvl._colorDistribution)
+        {
+            Debug.Log("GetColorByDificulty() ------------------- " + utils.DebugList(Colors, "Colors"));
+        }
+
+        int colorInt;
+        int splitPercentage;
+        List<int> percentages;
+        List<int> percentageDistribution;
+
+        if (Colors.Any(c => c == 0))
+        {
+            int countOfZeros = Colors.Count(c => c == 0);
+            splitPercentage = 100 / Colors.Count;
+
+            if (_levelRandomRanked.debugLvl._colorDistribution)
+            {
+                Debug.Log("countOfZeros: " + countOfZeros);
+                Debug.Log("splitPercentage: " + splitPercentage);
+            }
+
+            if (countOfZeros == Colors.Count)
+            {
+                percentages = GetWithZeroPercentages(splitPercentage, splitPercentage);
+                percentageDistribution = SetupPercentages(percentages);
+
+                if (_levelRandomRanked.debugLvl._colorDistribution)
+                {
+                    Debug.Log(utils.DebugList<int>(percentages, "percentages"));
+                    Debug.Log(utils.DebugList<int>(percentageDistribution, "percentageDistribution"));
+                }
+
+                colorInt = ExtractRandomColor(percentageDistribution);
+                return ReturnBlobColor(colorInt);
+            }
+
+            int countOfNumbers = Colors.Count - countOfZeros;
+            int numbersPercentage = splitPercentage / Colors.Count;
+            int remainingPercentage = 100 - (numbersPercentage * countOfNumbers);
+            int zerosPercentage = remainingPercentage / countOfZeros;
+
+            if (_levelRandomRanked.debugLvl._colorDistribution)
+            {
+                Debug.Log("countOfNumbers: " + countOfNumbers);
+                Debug.Log("numbersPercentage: " + numbersPercentage);
+                Debug.Log("remainingPercentage: " + remainingPercentage);
+                Debug.Log("zerosPercentage: " + zerosPercentage);
+            }
+
+            percentages = GetWithZeroPercentages(zerosPercentage, numbersPercentage);
+            percentageDistribution = SetupPercentages(percentages);
+
+            colorInt = ExtractRandomColor(percentageDistribution);
             return ReturnBlobColor(colorInt);
+        }
+
+        int maxValue = Colors.Max();
+
+        List<float> coeficientColors = new List<float>();
+        for (var i = 0; i < Colors.Count; i++)
+        {
+            coeficientColors.Add((float)maxValue / (float)Colors[i]);
+        }
+        float coeficientSum = coeficientColors.Sum();
+        float commonD = 100 / coeficientSum;
+
+        if (_levelRandomRanked.debugLvl._colorDistribution)
+        {
+            Debug.Log("maxValue: " + maxValue);
+            Debug.Log(utils.DebugList<float>(coeficientColors, "coeficientColors"));
+            Debug.Log("coeficientSum: " + coeficientSum);
+            Debug.Log("commonD: " + commonD);
+        }
+
+        percentages = new List<int>();
+        for (var i = 0; i < Colors.Count; i++)
+        {
+            percentages.Add((int)Mathf.Floor(coeficientColors[i] * commonD));
+        }
+
+        int remaineder = 100 - percentages.Sum();
+        percentages[percentages.Count - 1] += remaineder;
+        percentageDistribution = SetupPercentages(percentages);
+
+        if (_levelRandomRanked.debugLvl._colorDistribution)
+        {
+            Debug.Log("remaineder: " + remaineder);
+            Debug.Log(utils.DebugList<int>(percentages, "percentages"));
+            Debug.Log(utils.DebugList<int>(percentageDistribution, "percentageDistribution"));
+        }
+
+        colorInt = ExtractRandomColor(percentageDistribution);
+        return ReturnBlobColor(colorInt);
+    }
+
+    private List<int> GetWithZeroPercentages(int zerosPercentage, int numbersPercentage)
+    {
+        List<int> percentages = new List<int>();
+        for (int i = 0; i < Colors.Count; i++)
+        {
+            if (Colors[i] == 0)
+            {
+                percentages.Add(zerosPercentage);
+            }
+            else
+            {
+                percentages.Add(numbersPercentage);
+            }
+        }
+        return percentages;
+    }
+
+    private List<int> SetupPercentages(List<int> percentages)
+    {
+        for (int i = 1; i < percentages.Count; i++)
+        {
+            percentages[i] = percentages[i - 1] + percentages[i];
+        }
+        return percentages;
+    }
+
+    private int ExtractRandomColor(List<int> percentages)
+    {
+        int randomNumber = UnityEngine.Random.Range(0, 100);
+        int index = percentages.FindIndex(p => randomNumber < p);
+
+        if (_levelRandomRanked.debugLvl._colorDistribution)
+        {
+            Debug.Log("randomNumber: " + randomNumber + ", indexIn_colors: " + index);
+        }
+        ChangeColorNumbers(index);
+        return index;
+    }
+
+    public void ChangeColorNumbers(int index, bool add = true)
+    {
+        if (add)
+        {
+            Colors[index]++;
         }
         else
         {
-            var div = DificultySeed / Dificulty;
-            var parts = new int[Dificulty + 1];
-            for (var i = 1; i <= Dificulty; i++)
-            {
-                parts[i] = i * div;
-                if (randomNumber < parts[i])
-                {
-                    colorInt = i;
-                    break;
-                }
-            }
+            Colors[index]--;
         }
-        return ReturnBlobColor(colorInt);
+        if (_levelRandomRanked.debugLvl._colorDistribution)
+        {
+            Debug.Log(utils.DebugList<int>(Colors, "Colors"));
+        }
     }
 
     public BlobColor ReturnBlobColor(int colorInt)
     {
         switch (colorInt)
         {
-            case 2:
-                return BlobColor.AtlantisColor;
-            case 3:
-                return BlobColor.RoyalBlue;
-            case 4:
-                return BlobColor.Candlelight;
-            case 5:
-                return BlobColor.MediumPurple;
             case 1:
+                return BlobColor.AtlantisColor;
+            case 2:
+                return BlobColor.RoyalBlue;
+            case 3:
+                return BlobColor.Candlelight;
+            case 4:
+                return BlobColor.MediumPurple;
+            case 0:
             default:
                 return BlobColor.PomegranateColor;
         }
@@ -107,7 +244,9 @@ public class DificultyService : MonoBehaviour
 
         if (isAtLeastOnBlobConnectedToCeil)
         {
-            float maxYBlob = _levelRandomRanked.Blobs.Min(b => b.transform.position.y);
+            float maxYBlob = _levelRandomRanked.Blobs.Min(b => b.transform.position.y) + HiddenSettings._.GameOverOffsetY;
+            // Debug.Log("maxYBlob: " + maxYBlob);
+            Game._.Player.SmallestBlobY = maxYBlob;
             float min = -3f;
             maxYBlob = maxYBlob - min;
             float max = 4.44f;

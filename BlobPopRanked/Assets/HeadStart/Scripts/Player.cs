@@ -3,6 +3,8 @@ using System.Collections;
 using System.Collections.Generic;
 using Assets.Scripts;
 using UnityEngine;
+using UnityEngine.UI;
+using UnityEngine.EventSystems;
 
 public class Player : MonoBehaviour
 {
@@ -13,6 +15,8 @@ public class Player : MonoBehaviour
     public Vector2 SecondBlobPos;
     public bool BlobInMotion;
     public bool MakingBlob;
+    public bool IsInPointArea;
+    public float? SmallestBlobY;
 
     internal void MakeBlob(bool firstLevel = false)
     {
@@ -55,6 +59,7 @@ public class Player : MonoBehaviour
     {
         if (IsGameOver(blobY))
         {
+            UIController._.DialogController.ShowDialog(true, GameplayState.Failed);
             return;
         }
         if (MakingBlob) // ?
@@ -85,12 +90,37 @@ public class Player : MonoBehaviour
         return go;
     }
 
-    private bool IsGameOver(float blobY)
+    public bool IsGameOver(float blobY)
     {
+        float calculatedBlobY = blobY + HiddenSettings._.GameOverOffsetY;
+
+        if (SmallestBlobY.HasValue == false)
+        {
+            SmallestBlobY = 10;
+        }
+
+        if (calculatedBlobY >= SmallestBlobY)
+        {
+            return false;
+        }
+
+        SmallestBlobY = calculatedBlobY;
         if (Game._.Level<LevelRandomRanked>().debugLvl._gameOver)
         {
-            Debug.Log(blobY);
+            Debug.Log(SmallestBlobY.Value);
         }
-        return blobY < StartPos.y || blobY < -3.95f;
+        return blobY < StartPos.y || SmallestBlobY.Value < 0;
+    }
+
+    public void SetIsInPointArea(bool val)
+    {
+        IsInPointArea = val;
+    }
+
+    public void PointerUp(BaseEventData baseEventData)
+    {
+        PointerEventData pointerData = baseEventData as PointerEventData;
+        Vector3 p = Camera.main.ScreenToWorldPoint(new Vector3(pointerData.position.x, pointerData.position.y));
+        Game._.Level<LevelRandomRanked>().CastRayToWorld(new Vector3(p.x, p.y, 0));
     }
 }

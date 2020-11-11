@@ -35,6 +35,7 @@ public class HiddenSettings : MonoBehaviour
     public float NeighborTestDistance = 0.55f;
     public float NeighborProximity = 0.6f;
     public int MinNeighborCountToDestroy = 2;
+    public float GameOverOffsetY = 3.95f;
 
     [Header("ANIMATIONS")]
     public float BlobKillAnimationLength = 0.3f;

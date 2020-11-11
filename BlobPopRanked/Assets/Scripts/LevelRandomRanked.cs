@@ -24,6 +24,7 @@ public class LevelRandomRanked : MonoBehaviour, ILevel
     private List<int> _verified;
     private List<int> _checked;
     public DificultyService DificultyService;
+    public int Points;
 
     void Start()
     {
@@ -223,6 +224,23 @@ public class LevelRandomRanked : MonoBehaviour, ILevel
 
     public void DestroyBlobs(bool affectedCheck = false)
     {
+        if (_toDestroy == null || _toDestroy.Count == 0)
+        {
+            return;
+        }
+
+        foreach (int id in _toDestroy)
+        {
+            Blob oneBlobFromToDestroy = Blobs.Find(b => b.Id == id);
+            int colorIndex = (int)oneBlobFromToDestroy.BlobColor;
+            DificultyService.ChangeColorNumbers(colorIndex, false);
+        }
+
+        int points = CalculatePoints(_toDestroy.Count);
+        // Debug.Log("points: " + points + "");
+        Points += points;
+        UIController._.UiDataController.UpdateText(Points, UiDataType.Point);
+
         _toDestroy.Reverse();
         foreach (int bId in _toDestroy)
         {
@@ -244,6 +262,20 @@ public class LevelRandomRanked : MonoBehaviour, ILevel
         {
             CheckAffected();
         }
+    }
+
+    private int CalculatePoints(int count)
+    {
+        if (count <= 3)
+        {
+            return count;
+        }
+        int rest = 0;
+        if (count > 3)
+        {
+            rest = count - 3;
+        }
+        return (3 + (rest * 2));
     }
 
     public void CheckAffected()
@@ -364,16 +396,31 @@ public class LevelRandomRanked : MonoBehaviour, ILevel
         return false;
     }
 
-    public void CastRayToWorld()
+    public void CastRayToWorld(Vector3? point = null)
     {
         if (debugLvl._noFiring)
         {
             return;
         }
-        Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
-        Vector3 point = ray.origin + (ray.direction * distance);
-        Game._.Player.Target.position = point;
-        Game._.Player.Shoot(point);
+
+        if (point.HasValue)
+        {
+            //Debug.Log("point: " + point);
+            Game._.Player.Target.position = point.Value;
+            Game._.Player.Shoot(point.Value);
+        }
+        else
+        {
+            if (Game._.Player.IsInPointArea == false)
+            {
+                return;
+            }
+            Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
+            point = ray.origin + (ray.direction * distance);
+            //Debug.Log("point: " + point);
+            Game._.Player.Target.position = point.Value;
+            Game._.Player.Shoot(point.Value);
+        }
     }
 }
 
