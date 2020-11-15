@@ -1551,6 +1551,7 @@ MonoBehaviour:
   LevelDebugState: 0
   TextHelper: {fileID: 1547149046}
   _dificulty: 0
+  _colorDistribution: 0
   _shooting: 0
   _stickingProcess: 0
   _proximity: 0
@@ -1813,6 +1814,36 @@ PrefabInstance:
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: ab4ac96b18902cd4290bc37e629eb5aa, type: 3}
+--- !u!1 &852430988
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 852430989}
+  m_Layer: 0
+  m_Name: _BlobsParent
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &852430989
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 852430988}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_RootOrder: 8
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1001 &877841863
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -3439,6 +3470,7 @@ MonoBehaviour:
   Affected: 
   DificultyService: {fileID: 0}
   Points: 0
+  BlobsParentT: {fileID: 852430989}
 --- !u!114 &1814022079
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -3457,7 +3489,7 @@ MonoBehaviour:
   MaxHits: 4
   HitsToReset: 0
   Hits: 0
-  _colors: 
+  Colors: 
 --- !u!1 &1881322699
 GameObject:
   m_ObjectHideFlags: 0

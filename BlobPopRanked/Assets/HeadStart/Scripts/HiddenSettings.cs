@@ -30,16 +30,19 @@ public class HiddenSettings : MonoBehaviour
     public bool InstantDebug;
 
     [Header("Game Configuration")]
-    public int CeilId = 0;
-    public float WallStickLimit = 4.44f;
-    public float NeighborTestDistance = 0.55f;
-    public float NeighborProximity = 0.6f;
-    public int MinNeighborCountToDestroy = 2;
-    public float GameOverOffsetY = 3.95f;
+    public int CeilId;
+    public float WallStickLimit;
+    public float NeighborTestDistance;
+    public float NeighborProximity;
+    public int MinNeighborCountToDestroy;
+    public float GameOverOffsetY;
 
     [Header("ANIMATIONS")]
-    public float BlobKillAnimationLength = 0.3f;
-    public float BlobExplodeAnimationLength = 0.3f;
+    public float BlobKillAnimationLength;
+    public float BlobExplodeAnimationLength;
+    public float BlobForcePushAnimL;
+    public float BlobElasticBackAnimL;
+    public float BallStickyReflectDistanceModifier;
 
     [Header("Colors")]
     public GameObject PrefabBankPrefab;

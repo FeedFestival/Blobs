@@ -23,7 +23,10 @@ public class Blob : MonoBehaviour
     private float? _radius;
     public bool HasAnyNeighbors;
     public bool CanDestroyNeighbors;
-    private int? _descendTweenId;
+    private int? _forcePushTweenId;
+    private Vector2 _initialPos;
+    private int? _reflectTweenId;
+    private Vector2 _reflectToPos;
 
     internal float GetRadius()
     {
@@ -54,32 +57,26 @@ public class Blob : MonoBehaviour
             gameObject.tag = "Blob";
         }
 
-        Pos = pos;
+        SetWorldPosition(pos);
         gameObject.transform.position = Pos;
     }
 
     internal void Descend()
     {
         float spacing = Game._.Level<LevelRandomRanked>().Spacing;
-        Pos = new Vector3(Pos.x, Pos.y - spacing, Pos.z);
+        SetWorldPosition(new Vector3(Pos.x, Pos.y - spacing, Pos.z));
         if (Pos.y < HiddenSettings._.WallStickLimit)
         {
             RemoveSticked(HiddenSettings._.CeilId);
         }
 
         Game._.Player.IsGameOver(Pos.y);
+    }
 
-        if (_descendTweenId.HasValue)
-        {
-            LeanTween.cancel(_descendTweenId.Value);
-            _descendTweenId = null;
-        }
-        _descendTweenId = LeanTween.move(gameObject,
-            Pos,
-            HiddenSettings._.BlobExplodeAnimationLength
-            ).id;
-        LeanTween.descr(_descendTweenId.Value).setEase(LeanTweenType.linear);
-        LeanTween.descr(_descendTweenId.Value).setOnComplete(() => { _descendTweenId = null; });
+    private void SetWorldPosition(Vector3 pos)
+    {
+        Pos = pos;
+        // Debug.Log("blob" + Id + " Pos: " + Pos);
     }
 
     private void RemoveSticked(int id)
@@ -267,40 +264,30 @@ public class Blob : MonoBehaviour
             StickedTo.Add(HiddenSettings._.CeilId);
         }
 
-        List<Blob> blobsRef = Game._.Level<LevelRandomRanked>().Blobs;
-        foreach (var proximityBlob in blobsRef)
+        var proximityBlobs = FindBlobsInProximity();
+
+        AnimateShockwave(proximityBlobs);
+
+        foreach (var proximityBlob in proximityBlobs)
         {
             if (otherBlob != null && proximityBlob.Id == otherBlob.Id)
             {
                 continue;
             }
-            float distance = 0;
-            var inProximity = BlobService.AreClose(transform, proximityBlob.transform, ref distance, proximity: true);
-            if (inProximity)
+            bool areNeighbors = IfNeighborAdd(otherBlob: proximityBlob);
+            if (Game._.Level<LevelRandomRanked>().debugLvl._proximity && areNeighbors)
             {
-                if (Game._.Level<LevelRandomRanked>().debugLvl._proximity)
-                {
-                    Debug.Log("blob" + Id + " and proximityBlob" + proximityBlob.Id +
-                    " distance: " + distance +
-                    "(min: " + HiddenSettings._.NeighborProximity +
-                    ") inProximity: " + inProximity);
-                }
-
-                bool areNeighbors = IfNeighborAdd(otherBlob: proximityBlob);
-                if (Game._.Level<LevelRandomRanked>().debugLvl._proximity && areNeighbors)
-                {
-                    Debug.Log("From Proximity found blob" + proximityBlob.Id + " as neighbor");
-                }
-                if (areNeighbors && HasAnyNeighbors == false)
-                {
-                    HasAnyNeighbors = true;
-                }
-                // canDestroy = proximityBlob.Neighbors.Count >= HiddenSettings._.MinNeighborCountToDestroy;
-                canDestroy = MeetsRequirementsToDestroy(proximityBlob);
-                if (canDestroy && CanDestroyNeighbors == false)
-                {
-                    CanDestroyNeighbors = true;
-                }
+                Debug.Log("From Proximity found blob" + proximityBlob.Id + " as neighbor");
+            }
+            if (areNeighbors && HasAnyNeighbors == false)
+            {
+                HasAnyNeighbors = true;
+            }
+            // canDestroy = proximityBlob.Neighbors.Count >= HiddenSettings._.MinNeighborCountToDestroy;
+            canDestroy = MeetsRequirementsToDestroy(proximityBlob);
+            if (canDestroy && CanDestroyNeighbors == false)
+            {
+                CanDestroyNeighbors = true;
             }
         }
 
@@ -309,6 +296,104 @@ public class Blob : MonoBehaviour
         {
             CanDestroyNeighbors = true;
         }
+    }
+
+    private List<Blob> FindBlobsInProximity()
+    {
+        return Game._.Level<LevelRandomRanked>().Blobs
+            .Where(b =>
+            {
+                float distance = 0;
+                bool inProximity = BlobService.AreClose(transform, b.transform, ref distance, proximity: true);
+                if (Game._.Level<LevelRandomRanked>().debugLvl._proximity)
+                {
+                    Debug.Log("blob" + Id + " and proximityBlob" + b.Id + " distance: " + distance +
+                        "(min: " + HiddenSettings._.NeighborProximity + ") inProximity: " + inProximity);
+                }
+                return inProximity;
+            }).ToList();
+    }
+
+    public void AnimateElasticSettle(BlobHitStickyInfo blobHitStickyInfo)
+    {
+
+        if (_reflectTweenId.HasValue)
+        {
+            LeanTween.cancel(_reflectTweenId.Value);
+            _reflectTweenId = null;
+        }
+
+        Vector2 dirFromOtherBlobToThisOne = (transform.localPosition - blobHitStickyInfo.otherBlob.transform.localPosition).normalized;
+        Debug.Log("dirFromOtherBlobToThisOne: " + dirFromOtherBlobToThisOne);
+        Ray ray = new Ray(blobHitStickyInfo.otherBlob.transform.localPosition, dirFromOtherBlobToThisOne);
+        Vector2 pos = ray.GetPoint(0.5f);
+        _initialPos = pos;
+
+        _reflectToPos = (Vector2)transform.localPosition + ((Vector2)blobHitStickyInfo.ReflectDir.normalized * HiddenSettings._.BallStickyReflectDistanceModifier);
+        _reflectTweenId = LeanTween.moveLocal(gameObject,
+            _reflectToPos,
+            HiddenSettings._.BlobForcePushAnimL
+            ).id;
+        LeanTween.descr(_reflectTweenId.Value).setEase(LeanTweenType.easeOutExpo);
+        LeanTween.descr(_reflectTweenId.Value).setOnComplete(() =>
+        {
+            ElasticBack();
+        });
+    }
+
+    private void AnimateShockwave(List<Blob> proximityBlobs)
+    {
+        foreach (Blob proxiBlob in proximityBlobs)
+        {
+            float distance = Vector2.Distance(
+                        new Vector2(transform.position.x, transform.position.y),
+                        new Vector2(proxiBlob.transform.position.x, proxiBlob.transform.position.y)
+                    );
+            Vector2 dir = (proxiBlob.transform.position - transform.position).normalized;
+            var proxiBlobDir = (dir * ((1 - distance) + 0.1f)) * 0.2f;
+            proxiBlob.ForcePush(proxiBlobDir);
+        }
+    }
+
+    private void ForcePush(Vector2 proxiBlobDir)
+    {
+        if (_forcePushTweenId.HasValue)
+        {
+            LeanTween.cancel(_forcePushTweenId.Value);
+            _forcePushTweenId = null;
+        }
+        _initialPos = transform.localPosition;
+        _forcePushTweenId = LeanTween.moveLocal(gameObject,
+            _initialPos + proxiBlobDir,
+            HiddenSettings._.BlobForcePushAnimL
+            ).id;
+        LeanTween.descr(_forcePushTweenId.Value).setEase(LeanTweenType.easeOutExpo);
+        LeanTween.descr(_forcePushTweenId.Value).setOnComplete(() =>
+        {
+            ElasticBack();
+        });
+    }
+
+    private void ElasticBack()
+    {
+        if (_forcePushTweenId.HasValue)
+        {
+            LeanTween.cancel(_forcePushTweenId.Value);
+            _forcePushTweenId = null;
+        }
+        _forcePushTweenId = LeanTween.moveLocal(gameObject,
+            _initialPos,
+            HiddenSettings._.BlobElasticBackAnimL
+            ).id;
+
+        List<int> eases = new List<int>() {
+            (int)LeanTweenType.easeInOutBack,
+            (int)LeanTweenType.easeOutElastic,
+            (int)LeanTweenType.easeOutBounce
+        };
+        LeanTweenType ease = (LeanTweenType)percent.GetRandomFromList<int>(eases);
+
+        LeanTween.descr(_forcePushTweenId.Value).setEase(ease);
     }
 
     private bool MeetsRequirementsToDestroy(Blob blobB, Blob blobA = null)

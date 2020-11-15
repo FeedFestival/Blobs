@@ -25,6 +25,8 @@ public class LevelRandomRanked : MonoBehaviour, ILevel
     private List<int> _checked;
     public DificultyService DificultyService;
     public int Points;
+    public Transform BlobsParentT;
+    private int? _descendTweenId;
 
     void Start()
     {
@@ -50,6 +52,21 @@ public class LevelRandomRanked : MonoBehaviour, ILevel
         {
             return;
         }
+
+        var newPos = new Vector3(BlobsParentT.position.x, BlobsParentT.position.y - Spacing, BlobsParentT.position.z);
+        if (_descendTweenId.HasValue)
+        {
+            LeanTween.cancel(_descendTweenId.Value);
+            _descendTweenId = null;
+        }
+        _descendTweenId = LeanTween.move(BlobsParentT.gameObject,
+            newPos,
+            HiddenSettings._.BlobExplodeAnimationLength
+            ).id;
+        LeanTween.descr(_descendTweenId.Value).setEase(LeanTweenType.linear);
+        LeanTween.descr(_descendTweenId.Value).setOnComplete(() => { _descendTweenId = null; });
+        
+
         foreach (Blob blob in Blobs)
         {
             blob.Descend();
@@ -172,8 +189,9 @@ public class LevelRandomRanked : MonoBehaviour, ILevel
                 Blobs[Blobs.Count - 1].Pos.x + Spacing,
                 StartPos.y, 0);
         }
+        go.transform.SetParent(BlobsParentT);
         var blob = go.GetComponent<Blob>();
-        blob.SetPosition(pos);
+        blob.SetPosition(pos, true);
         blob.SetColor(DificultyService.GetColorByDificulty());
         blob.CalculateNeighbors(Blobs);
         Blobs.Add(blob);

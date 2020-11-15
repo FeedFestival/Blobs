@@ -12,19 +12,13 @@ namespace Assets.Scripts.utils
 {
     public static class utils
     {
-        public static readonly string _version = "1.0.2";
+        public static readonly string _version = "1.0.3";
         public static string ConvertNumberToK(int num)
         {
             if (num >= 1000)
                 return string.Concat(num / 1000, "k");
             else
                 return num.ToString();
-        }
-
-        public static int GetPennyToss()
-        {
-            var randomNumber = Random.Range(0, 100);
-            return (randomNumber > 50) ? 1 : 0;
         }
 
         public static void VarDump<T>(T obj)
@@ -121,6 +115,31 @@ namespace Assets.Scripts.utils
         public static float What(float _is, float _of)
         {
             return (_is * 100f) / _of;
+        }
+
+        public static int PennyToss(int _from = 0, int _to = 100)
+        {
+            var randomNumber = Random.Range(_from, _to);
+            return (randomNumber > 50) ? 1 : 0;
+        }
+
+        public static T GetRandomFromList<T>(List<T> list)
+        {
+            List<int> percentages = new List<int>();
+            int splitPercentages = Mathf.FloorToInt(100 / list.Count);
+            int remainder = 100 - (splitPercentages * list.Count);
+            for (int i = 0; i < list.Count; i++)
+            {
+                int percent = i == (list.Count - 1) ? splitPercentages + remainder : splitPercentages;
+                percentages.Add(percent);
+            }
+            for (int i = 1; i < percentages.Count; i++)
+            {
+                percentages[i] = percentages[i - 1] + percentages[i];
+            }
+            int randomNumber = UnityEngine.Random.Range(0, 100);
+            int index = percentages.FindIndex(p => randomNumber < p);
+            return list[index];
         }
     }
 }

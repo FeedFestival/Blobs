@@ -55,9 +55,9 @@ public class Player : MonoBehaviour
         }
     }
 
-    public void BlobHitSticky(float blobY, Blob blob, Blob otherBlob = null)
+    public void BlobHitSticky(BlobHitStickyInfo blobHitStickyInfo)
     {
-        if (IsGameOver(blobY))
+        if (IsGameOver(blobHitStickyInfo.blobY))
         {
             UIController._.DialogController.ShowDialog(true, GameplayState.Failed);
             return;
@@ -67,13 +67,17 @@ public class Player : MonoBehaviour
             return;
         }
 
-        blob.SetPosition(blob.transform.position, createdInRow: false);
+        blobHitStickyInfo.blob.transform.SetParent(Game._.Level<LevelRandomRanked>().BlobsParentT);
 
-        blob.CheckSurroundings(otherBlob);
+        blobHitStickyInfo.blob.AnimateElasticSettle(blobHitStickyInfo);
 
-        Game._.Level<LevelRandomRanked>().Blobs.Add(blob);
+        blobHitStickyInfo.blob.SetPosition(blobHitStickyInfo.blob.transform.position, createdInRow: false);
+
+        blobHitStickyInfo.blob.CheckSurroundings(blobHitStickyInfo.otherBlob);
+
+        Game._.Level<LevelRandomRanked>().Blobs.Add(blobHitStickyInfo.blob);
         // ! important to try to destroy AFTER adding
-        Game._.Level<LevelRandomRanked>().TryDestroyNeighbors(blob);
+        Game._.Level<LevelRandomRanked>().TryDestroyNeighbors(blobHitStickyInfo.blob);
 
         FirstBounceBlob = null;
         MakeBlob();

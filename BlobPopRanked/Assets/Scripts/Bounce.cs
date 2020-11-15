@@ -37,17 +37,15 @@ public class Bounce : MonoBehaviour
         if (col.transform.tag == "Blob" || col.transform.tag == "StickySurface")
         {
             _rb.velocity = Vector3.zero;
-            var blob = GetComponent<Blob>();
+            BlobHitStickyInfo blobHitStickyInfo = new BlobHitStickyInfo(transform.position.y, GetComponent<Blob>());
+            blobHitStickyInfo.ReflectDir = GetNormalizedDirection(col.contacts[0].normal);
 
             if (col.transform.tag == "Blob")
             {
-                var otherBlob = col.gameObject.GetComponent<Blob>();
-                Game._.Player.BlobHitSticky(transform.position.y, blob, otherBlob);
+                blobHitStickyInfo.otherBlob = col.gameObject.GetComponent<Blob>();
             }
-            else
-            {
-                Game._.Player.BlobHitSticky(transform.position.y, blob);
-            }
+
+            Game._.Player.BlobHitSticky(blobHitStickyInfo);
 
             Destroy(_rb);
             Destroy(this);
@@ -66,9 +64,14 @@ public class Bounce : MonoBehaviour
         _rb.AddForce(new Vector3(dir.x, dir.y, 0) * _desiredSpeed);
     }
 
+    private Vector3 GetNormalizedDirection(Vector3 collisionNormal)
+    {
+        return Vector3.Reflect(lastVelocity.normalized, collisionNormal).normalized;
+    }
+
     private void ReflectOffSurface(Vector3 collisionNormal)
     {
-        var direction = Vector3.Reflect(lastVelocity.normalized, collisionNormal).normalized;
+        var direction = GetNormalizedDirection(collisionNormal);
         _rb.velocity = direction * Mathf.Max(_desiredSpeed, 0f);
     }
 }
