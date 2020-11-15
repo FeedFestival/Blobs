@@ -132,9 +132,9 @@ public class Player : MonoBehaviour
 
         blobHitStickyInfo.blob.transform.SetParent(Game._.Level<LevelRandomRanked>().BlobsParentT);
 
-        blobHitStickyInfo.blob.AnimateElasticSettle(blobHitStickyInfo);
-
         blobHitStickyInfo.blob.SetPosition(blobHitStickyInfo.blob.transform.position, createdInRow: false);
+
+        blobHitStickyInfo.blob.AnimateElasticSettle(blobHitStickyInfo);
 
         blobHitStickyInfo.blob.CheckSurroundings(blobHitStickyInfo.otherBlob);
 
@@ -150,7 +150,9 @@ public class Player : MonoBehaviour
 
     private GameObject GetRandomBlob()
     {
-        var go = HiddenSettings._.GetAnInstantiated(PrefabBank._.NewBlob);
+        var go = HiddenSettings._.GetAnInstantiated(
+            Game._.Level<LevelRandomRanked>().debugLvl._neighborsProcess ? PrefabBank._.DebugNewBlob : PrefabBank._.NewBlob
+        );
         go.GetComponent<Blob>().SetColor(
             Game._.Level<LevelRandomRanked>().DificultyService.GetColorByDificulty()
         );

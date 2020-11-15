@@ -1555,6 +1555,7 @@ MonoBehaviour:
   _shooting: 0
   _stickingProcess: 0
   _proximity: 0
+  _destroyCheck: 0
   _destroyProcess: 0
   _gameOver: 0
   _blobGen: 0

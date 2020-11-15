@@ -15,6 +15,7 @@ public class LevelRandomRankedDebug : MonoBehaviour
     public bool _shooting;
     public bool _stickingProcess;
     public bool _proximity;
+    public bool _destroyCheck;
     public bool _destroyProcess;
     public bool _gameOver;
     [Header("Debug Settings")]
