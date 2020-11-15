@@ -324,7 +324,7 @@ public class Blob : MonoBehaviour
         }
 
         Vector2 dirFromOtherBlobToThisOne = (transform.localPosition - blobHitStickyInfo.otherBlob.transform.localPosition).normalized;
-        Debug.Log("dirFromOtherBlobToThisOne: " + dirFromOtherBlobToThisOne);
+        // Debug.Log("dirFromOtherBlobToThisOne: " + dirFromOtherBlobToThisOne);
         Ray ray = new Ray(blobHitStickyInfo.otherBlob.transform.localPosition, dirFromOtherBlobToThisOne);
         Vector2 pos = ray.GetPoint(0.5f);
         _initialPos = pos;

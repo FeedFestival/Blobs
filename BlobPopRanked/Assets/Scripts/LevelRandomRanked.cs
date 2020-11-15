@@ -12,7 +12,6 @@ public class LevelRandomRanked : MonoBehaviour, ILevel
     public Vector2 StartPos;
     public float Spacing;
     public List<Blob> Blobs;
-    private float distance = 4.5f;
     public int _increment = -1;
     public bool FirstLevel = true;
     public List<int> LevelIncreseThreshhold;
@@ -27,6 +26,8 @@ public class LevelRandomRanked : MonoBehaviour, ILevel
     public int Points;
     public Transform BlobsParentT;
     private int? _descendTweenId;
+    public Collider2D LeftWall;
+    public Collider2D RightWall;
 
     void Start()
     {
@@ -65,7 +66,7 @@ public class LevelRandomRanked : MonoBehaviour, ILevel
             ).id;
         LeanTween.descr(_descendTweenId.Value).setEase(LeanTweenType.linear);
         LeanTween.descr(_descendTweenId.Value).setOnComplete(() => { _descendTweenId = null; });
-        
+
 
         foreach (Blob blob in Blobs)
         {
@@ -414,32 +415,52 @@ public class LevelRandomRanked : MonoBehaviour, ILevel
         return false;
     }
 
-    public void CastRayToWorld(Vector3? point = null)
+    public bool CanFireBlob(Vector3? point = null)
     {
         if (debugLvl._noFiring)
         {
-            return;
+            return false;
         }
-
         if (point.HasValue)
         {
-            //Debug.Log("point: " + point);
             Game._.Player.Target.position = point.Value;
-            Game._.Player.Shoot(point.Value);
+            return true;
         }
-        else
-        {
-            if (Game._.Player.IsInPointArea == false)
-            {
-                return;
-            }
-            Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
-            point = ray.origin + (ray.direction * distance);
-            //Debug.Log("point: " + point);
-            Game._.Player.Target.position = point.Value;
-            Game._.Player.Shoot(point.Value);
-        }
+        return false;
     }
+
+    public void DisableWalls(DisableWallOp disableWallOp, bool disable = true)
+    {
+        switch (disableWallOp)
+        {
+            case DisableWallOp.LeftInverse:
+                LeftWall.enabled = !disable;
+                RightWall.enabled = !LeftWall.enabled;
+                break;
+            case DisableWallOp.RightInverse:
+                RightWall.enabled = !disable;
+                LeftWall.enabled = !RightWall.enabled;
+                break;
+            case DisableWallOp.JustLeft:
+                LeftWall.enabled = !disable;
+                break;
+            case DisableWallOp.JustRight:
+                RightWall.enabled = !disable;
+                break;
+            case DisableWallOp.Both:
+            default:
+                LeftWall.enabled = !disable;
+                RightWall.enabled = !disable;
+                break;
+        }
+        // Debug.Log(LeftWall.gameObject.name + " - " + LeftWall.enabled);
+        // Debug.Log(RightWall.gameObject.name + " - " + RightWall.enabled);
+    }
+}
+
+public enum DisableWallOp
+{
+    Both, LeftInverse, RightInverse, JustLeft, JustRight
 }
 
 public enum BlobColor

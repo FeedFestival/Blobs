@@ -142,4 +142,12 @@ namespace Assets.Scripts.utils
             return list[index];
         }
     }
+
+    public static class world2d
+    {
+        // private Vector2 GetNormalizedDirection( Vector2 collisionNormal)
+        // {
+        //     return Vector2.Reflect(lastVelocity.normalized, collisionNormal).normalized;
+        // }
+    }
 }
