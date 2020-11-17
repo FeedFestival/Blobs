@@ -72,14 +72,15 @@ namespace Assets.Scripts.utils
             return name + " [" + debug + "](" + array.Count + ")";
         }
 
-        public static string DebugList<T>(List<T> array, string name)
+        public static string DebugList<T>(List<T> array, string name = null)
         {
             string debug = string.Empty;
             foreach (T bId in array)
             {
                 debug += bId.ToString() + " ; ";
             }
-            return name + " [" + debug + "](" + array.Count + ")";
+            return string.IsNullOrEmpty(name) ? debug
+                : name + " [" + debug + "](" + array.Count + ")";
         }
 
         public static string DebugQueue<T>(Queue<T> array, string name)
@@ -90,6 +91,17 @@ namespace Assets.Scripts.utils
                 debug += JsonHelper.ToJson<T>(t);
             }
             return name + " (" + debug + ")[" + array.Count + "]";
+        }
+
+        public static string DebugDict<T>(Dictionary<T, T> array, string name = null)
+        {
+            string debug = string.Empty;
+            foreach (var bId in array)
+            {
+                debug += "[" + bId.Key.ToString() + "] " + bId.Value.ToString();
+            }
+            return string.IsNullOrEmpty(name) ? debug
+                : name + " [" + debug + "](" + array.Count + ")";
         }
 
         public static void AddIfNone(int value, ref List<int> array, string debugAdd = null)

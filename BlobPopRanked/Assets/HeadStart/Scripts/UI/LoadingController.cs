@@ -56,9 +56,9 @@ public class LoadingController : MonoBehaviour
         if (instant == false)
         {
             _onTransitionEnd = onTransitionEnd;
-            _overlay.color = show ? HiddenSettings._.CodGrayColor : HiddenSettings._.TransparentColor;
+            _overlay.color = show ? ColorBank._.Black_Cod_Gray : HiddenSettings._.TransparentColor;
             _fadeAnimationId = LeanTween.color(_overlay.gameObject.GetComponent<RectTransform>(),
-            show ? HiddenSettings._.TransparentColor : HiddenSettings._.CodGrayColor,
+            show ? HiddenSettings._.TransparentColor : ColorBank._.Black_Cod_Gray,
             _timeBetweenFadings).id;
             LeanTween.descr(_fadeAnimationId.Value).setEase(LeanTweenType.linear);
             if (_onTransitionEnd != null)
@@ -67,13 +67,13 @@ public class LoadingController : MonoBehaviour
             }
             return;
         }
-        _overlay.color = show ? HiddenSettings._.TransparentColor : HiddenSettings._.CodGrayColor;
+        _overlay.color = show ? HiddenSettings._.TransparentColor : ColorBank._.Black_Cod_Gray;
     }
 
     public void ShowLoading()
     {
         LoadingText.gameObject.SetActive(true);
-        var color = HiddenSettings._.PomegranateColor;
+        var color = ColorBank._.Red_Torch;
         color.a = 0;
         LoadingText.color = color;
 
@@ -150,7 +150,7 @@ public class LoadingController : MonoBehaviour
             leanTweenType = LeanTweenType.easeOutBack;
         }
 
-        var color = HiddenSettings._.PomegranateColor;
+        var color = ColorBank._.Red_Torch;
         color.a = from;
 
         LoadingText.color = color;

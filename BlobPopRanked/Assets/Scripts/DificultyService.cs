@@ -221,16 +221,16 @@ public class DificultyService : MonoBehaviour
         switch (colorInt)
         {
             case 1:
-                return BlobColor.AtlantisColor;
+                return BlobColor.BLUE;
             case 2:
-                return BlobColor.RoyalBlue;
+                return BlobColor.YELLOW;
             case 3:
-                return BlobColor.Candlelight;
+                return BlobColor.GREEN;
             case 4:
-                return BlobColor.MediumPurple;
+                return BlobColor.BROWN;
             case 0:
             default:
-                return BlobColor.PomegranateColor;
+                return BlobColor.RED;
         }
     }
 

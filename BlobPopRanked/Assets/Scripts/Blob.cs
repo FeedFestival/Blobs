@@ -28,6 +28,7 @@ public class Blob : MonoBehaviour
     private int? _reflectTweenId;
     private Vector2 _reflectToPos;
     List<int> _linkedNeighbors;
+    public List<StickingGlue> StickingGlues;
 
     internal float GetRadius()
     {
@@ -42,7 +43,7 @@ public class Blob : MonoBehaviour
     internal void SetPosition(Vector3 pos, bool createdInRow = true)
     {
         Id = Game._.GetUniqueId();
-        if (Game._.Level<LevelRandomRanked>().debugLvl._neighborsProcess)
+        if (Game._.Level<LevelRandomRanked>().debugLvl._debugBlobs)
         {
             if (IdText != null) IdText.text = Id.ToString();
         }
@@ -80,22 +81,12 @@ public class Blob : MonoBehaviour
         // Debug.Log("blob" + Id + " Pos: " + Pos);
     }
 
-    private void RemoveSticked(int id)
-    {
-        int index = StickedTo.FindIndex(s => s == id);
-        if (index >= 0)
-        {
-            // Debug.Log("blob" + Id + " posY: " + Pos.y + " removed CeilIndex: " + index);
-            StickedTo.RemoveAt(index);
-        }
-    }
-
     internal void SetColor(BlobColor blobColor, bool instant = true)
     {
         BlobColor = blobColor;
         if (instant)
         {
-            Sprite.color = HiddenSettings._.GetColorByBlobColor(BlobColor);
+            Sprite.color = Game._.Level<LevelRandomRanked>().GetColorByBlobColor(BlobColor);
         }
     }
 
@@ -118,7 +109,7 @@ public class Blob : MonoBehaviour
 
         if (Neighbors.Contains(id.Value))
         {
-            if (Game._.Level<LevelRandomRanked>().debugLvl._neighborsProcess == true)
+            if (Game._.Level<LevelRandomRanked>().debugLvl._neighborsProcess)
             {
                 Debug.LogWarning("      - blob(" + Id + ") has " + id + " as neighbor.");
             }
@@ -135,23 +126,19 @@ public class Blob : MonoBehaviour
 
         Neighbors.Add(id.Value);
 
-        if (Game._.Level<LevelRandomRanked>().debugLvl._neighborsProcess)
+        if (Game._.Level<LevelRandomRanked>().debugLvl._debugBlobs
+            && Game._.Level<LevelRandomRanked>().debugLvl._neighborsProcess)
         {
-            ShowNeighbors_Debug();
+            if (NeighborText != null) NeighborText.text = utils.DebugList<int>(Neighbors);
         }
     }
 
     internal void Kill()
     {
         List<Blob> blobsRef = Game._.Level<LevelRandomRanked>().Blobs;
-        string debug = "";
+
         foreach (var stickedTo in StickedTo)
         {
-            if (Game._.Level<LevelRandomRanked>().debugLvl._stickingProcess)
-            {
-                debug += stickedTo + ", ";
-            }
-
             int index = blobsRef.FindIndex(b => b.Id == stickedTo);
             if (index >= 0 && index < blobsRef.Count)
             {
@@ -161,14 +148,14 @@ public class Blob : MonoBehaviour
         }
         if (Game._.Level<LevelRandomRanked>().debugLvl._stickingProcess)
         {
-            Debug.Log("StickedTo: " + debug);
+            Debug.Log(utils.DebugList<int>(StickedTo, "StickedTo"));
         }
 
         GetComponent<CircleCollider2D>().enabled = false;
         if (Game._.Level<LevelRandomRanked>().debugLvl._blobKilling)
         {
             float transparency = 0.15f;
-            Color color = HiddenSettings._.GetColorByBlobColor(BlobColor);
+            Color color = Game._.Level<LevelRandomRanked>().GetColorByBlobColor(BlobColor);
             color.a = transparency;
             Sprite.color = color;
             color = HiddenSettings._.White;
@@ -209,12 +196,7 @@ public class Blob : MonoBehaviour
 
         if (areClose)
         {
-            if (Game._.Level<LevelRandomRanked>().debugLvl._stickingProcess)
-            {
-                Debug.Log("blob" + Id + " sticked to otherBlob" + otherBlob.Id);
-            }
             StickTo(otherBlob);
-            otherBlob.StickTo(this);
         }
 
         if (Game._.Level<LevelRandomRanked>().debugLvl._neighborsProcess)
@@ -233,23 +215,49 @@ public class Blob : MonoBehaviour
         return areClose && areSameColor;
     }
 
-    private void ShowNeighbors_Debug()
+    public void StickTo(Blob otherBlob, bool viceVersa = true)
     {
-        NeighborText.text = "";
-        foreach (var n in Neighbors)
+        if (viceVersa)
         {
-            NeighborText.text += n.ToString() + ", ";
-        }
-    }
+            if (Game._.Level<LevelRandomRanked>().debugLvl._stickingProcess)
+            {
+                Debug.Log("blob" + Id + " sticked to otherBlob" + otherBlob.Id);
+            }
 
-    public void StickTo(Blob otherBlob)
-    {
+            int index = StickingGlues.FindIndex(sG => sG.gameObject.activeSelf == false);
+            if (otherBlob.StickedTo.Contains(Id) == false)
+            {
+                StickingGlues[index].SetStickedTo(stickedTo: otherBlob, BlobColor);
+            }
+
+            otherBlob.StickTo(this, viceVersa: false);
+        }
+
         if (StickedTo.Contains(otherBlob.Id))
         {
             return;
         }
         StickedTo.Add(otherBlob.Id);
         StickedTo = StickedTo.OrderByDescending(s => s).ToList();
+    }
+
+    private void RemoveSticked(int id)
+    {
+        int index = StickedTo.FindIndex(s => s == id);
+        if (index >= 0)
+        {
+            if (Game._.Level<LevelRandomRanked>().debugLvl._stickingProcess)
+            {
+                Debug.Log("blob" + Id + " removed stickedBlob[" + id + "]");
+            }
+            StickedTo.RemoveAt(index);
+
+            index = StickingGlues.FindIndex(sG => sG.StickedTo == id);
+            if (index >= 0)
+            {
+                StickingGlues[index].Unstick();
+            }
+        }
     }
 
     public void CheckSurroundings(Blob otherBlob = null)
@@ -312,6 +320,7 @@ public class Blob : MonoBehaviour
             _reflectTweenId = null;
         }
 
+        // BUG Here when hittings sticky ceil
         Vector2 dirFromOtherBlobToThisOne = (transform.localPosition - blobHitStickyInfo.otherBlob.transform.localPosition).normalized;
         // Debug.Log("dirFromOtherBlobToThisOne: " + dirFromOtherBlobToThisOne);
         Ray ray = new Ray(blobHitStickyInfo.otherBlob.transform.localPosition, dirFromOtherBlobToThisOne);

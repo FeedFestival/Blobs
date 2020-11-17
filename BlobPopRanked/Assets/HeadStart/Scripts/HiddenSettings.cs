@@ -44,48 +44,9 @@ public class HiddenSettings : MonoBehaviour
     public float BlobElasticBackAnimL;
     public float BallStickyReflectDistanceModifier;
 
-    [Header("Colors")]
     public GameObject PrefabBankPrefab;
-    public Color MineShaftLightColor;
-    public Color MineShaft;
-    public Color CodGrayColor;
+
+    [Header("Colors")]
     public Color TransparentColor;
-    public Color OrangeColor;
-    public Color PomegranateColor;  // RED
-    public Color AlizarinCrimsonColor;
-    public Color VioletLightColor;
-    public Color MediumPurple;
-    public Color VioletDarkColor;
-    public Color RoyalBlueLightColor;
-    public Color RoyalBlue;
-    public Color RoyalBlueDarkColor;
-    public Color Conifer;
-    public Color AtlantisColor;
-    public Color AtlantisDarkColor;
-    public Color Gorse;
-    public Color Candlelight;
-    public Color Amber;
-    public Color YellowColor;
-    public Color LightBlueColor;
     public Color White;
-    public Color WhiteTransparent;
-
-    public Color GetColorByBlobColor(BlobColor blobColor)
-    {
-        switch (blobColor)
-        {
-            case BlobColor.AtlantisColor:
-                return AtlantisColor;
-            case BlobColor.RoyalBlue:
-                return RoyalBlue;
-            case BlobColor.Candlelight:
-                return Candlelight;
-            case BlobColor.MediumPurple:
-                return MediumPurple;
-            case BlobColor.PomegranateColor:
-            default:
-                return PomegranateColor;
-
-        }
-    }
 }

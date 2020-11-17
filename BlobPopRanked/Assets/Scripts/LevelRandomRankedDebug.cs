@@ -19,6 +19,7 @@ public class LevelRandomRankedDebug : MonoBehaviour
     public bool _destroyProcess;
     public bool _gameOver;
     [Header("Debug Settings")]
+    public bool _debugBlobs;
     public bool _blobGen;
     public bool _newLevel;
     public bool _neighborsProcess;

@@ -49,6 +49,11 @@ public class Player : MonoBehaviour
 
     public void Shoot()
     {
+        if (BlobInMotion || FirstBounceBlob == null)
+        {
+            return;
+        }
+
         if (Game._.Level<LevelRandomRanked>().debugLvl._shooting == false && Target != null)
         {
             Destroy(Target.gameObject);
@@ -70,28 +75,9 @@ public class Player : MonoBehaviour
         }
     }
 
-    public void ShootPhysics()
-    {
-        if (BlobInMotion || FirstBounceBlob == null)
-        {
-            return;
-        }
-
-        FirstBounceBlob.GetComponent<CircleCollider2D>().enabled = true;
-        SecondBounceBlob.GetComponent<CircleCollider2D>().enabled = true;
-
-        FirstBounceBlob.Shoot();
-        BlobInMotion = true;
-        if (Game._.Level<LevelRandomRanked>().debugLvl._shooting)
-        {
-            Debug.Log("SHOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOT \n __________________________________________");
-        }
-    }
-
     public void ShootAnimated()
     {
         _inFlightIndex++;
-
         if (_inFlightIndex >= BlobFlightPositions.Count)
         {
             return;
@@ -114,6 +100,18 @@ public class Player : MonoBehaviour
         LeanTween.descr(_flightTweenId.Value).setEase(LeanTweenType.linear);
         LeanTween.descr(_flightTweenId.Value).setOnComplete(() =>
         {
+            if (BlobFlightPositions.Count == 2)
+            {
+                Debug.Log("Straitgh Route");
+            }
+            else
+            {
+                Debug.Log("BlobFlightPositions.Count: " + BlobFlightPositions.Count);
+                if (_inFlightIndex == BlobFlightPositions.Count - 2)
+                {
+                    Debug.Log("[Penultimum Route] _inFlightIndex: " + _inFlightIndex + " BlobFlightPositions.Count: " + BlobFlightPositions.Count);
+                }
+            }
             ShootAnimated();
         });
     }
@@ -151,7 +149,7 @@ public class Player : MonoBehaviour
     private GameObject GetRandomBlob()
     {
         var go = HiddenSettings._.GetAnInstantiated(
-            Game._.Level<LevelRandomRanked>().debugLvl._neighborsProcess ? PrefabBank._.DebugNewBlob : PrefabBank._.NewBlob
+            Game._.Level<LevelRandomRanked>().debugLvl._debugBlobs ? PrefabBank._.DebugNewBlob : PrefabBank._.NewBlob
         );
         go.GetComponent<Blob>().SetColor(
             Game._.Level<LevelRandomRanked>().DificultyService.GetColorByDificulty()
@@ -307,11 +305,6 @@ public class Player : MonoBehaviour
 
     void Update()
     {
-        if (Input.GetKeyUp(KeyCode.Space))
-        {
-            ShootPhysics();
-        }
-
         if (Input.GetKeyUp(KeyCode.Return))
         {
             Shoot();
