@@ -21,7 +21,6 @@ public class Player : MonoBehaviour
     public bool BlobInMotion;
     public bool MakingBlob;
     public bool IsInPointArea;
-    public float? SmallestBlobY;
     private float _radius = 0.24f;
     private int _stopAfter;
     private int? _flightTweenId;
@@ -74,6 +73,7 @@ public class Player : MonoBehaviour
         }
         FirstBounceBlob.GetComponent<CircleCollider2D>().enabled = true;
         SecondBounceBlob.GetComponent<CircleCollider2D>().enabled = true;
+        Game._.Level<LevelRandomRanked>().EndGameCollider.enabled = true;
 
         if (Game._.Level<LevelRandomRanked>().debugLvl._shooting)
         {
@@ -230,11 +230,11 @@ public class Player : MonoBehaviour
 
     public void BlobHitSticky(BlobHitStickyInfo blobHitStickyInfo)
     {
-        if (IsGameOver(blobHitStickyInfo.blobY))
-        {
-            UIController._.DialogController.ShowDialog(true, GameplayState.Failed);
-            return;
-        }
+        // if (IsGameOver(blobHitStickyInfo.blobY))
+        // {
+        //     UIController._.DialogController.ShowDialog(true, GameplayState.Failed);
+        //     return;
+        // }
         if (MakingBlob)
         {
             return;
@@ -269,28 +269,6 @@ public class Player : MonoBehaviour
         return go;
     }
 
-    public bool IsGameOver(float blobY)
-    {
-        float calculatedBlobY = blobY + HiddenSettings._.GameOverOffsetY;
-
-        if (SmallestBlobY.HasValue == false)
-        {
-            SmallestBlobY = 10;
-        }
-
-        if (calculatedBlobY >= SmallestBlobY)
-        {
-            return false;
-        }
-
-        SmallestBlobY = calculatedBlobY;
-        if (Game._.Level<LevelRandomRanked>().debugLvl._gameOver)
-        {
-            Debug.Log(SmallestBlobY.Value);
-        }
-        return blobY < StartPos.y || SmallestBlobY.Value < 0;
-    }
-
     public void SetIsInPointArea(bool val)
     {
         IsInPointArea = val;
@@ -310,6 +288,7 @@ public class Player : MonoBehaviour
 
         FirstBounceBlob.GetComponent<CircleCollider2D>().enabled = false;
         SecondBounceBlob.GetComponent<CircleCollider2D>().enabled = false;
+        Game._.Level<LevelRandomRanked>().EndGameCollider.enabled = false;
 
         _stopAfter = 0;
 

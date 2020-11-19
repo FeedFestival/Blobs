@@ -244,21 +244,35 @@ public class DificultyService : MonoBehaviour
 
         if (isAtLeastOnBlobConnectedToCeil)
         {
-            float maxYBlob = _levelRandomRanked.Blobs.Min(b => b.transform.position.y) + HiddenSettings._.GameOverOffsetY;
-            // Debug.Log("maxYBlob: " + maxYBlob);
-            Game._.Player.SmallestBlobY = maxYBlob;
-            float min = -3f;
-            maxYBlob = maxYBlob - min;
-            float max = 4.44f;
-            float total = max - min;
-            float colorPerc = percent.What(_is: maxYBlob, _of: total);
-            // Debug.Log("colorPerc: " + colorPerc);
-            float perc = (100 - colorPerc) + 10;
-            // Debug.Log("perc: " + perc);
+            float blobY = _levelRandomRanked.Blobs.Min(b => b.transform.position.y);
 
-            HitsToReset = (int)Mathf.Floor(percent.Find(perc, _of: MaxHits));
+            Debug.Log("blobY: " + blobY);
+            float overZero = 4.44f;
+            float dashedLine = -4.23f;
+            float newDashedLine = dashedLine - overZero;
+            float newBlobY = blobY - overZero;
+
+            Debug.Log("newDashedLine: " + newDashedLine);
+            Debug.Log("newBlobY: " + newBlobY);
+
+            float healthPercent = percent.What(_is: newBlobY, _of: newDashedLine);
+            Debug.Log("healthPercent: " + healthPercent);
+
+            HitsToReset = (int)Mathf.Ceil(percent.Find(healthPercent, _of: MaxHits));
+
+            // HitsToReset = HitsToReset + (int)Mathf.Floor(percent.Find(healthPercent, Dificulty));
             // Debug.Log("HitsToReset: " + HitsToReset);
-            HitsToReset = HitsToReset + (int)Mathf.Floor(percent.Find(colorPerc, Dificulty));
+
+            if (HitsToReset < 1)
+            {
+                HitsToReset = 1;
+            }
+            else if (HitsToReset > 7)
+            {
+                HitsToReset = 7;
+            }
+            Debug.Log("HitsToReset: " + HitsToReset);
+
             Hits++;
             if (Hits >= HitsToReset)
             {

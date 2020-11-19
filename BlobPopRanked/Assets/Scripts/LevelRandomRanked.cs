@@ -29,6 +29,7 @@ public class LevelRandomRanked : MonoBehaviour, ILevel
     private int? _descendTweenId;
     public Collider2D LeftWall;
     public Collider2D RightWall;
+    public PolygonCollider2D EndGameCollider;
 
     void Start()
     {
@@ -93,14 +94,17 @@ public class LevelRandomRanked : MonoBehaviour, ILevel
         }
         else
         {
-            GenerateBlobLevel();
+            GenerateBlobLevel(alreadyCalculateDificulty: true);
         }
     }
 
-    public void GenerateBlobLevel()
+    public void GenerateBlobLevel(bool alreadyCalculateDificulty = false)
     {
-        DificultyService.CalculateDificulty();
-        DificultyService.CalculateDificultySeed();
+        if (alreadyCalculateDificulty == false)
+        {
+            DificultyService.CalculateDificulty();
+            DificultyService.CalculateDificultySeed();
+        }
 
         if (debugLvl._blobGen == false)
         {

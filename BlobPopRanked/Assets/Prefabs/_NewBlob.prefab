@@ -13,7 +13,7 @@ GameObject:
   - component: {fileID: 485944421924740955}
   - component: {fileID: 485944421924740954}
   - component: {fileID: 485944421924740953}
-  m_Layer: 0
+  m_Layer: 9
   m_Name: _NewBlob
   m_TagString: Player
   m_Icon: {fileID: 0}
@@ -81,8 +81,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0ae30a1c479dcbf46bdfd75cfec7365c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  MaxDesiredSpeed: 5
-  _desiredSpeed: 0
 --- !u!58 &485944421924740954
 CircleCollider2D:
   m_ObjectHideFlags: 0
@@ -131,7 +129,7 @@ GameObject:
   - component: {fileID: 2200218109856356163}
   - component: {fileID: 2200218109856356162}
   - component: {fileID: 2200218109856356167}
-  m_Layer: 0
+  m_Layer: 9
   m_Name: _stickingGlue
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -226,7 +224,7 @@ GameObject:
   - component: {fileID: 2814722320261878791}
   - component: {fileID: 2814722320261878784}
   - component: {fileID: 2814722320261878785}
-  m_Layer: 0
+  m_Layer: 9
   m_Name: _stickingGlue (1)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -321,7 +319,7 @@ GameObject:
   - component: {fileID: 2814722321291812800}
   - component: {fileID: 2814722321291812801}
   - component: {fileID: 2814722321291812802}
-  m_Layer: 0
+  m_Layer: 9
   m_Name: _stickingGlue (4)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -416,7 +414,7 @@ GameObject:
   - component: {fileID: 2814722321383576647}
   - component: {fileID: 2814722321383576640}
   - component: {fileID: 2814722321383576641}
-  m_Layer: 0
+  m_Layer: 9
   m_Name: _stickingGlue (2)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -511,7 +509,7 @@ GameObject:
   - component: {fileID: 2814722321516322553}
   - component: {fileID: 2814722321516322554}
   - component: {fileID: 2814722321516322555}
-  m_Layer: 0
+  m_Layer: 9
   m_Name: _stickingGlue (3)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -605,7 +603,7 @@ GameObject:
   m_Component:
   - component: {fileID: 2727794183343139429}
   - component: {fileID: 7630998994319651843}
-  m_Layer: 0
+  m_Layer: 9
   m_Name: Circle
   m_TagString: Untagged
   m_Icon: {fileID: 0}

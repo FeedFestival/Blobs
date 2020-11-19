@@ -7,10 +7,9 @@ using UnityEngine.SceneManagement;
 
 public class Game : MonoBehaviour
 {
-    public static readonly string _version = "1.0.1";
+    public static readonly string _version = "1.0.2";
     private static Game _game;
     public static Game _ { get { return _game; } }
-
     public LevelController LevelController;
     public Player Player;
     public DataService DataService;
@@ -85,9 +84,14 @@ public class Game : MonoBehaviour
         });
     }
 
+    internal void GameOver()
+    {
+        UIController._.DialogController.ShowDialog(true, GameplayState.Failed);
+    }
+
     public T Level<T>()
     {
-        return (T) Convert.ChangeType(LevelController.Level, typeof(T));
+        return (T)Convert.ChangeType(LevelController.Level, typeof(T));
     }
 
     public int GetUniqueId()

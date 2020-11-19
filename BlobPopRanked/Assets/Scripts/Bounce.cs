@@ -9,6 +9,7 @@ public class Bounce : MonoBehaviour
     void Awake()
     {
         _rb = gameObject.GetComponent<Rigidbody2D>();
+        gameObject.layer = LayerMask.NameToLayer("BlobProjectile");
     }
 
     void OnCollisionEnter2D(Collision2D col)
@@ -34,9 +35,4 @@ public class Bounce : MonoBehaviour
         Destroy(_rb);
         Destroy(this);
     }
-
-    // private Vector3 GetNormalizedDirection(Vector3 collisionNormal)
-    // {
-    //     return Vector3.Reflect(lastVelocity.normalized, collisionNormal).normalized;
-    // }
 }

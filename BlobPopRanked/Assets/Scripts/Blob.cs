@@ -52,6 +52,7 @@ public class Blob : MonoBehaviour
         {
             gameObject.tag = "Blob";
         }
+        gameObject.layer = LayerMask.NameToLayer("Blob");
 
         if (Game._.Level<LevelRandomRanked>().debugLvl._debugBlobs)
         {
@@ -76,8 +77,6 @@ public class Blob : MonoBehaviour
         {
             RemoveSticked(HiddenSettings._.CeilId);
         }
-
-        Game._.Player.IsGameOver(Pos.y);
     }
 
     private void SetWorldPosition(Vector3 pos)
