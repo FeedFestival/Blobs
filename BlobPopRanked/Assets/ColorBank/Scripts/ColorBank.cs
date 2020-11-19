@@ -10,6 +10,7 @@ public class ColorBank : MonoBehaviour
     void Awake()
     {
         _colorBank = this;
+        DontDestroyOnLoad(this);
     }
 
     [Header("Backgrounds")]
@@ -90,6 +91,7 @@ public class ColorBank : MonoBehaviour
     public Color Purple_Heart;
     public Color Purple_Violet_Electric;
     public Color Purple_Studio;
+    public Color Purple_Salt_Box;
 
     [Header("Dark_Purple")]
     public Color Purple_Dark_Voodoo;
@@ -115,6 +117,7 @@ public class ColorBank : MonoBehaviour
     public Color Brown_Finn;
     public Color Brown_Saddle;
     public Color Brown_Loulou;
+    public Color Brown_Flint;
     public Color Brown_Dark_Pink_Aubergine;
     public Color Brown_Bistre;
     public Color Brown_English_Walnut;
@@ -284,6 +287,7 @@ public class ColorBank : MonoBehaviour
         Purple_Heart = GetColor(_hexes["Purple_Heart"]);
         Purple_Violet_Electric = GetColor(_hexes["Purple_Violet_Electric"]);
         Purple_Studio = GetColor(_hexes["Purple_Studio"]);
+        Purple_Salt_Box = GetColor(_hexes["Purple_Salt_Box"]);
 
         // Brown
         Brown_Finn = GetColor(_hexes["Brown_Finn"]);
@@ -291,6 +295,7 @@ public class ColorBank : MonoBehaviour
         Brown_Ferra = GetColor(_hexes["Brown_Ferra"]);
         Brown_Roman_Coffee = GetColor(_hexes["Brown_Roman_Coffee"]);
         Brown_Loulou = GetColor(_hexes["Brown_Loulou"]);
+        Brown_Flint = GetColor(_hexes["Brown_Flint"]);
         Brown_English_Walnut = GetColor(_hexes["Brown_English_Walnut"]);
         Brown_Gondola = GetColor(_hexes["Brown_Gondola"]);
         Brown_Bistre = GetColor(_hexes["Brown_Bistre"]);
@@ -482,15 +487,18 @@ public class ColorBank : MonoBehaviour
         AddHex("Purple_Heart", "8c26d9");
         AddHex("Purple_Violet_Electric", "6600ff");
         AddHex("Purple_Studio", "6E53B0");
+        AddHex("Purple_Salt_Box", "66546D");
         
 
 
         // Brown
+        
         AddHex("Brown_Finn", "532742");
         AddHex("Brown_Buccaneer", "653543");
         AddHex("Brown_Ferra", "77494c");
         AddHex("Brown_Roman_Coffee", "805753");
         AddHex("Brown_Loulou", "4c1036");
+        AddHex("Brown_Flint", "6C645B");
         AddHex("Brown_English_Walnut", "3E2C22");
         AddHex("Brown_Gondola", "170d0e");
         AddHex("Brown_Bistre", "3c2f21");

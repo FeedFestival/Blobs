@@ -504,6 +504,11 @@ public class LevelRandomRanked : MonoBehaviour, ILevel
         {
             color = ColorBank._.Green_Blue_Wedgewood;
         }
+        else if (fromColor == BlobColor.BLUE && toColor == BlobColor.BROWN ||
+            fromColor == BlobColor.BROWN && toColor == BlobColor.BLUE)
+        {
+            color = ColorBank._.Purple_Salt_Box;
+        }
         else if (fromColor == BlobColor.RED && toColor == BlobColor.YELLOW
             || fromColor == BlobColor.YELLOW && toColor == BlobColor.RED)
         {
@@ -528,6 +533,11 @@ public class LevelRandomRanked : MonoBehaviour, ILevel
                     || fromColor == BlobColor.BROWN && toColor == BlobColor.YELLOW)
         {
             color = ColorBank._.Brown_Muddy_Waters;
+        }
+        else if (fromColor == BlobColor.GREEN && toColor == BlobColor.BROWN
+                    || fromColor == BlobColor.BROWN && toColor == BlobColor.GREEN)
+        {
+            color = ColorBank._.Brown_Flint;
         }
         //
         else

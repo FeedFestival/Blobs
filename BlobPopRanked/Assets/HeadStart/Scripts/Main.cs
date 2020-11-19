@@ -55,6 +55,12 @@ public class Main : MonoBehaviour
             MusicManager._.Init();
         }
 
+        if (FindObjectOfType<ColorBank>() == null)
+        {
+            go = Instantiate(prefabBank.ColorBankPrefab, new Vector3(0, 0, 0), Quaternion.identity);
+            ColorBank._.CalculateColors();
+        }
+
         if (IsThisTheLoadingScene == false)
         {
             if (_game.LevelController == null)

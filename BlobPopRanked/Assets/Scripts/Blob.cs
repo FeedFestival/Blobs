@@ -42,16 +42,10 @@ public class Blob : MonoBehaviour
 
     internal void SetPosition(Vector3 pos, bool createdInRow = true)
     {
-        Id = Game._.GetUniqueId();
-        if (Game._.Level<LevelRandomRanked>().debugLvl._debugBlobs)
-        {
-            if (IdText != null) IdText.text = Id.ToString();
-        }
-        gameObject.name = "_Blob " + Id;
-
         StickedTo = new List<int>();
         if (createdInRow)
         {
+            SetId();
             StickedTo.Add(HiddenSettings._.CeilId);
         }
         else
@@ -59,8 +53,19 @@ public class Blob : MonoBehaviour
             gameObject.tag = "Blob";
         }
 
+        if (Game._.Level<LevelRandomRanked>().debugLvl._debugBlobs)
+        {
+            if (IdText != null) IdText.text = Id.ToString();
+        }
+
         SetWorldPosition(pos);
         gameObject.transform.position = Pos;
+    }
+
+    public void SetId()
+    {
+        Id = Game._.GetUniqueId();
+        gameObject.name = "_Blob " + Id;
     }
 
     internal void Descend()

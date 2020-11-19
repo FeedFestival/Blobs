@@ -26,12 +26,17 @@ public class BlobFLight
     public float distanceToPrevious;
     public float time;
     public Vector2 Pos;
+    public Blob Blob;
 
     public BlobFLight() { }
 
-    public BlobFLight(Vector2 pos)
+    public BlobFLight(Vector2 pos, Blob blob = null)
     {
         this.Pos = pos;
+        if (blob != null)
+        {
+            Blob = blob;
+        }
     }
 }
 

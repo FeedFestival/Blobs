@@ -72,12 +72,21 @@ namespace Assets.Scripts.utils
             return name + " [" + debug + "](" + array.Count + ")";
         }
 
-        public static string DebugList<T>(List<T> array, string name = null)
+        public delegate string DebugFunc<T>(T obj);
+
+        public static string DebugList<T>(List<T> array, string name = null, DebugFunc<T> debugFunc = null)
         {
             string debug = string.Empty;
             foreach (T bId in array)
             {
-                debug += bId.ToString() + " ; ";
+                if (debugFunc == null)
+                {
+                    debug += bId.ToString() + " ; ";
+                }
+                else
+                {
+                    debug += debugFunc(bId);
+                }
             }
             return string.IsNullOrEmpty(name) ? debug
                 : name + " [" + debug + "](" + array.Count + ")";

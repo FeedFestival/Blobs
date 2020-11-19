@@ -5,6 +5,7 @@ using Assets.Scripts;
 using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.EventSystems;
+using Assets.Scripts.utils;
 
 public class Player : MonoBehaviour
 {
@@ -25,6 +26,13 @@ public class Player : MonoBehaviour
     private int _stopAfter;
     private int? _flightTweenId;
     private int _inFlightIndex;
+    private bool _firstAndOnly;
+    private bool _last;
+    private IEnumerator _performSecondCheck;
+    private IEnumerator _performLastCheck;
+    private BlobFLight _lastBlobFlight;
+    private int _lastBlobFlightBlobId;
+    private Vector2 _lastDir;
 
     internal void MakeBlob(bool firstLevel = false)
     {
@@ -42,6 +50,9 @@ public class Player : MonoBehaviour
             }
 
             FirstBounceBlob.transform.position = StartPos;
+            FirstBounceBlob.GetComponent<Blob>().SetId();
+            _lastBlobFlightBlobId = FirstBounceBlob.GetComponent<Blob>().Id;
+
             SecondBounceBlob.transform.position = SecondBlobPos;
             MakingBlob = false;
         }, 0.2f);
@@ -64,15 +75,17 @@ public class Player : MonoBehaviour
         FirstBounceBlob.GetComponent<CircleCollider2D>().enabled = true;
         SecondBounceBlob.GetComponent<CircleCollider2D>().enabled = true;
 
-        _inFlightIndex = 0;
-        FirstBounceBlob.transform.position = BlobFlightPositions[_inFlightIndex].Pos;
+        if (Game._.Level<LevelRandomRanked>().debugLvl._shooting)
+        {
+            Debug.Log("SHOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOT \n ___________________" + BlobFlightPositions.Count + "_______________________");
+        }
+
+        _firstAndOnly = BlobFlightPositions.Count == 1;
+        _last = false;
+        _inFlightIndex = -1;
         ShootAnimated();
 
         BlobInMotion = true;
-        if (Game._.Level<LevelRandomRanked>().debugLvl._shooting)
-        {
-            Debug.Log("SHOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOT \n __________________________________________");
-        }
     }
 
     public void ShootAnimated()
@@ -80,10 +93,25 @@ public class Player : MonoBehaviour
         _inFlightIndex++;
         if (_inFlightIndex >= BlobFlightPositions.Count)
         {
+            EndAnimatedShot();
             return;
         }
-        BlobFlightPositions[_inFlightIndex].distanceToPrevious
-            = Vector2.Distance(BlobFlightPositions[_inFlightIndex - 1].Pos, BlobFlightPositions[_inFlightIndex].Pos);
+
+        if (_firstAndOnly == false)
+        {
+            _last = _inFlightIndex == BlobFlightPositions.Count - 1;
+        }
+
+        if (_inFlightIndex == 0)
+        {
+            BlobFlightPositions[_inFlightIndex].distanceToPrevious =
+                Vector2.Distance(FirstBounceBlob.transform.position, BlobFlightPositions[_inFlightIndex].Pos);
+        }
+        else
+        {
+            BlobFlightPositions[_inFlightIndex].distanceToPrevious =
+                Vector2.Distance(BlobFlightPositions[_inFlightIndex - 1].Pos, BlobFlightPositions[_inFlightIndex].Pos);
+        }
         BlobFlightPositions[_inFlightIndex].time = 0.09f * BlobFlightPositions[_inFlightIndex].distanceToPrevious;
         PlayFlight(BlobFlightPositions[_inFlightIndex]);
     }
@@ -96,24 +124,108 @@ public class Player : MonoBehaviour
             _flightTweenId = null;
         }
 
+        if (_firstAndOnly || _last)
+        {
+            if (FirstBounceBlob == null)
+            {
+                Debug.Log("We probably <b>HIT SOMETHING</b> on the way.");
+                EndAnimatedShot();
+                return;
+            }
+            _lastDir = (blobFLight.Pos - (Vector2)FirstBounceBlob.transform.position).normalized;
+            if (_performSecondCheck != null)
+            {
+                StopCoroutine(_performSecondCheck);
+                _performSecondCheck = null;
+            }
+            _performSecondCheck = CalculateNewPossibleHit(blobFLight);
+            StartCoroutine(_performSecondCheck);
+        }
+
         _flightTweenId = LeanTween.move(FirstBounceBlob.gameObject, blobFLight.Pos, blobFLight.time).id;
         LeanTween.descr(_flightTweenId.Value).setEase(LeanTweenType.linear);
         LeanTween.descr(_flightTweenId.Value).setOnComplete(() =>
         {
-            if (BlobFlightPositions.Count == 2)
-            {
-                Debug.Log("Straitgh Route");
-            }
-            else
-            {
-                Debug.Log("BlobFlightPositions.Count: " + BlobFlightPositions.Count);
-                if (_inFlightIndex == BlobFlightPositions.Count - 2)
-                {
-                    Debug.Log("[Penultimum Route] _inFlightIndex: " + _inFlightIndex + " BlobFlightPositions.Count: " + BlobFlightPositions.Count);
-                }
-            }
             ShootAnimated();
         });
+    }
+
+    private void EndAnimatedShot()
+    {
+        _lastBlobFlight = BlobFlightPositions[BlobFlightPositions.Count - 1];
+        if (_performLastCheck != null)
+        {
+            StopCoroutine(_performLastCheck);
+            _performLastCheck = null;
+        }
+        _performLastCheck = CheckIfWeActuallyHit();
+        StartCoroutine(_performLastCheck);
+    }
+
+    private IEnumerator CalculateNewPossibleHit(BlobFLight blobFlight)
+    {
+        float cutTime = percent.Find(10, blobFlight.time);
+        float timeToWait = blobFlight.time - cutTime;
+
+        yield return new WaitForSeconds(timeToWait);
+
+        if (FirstBounceBlob != null)
+        {
+            FirstBounceBlob.transform.GetComponent<CircleCollider2D>().enabled = false;
+            Vector2 origin = FirstBounceBlob.transform.position;
+            RaycastHit2D hit = FakeShootBlob(origin: origin, towards: blobFlight.Pos);
+            if (hit)
+            {
+                if (hit.transform.tag == "Blob")
+                {
+                    Blob newHitBlob = hit.transform.GetComponent<Blob>();
+                    if (newHitBlob.Id != blobFlight.Blob.Id)
+                    {
+                        Debug.Log("Need another <b>ROUTE</b>: newHitBlob[" + newHitBlob.Id + "] was found where we expected blobFlight.blob[" + blobFlight.Blob.Id + "]");
+                        FakeHitBlob(hit);
+                    }
+                    else
+                    {
+                        Debug.Log("Route kept: newHitBlob[" + newHitBlob.Id + "] is the <b>SAME</b>, we expected blobFlight.blob[" + blobFlight.Blob.Id + "]");
+                    }
+                }
+                else
+                {
+                    Debug.Log("Need another <b>ROUTE</b>: " + hit.transform.gameObject.name + " was found where we expected blobFlight.blob[" + blobFlight.Blob.Id + "]");
+                    OnHitSomething(hit, origin);
+                }
+            }
+            FirstBounceBlob.transform.GetComponent<CircleCollider2D>().enabled = true;
+            StopCoroutine(_performSecondCheck);
+            _performSecondCheck = null;
+        }
+        else
+        {
+            Debug.Log("<b>EVERYTHING</b> went well I asume?");
+        }
+    }
+
+    private IEnumerator CheckIfWeActuallyHit()
+    {
+        yield return new WaitForSeconds(0.1f);
+
+        bool areStickedToAfterAll = _lastBlobFlight.Blob.StickedTo.Contains(_lastBlobFlightBlobId);
+        if (areStickedToAfterAll == false)
+        {
+            if (FirstBounceBlob != null)
+            {
+                Debug.Log("We didn't <b>HIT ANYTHING</b> _lastBlobFlight.BlobId: " + _lastBlobFlightBlobId + "_lastDir: " + _lastDir);
+                Vector2 origin = FirstBounceBlob.transform.position;
+                Vector2 targetPos = (Vector2)FirstBounceBlob.transform.position + _lastDir;
+                BlobInMotion = false;
+                FirstBounceBlob.GetComponent<CircleCollider2D>().enabled = false;
+                BlobFlightPositions = new List<BlobFLight>();
+                PrepShot(origin, targetPos);
+                Shoot();
+            }
+        }
+        StopCoroutine(_performLastCheck);
+        _performLastCheck = null;
     }
 
     public void BlobHitSticky(BlobHitStickyInfo blobHitStickyInfo)
@@ -123,7 +235,7 @@ public class Player : MonoBehaviour
             UIController._.DialogController.ShowDialog(true, GameplayState.Failed);
             return;
         }
-        if (MakingBlob) // ?
+        if (MakingBlob)
         {
             return;
         }
@@ -211,14 +323,16 @@ public class Player : MonoBehaviour
         }
 
         Vector2 origin = FirstBounceBlob.transform.position;
-        BlobFlightPositions = new List<BlobFLight>() { new BlobFLight(origin) };
+        BlobFlightPositions = new List<BlobFLight>();
+        PrepShot(origin, targetPos);
+        Shoot();
+    }
 
+    private void PrepShot(Vector2 origin, Vector2 targetPos)
+    {
         RaycastHit2D hit = FakeShootBlob(origin: origin, towards: targetPos);
         OnHitSomething(hit, origin);
-
         Game._.Level<LevelRandomRanked>().DisableWalls(DisableWallOp.Both, false);
-
-        Shoot();
     }
 
     private RaycastHit2D FakeShootBlob(Vector2 origin, Vector2 towards)
@@ -286,21 +400,23 @@ public class Player : MonoBehaviour
                 RaycastHit2D newHit = FakeShootBlob(origin: newOrigin, towards: newTowards);
                 OnHitSomething(newHit, newOrigin);
             }
-            // else if (hit.transform.tag == "StickySurface")
-            // {
-
-            // }
             else if (hit.transform.tag == "StickySurface" || hit.transform.tag == "Blob")
             {
-                Vector2 newOrigin = (Vector2)hit.centroid;
-                if (Game._.Level<LevelRandomRanked>().debugLvl._shooting)
-                {
-                    Debug.Log("newOrigin: " + newOrigin);
-                    CenteroidBlob.position = newOrigin;
-                }
-                BlobFlightPositions.Add(new BlobFLight(newOrigin));
+                FakeHitBlob(hit);
             }
         }
+    }
+
+    private void FakeHitBlob(RaycastHit2D hit)
+    {
+        Vector2 newOrigin = (Vector2)hit.centroid;
+        if (Game._.Level<LevelRandomRanked>().debugLvl._shooting)
+        {
+            Debug.Log("newOrigin: " + newOrigin);
+            CenteroidBlob.position = newOrigin;
+        }
+        Blob blob = hit.transform.GetComponent<Blob>();
+        BlobFlightPositions.Add(new BlobFLight(newOrigin, blob));
     }
 
     void Update()
