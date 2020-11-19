@@ -324,12 +324,21 @@ public class Blob : MonoBehaviour
             _reflectTweenId = null;
         }
 
-        // BUG Here when hittings sticky ceil
-        Vector2 dirFromOtherBlobToThisOne = (transform.localPosition - blobHitStickyInfo.otherBlob.transform.localPosition).normalized;
-        // Debug.Log("dirFromOtherBlobToThisOne: " + dirFromOtherBlobToThisOne);
-        Ray ray = new Ray(blobHitStickyInfo.otherBlob.transform.localPosition, dirFromOtherBlobToThisOne);
-        Vector2 pos = ray.GetPoint(0.5f);
-        _initialPos = pos;
+        bool hitSomethingElseThenABlob = blobHitStickyInfo.otherBlob == null;
+        if (hitSomethingElseThenABlob)
+        {
+            _initialPos = new Vector2(transform.localPosition.x, 4.44f - Game._.Level<LevelRandomRanked>().BlobsParentT.position.y);
+        }
+        else
+        {
+            Vector2 dirFromOtherBlobToThisOne = (transform.localPosition - blobHitStickyInfo.otherBlob.transform.localPosition).normalized;
+            // Debug.Log("dirFromOtherBlobToThisOne: " + dirFromOtherBlobToThisOne);
+
+            Ray ray = new Ray(blobHitStickyInfo.otherBlob.transform.localPosition, dirFromOtherBlobToThisOne);
+            Vector2 pos = ray.GetPoint(0.5f);
+            _initialPos = pos;
+        }
+        // Debug.Log("_initialPos: " + _initialPos);
 
         _reflectToPos = (Vector2)transform.localPosition + ((Vector2)blobHitStickyInfo.ReflectDir.normalized * HiddenSettings._.BallStickyReflectDistanceModifier);
         _reflectTweenId = LeanTween.moveLocal(gameObject,
@@ -376,13 +385,14 @@ public class Blob : MonoBehaviour
         });
     }
 
-    private void ElasticBack()
+    private void ElasticBack(bool worldMove = false)
     {
         if (_forcePushTweenId.HasValue)
         {
             LeanTween.cancel(_forcePushTweenId.Value);
             _forcePushTweenId = null;
         }
+
         _forcePushTweenId = LeanTween.moveLocal(gameObject,
             _initialPos,
             HiddenSettings._.BlobElasticBackAnimL

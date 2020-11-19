@@ -8,11 +8,13 @@ public class DificultyService : MonoBehaviour
     public int AdditionalRows = 0;
     public int Dificulty = 2;
     public int DificultySeed;
+    public int MinHits;
     public int MaxHits;
     public int HitsToReset;
     public int Hits;
     private LevelRandomRanked _levelRandomRanked;
     public List<int> Colors;
+    public List<int> LevelIncreseThreshhold;
 
     public void Init(LevelRandomRanked levelRandomRanked)
     {
@@ -40,22 +42,12 @@ public class DificultyService : MonoBehaviour
     public void CalculateDificulty()
     {
         AdditionalRows++;
-
-        if (AdditionalRows == 3)
+        foreach (int key in LevelIncreseThreshhold)
         {
-            Dificulty++;
-        }
-        else if (AdditionalRows == 5)
-        {
-            Dificulty++;
-        }
-        else if (AdditionalRows == 8)
-        {
-            Dificulty++;
-        }
-        else if (AdditionalRows == 13)
-        {
-            Dificulty++;
+            if (AdditionalRows == key)
+            {
+                Dificulty++;
+            }
         }
     }
 
@@ -236,40 +228,45 @@ public class DificultyService : MonoBehaviour
 
     public void CheckIfAddingNewRow()
     {
-        bool isAtLeastOnBlobConnectedToCeil = _levelRandomRanked.Blobs.Exists(b =>
+        bool isAtLeastOnBlobConnectedToCeil = (_levelRandomRanked.Blobs == null || _levelRandomRanked.Blobs.Count == 0) == false;
+        Debug.Log("_levelRandomRanked.Blobs.Count: " + _levelRandomRanked.Blobs.Count);
+        if (isAtLeastOnBlobConnectedToCeil == false)
         {
-            bool isConnectedToCeil = b.StickedTo.Exists(s => s == HiddenSettings._.CeilId);
-            return isConnectedToCeil;
-        });
+            isAtLeastOnBlobConnectedToCeil = _levelRandomRanked.Blobs.Exists(b =>
+            {
+                bool isConnectedToCeil = b.StickedTo.Exists(s => s == HiddenSettings._.CeilId);
+                return isConnectedToCeil;
+            });
+        }
 
         if (isAtLeastOnBlobConnectedToCeil)
         {
             float blobY = _levelRandomRanked.Blobs.Min(b => b.transform.position.y);
 
-            Debug.Log("blobY: " + blobY);
+            // Debug.Log("blobY: " + blobY);
             float overZero = 4.44f;
             float dashedLine = -4.23f;
             float newDashedLine = dashedLine - overZero;
             float newBlobY = blobY - overZero;
 
-            Debug.Log("newDashedLine: " + newDashedLine);
-            Debug.Log("newBlobY: " + newBlobY);
+            // Debug.Log("newDashedLine: " + newDashedLine);
+            // Debug.Log("newBlobY: " + newBlobY);
 
             float healthPercent = percent.What(_is: newBlobY, _of: newDashedLine);
-            Debug.Log("healthPercent: " + healthPercent);
+            // Debug.Log("healthPercent: " + healthPercent);
 
             HitsToReset = (int)Mathf.Ceil(percent.Find(healthPercent, _of: MaxHits));
 
             // HitsToReset = HitsToReset + (int)Mathf.Floor(percent.Find(healthPercent, Dificulty));
             // Debug.Log("HitsToReset: " + HitsToReset);
 
-            if (HitsToReset < 1)
+            if (HitsToReset < MinHits)
             {
-                HitsToReset = 1;
+                HitsToReset = MinHits;
             }
-            else if (HitsToReset > 7)
+            else if (HitsToReset > MaxHits)
             {
-                HitsToReset = 7;
+                HitsToReset = MaxHits;
             }
             Debug.Log("HitsToReset: " + HitsToReset);
 

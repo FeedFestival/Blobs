@@ -2752,7 +2752,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8c3eafa9017de33489a2b6379a7481a1, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  GameEnded: 0
 --- !u!50 &1375231961
 Rigidbody2D:
   serializedVersion: 4
@@ -3743,7 +3742,6 @@ MonoBehaviour:
   Blobs: []
   _increment: -1
   FirstLevel: 1
-  LevelIncreseThreshhold: 0200000004000000070000000a000000
   Affected: 
   DificultyService: {fileID: 0}
   Points: 0
@@ -3766,10 +3764,12 @@ MonoBehaviour:
   AdditionalRows: 0
   Dificulty: 2
   DificultySeed: 0
+  MinHits: 2
   MaxHits: 7
   HitsToReset: 1
   Hits: 0
   Colors: 
+  LevelIncreseThreshhold: 0300000005000000080000000d000000
 --- !u!1 &1881322699
 GameObject:
   m_ObjectHideFlags: 0

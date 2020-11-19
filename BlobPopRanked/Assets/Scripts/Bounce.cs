@@ -1,5 +1,6 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using Assets.Scripts.utils;
 using UnityEngine;
 
 public class Bounce : MonoBehaviour
@@ -17,19 +18,18 @@ public class Bounce : MonoBehaviour
         // sometimes this doesn't register 
         if (col.transform.tag == "Blob" || col.transform.tag == "StickySurface")
         {
-            OnCollision(col.transform.tag == "Blob"
-                ? col.gameObject.GetComponent<Blob>() : null);
+            bool isBlob = col.transform.tag == "Blob";
+            ContactPoint2D surfaceContact = col.GetContact(0);
+            OnCollision(surfaceContact: surfaceContact, isBlob ? col.gameObject.GetComponent<Blob>() : null);
         }
     }
 
-    public void OnCollision(Blob otherBlob = null)
+    public void OnCollision(ContactPoint2D surfaceContact, Blob otherBlob = null)
     {
         BlobHitStickyInfo blobHitStickyInfo = new BlobHitStickyInfo(transform.position.y, GetComponent<Blob>());
         blobHitStickyInfo.otherBlob = otherBlob;
 
-        // THIS IS WHERE THE BOUNCE FROM REFLECT HAPPENED AND NOT ANYMORE !!!
-        //      blobHitStickyInfo.ReflectDir = GetNormalizedDirection(col.contacts[0].normal);
-        // ABOVE !!!
+        blobHitStickyInfo.ReflectDir = world2d.GetNormalizedDirection(Game._.Player.LastDir, surfaceContact.normal);
 
         Game._.Player.BlobHitSticky(blobHitStickyInfo);
         Destroy(_rb);

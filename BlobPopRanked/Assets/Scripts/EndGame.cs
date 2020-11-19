@@ -4,30 +4,28 @@ using UnityEngine;
 
 public class EndGame : MonoBehaviour
 {
-    public bool GameEnded;
+    
     void OnCollisionEnter2D(Collision2D col)
     {
-        if (GameEnded)
+        if (Game._.GameOver)
         {
             return;
         }
         if (col.transform.tag == "Blob")
         {
-            Game._.GameOver();
-            GameEnded = true;
+            Game._.OnGameOver();
         }
     }
 
     void OnCollisionStay2D(Collision2D col)
     {
-        if (GameEnded)
+        if (Game._.GameOver)
         {
             return;
         }
         if (col.transform.tag == "Blob")
         {
-            Game._.GameOver();
-            GameEnded = true;
+            Game._.OnGameOver();
         }
     }
 }

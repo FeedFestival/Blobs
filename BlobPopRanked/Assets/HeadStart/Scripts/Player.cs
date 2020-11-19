@@ -31,7 +31,13 @@ public class Player : MonoBehaviour
     private IEnumerator _performLastCheck;
     private BlobFLight _lastBlobFlight;
     private int _lastBlobFlightBlobId;
-    private Vector2 _lastDir;
+    public Vector2 LastDir;
+    private int _layerMask;
+
+    void Start()
+    {
+        _layerMask = utils.CreateLayerMask(aExclude: true, LayerMask.NameToLayer("BlobProjectile"), LayerMask.NameToLayer("EndGame"));
+    }
 
     internal void MakeBlob(bool firstLevel = false)
     {
@@ -73,7 +79,6 @@ public class Player : MonoBehaviour
         }
         FirstBounceBlob.GetComponent<CircleCollider2D>().enabled = true;
         SecondBounceBlob.GetComponent<CircleCollider2D>().enabled = true;
-        Game._.Level<LevelRandomRanked>().EndGameCollider.enabled = true;
 
         if (Game._.Level<LevelRandomRanked>().debugLvl._shooting)
         {
@@ -132,7 +137,7 @@ public class Player : MonoBehaviour
                 EndAnimatedShot();
                 return;
             }
-            _lastDir = (blobFLight.Pos - (Vector2)FirstBounceBlob.transform.position).normalized;
+            LastDir = (blobFLight.Pos - (Vector2)FirstBounceBlob.transform.position).normalized;
             if (_performSecondCheck != null)
             {
                 StopCoroutine(_performSecondCheck);
@@ -186,8 +191,12 @@ public class Player : MonoBehaviour
                     }
                     else
                     {
-                        Debug.Log("Route kept: newHitBlob[" + newHitBlob.Id + "] is the <b>SAME</b>, we expected blobFlight.blob[" + blobFlight.Blob.Id + "]");
+                        // Debug.Log("Route kept: newHitBlob[" + newHitBlob.Id + "] is the <b>SAME</b>, we expected blobFlight.blob[" + blobFlight.Blob.Id + "]");
                     }
+                }
+                else if (hit.transform.tag == "StickySurface")
+                {
+                    // Debug.Log("<b>StickySurface</b>");
                 }
                 else
                 {
@@ -209,19 +218,23 @@ public class Player : MonoBehaviour
     {
         yield return new WaitForSeconds(0.1f);
 
-        bool areStickedToAfterAll = _lastBlobFlight.Blob.StickedTo.Contains(_lastBlobFlightBlobId);
-        if (areStickedToAfterAll == false)
+        bool hitSomethingElseThenABlob = _lastBlobFlight.Blob == null;
+        if (hitSomethingElseThenABlob == false)
         {
-            if (FirstBounceBlob != null)
+            bool areStickedToAfterAll = _lastBlobFlight.Blob.StickedTo.Contains(_lastBlobFlightBlobId);
+            if (areStickedToAfterAll == false)
             {
-                Debug.Log("We didn't <b>HIT ANYTHING</b> _lastBlobFlight.BlobId: " + _lastBlobFlightBlobId + "_lastDir: " + _lastDir);
-                Vector2 origin = FirstBounceBlob.transform.position;
-                Vector2 targetPos = (Vector2)FirstBounceBlob.transform.position + _lastDir;
-                BlobInMotion = false;
-                FirstBounceBlob.GetComponent<CircleCollider2D>().enabled = false;
-                BlobFlightPositions = new List<BlobFLight>();
-                PrepShot(origin, targetPos);
-                Shoot();
+                if (FirstBounceBlob != null)
+                {
+                    Debug.Log("We didn't <b>HIT ANYTHING</b> _lastBlobFlight.BlobId: " + _lastBlobFlightBlobId + "LastDir: " + LastDir);
+                    Vector2 origin = FirstBounceBlob.transform.position;
+                    Vector2 targetPos = (Vector2)FirstBounceBlob.transform.position + LastDir;
+                    BlobInMotion = false;
+                    FirstBounceBlob.GetComponent<CircleCollider2D>().enabled = false;
+                    BlobFlightPositions = new List<BlobFLight>();
+                    PrepShot(origin, targetPos);
+                    Shoot();
+                }
             }
         }
         StopCoroutine(_performLastCheck);
@@ -230,12 +243,7 @@ public class Player : MonoBehaviour
 
     public void BlobHitSticky(BlobHitStickyInfo blobHitStickyInfo)
     {
-        // if (IsGameOver(blobHitStickyInfo.blobY))
-        // {
-        //     UIController._.DialogController.ShowDialog(true, GameplayState.Failed);
-        //     return;
-        // }
-        if (MakingBlob)
+        if (MakingBlob || Game._.GameOver)
         {
             return;
         }
@@ -288,7 +296,6 @@ public class Player : MonoBehaviour
 
         FirstBounceBlob.GetComponent<CircleCollider2D>().enabled = false;
         SecondBounceBlob.GetComponent<CircleCollider2D>().enabled = false;
-        Game._.Level<LevelRandomRanked>().EndGameCollider.enabled = false;
 
         _stopAfter = 0;
 
@@ -321,7 +328,7 @@ public class Player : MonoBehaviour
         {
             Debug.Log("direction: " + direction);
         }
-        return Physics2D.CircleCast(origin, _radius, direction);
+        return Physics2D.CircleCast(origin, _radius, direction, Mathf.Infinity, _layerMask);
     }
 
     private void OnHitSomething(RaycastHit2D hit, Vector2 origin)

@@ -125,6 +125,16 @@ namespace Assets.Scripts.utils
                 Debug.Log(debugAdd);
             }
         }
+
+        public static int CreateLayerMask(bool aExclude, params int[] aLayers)
+    {
+        int v = 0;
+        foreach (var L in aLayers)
+            v |= 1 << L;
+        if (aExclude)
+            v = ~v;
+        return v;
+    }
     }
 
     public static class percent
@@ -166,9 +176,9 @@ namespace Assets.Scripts.utils
 
     public static class world2d
     {
-        // private Vector2 GetNormalizedDirection( Vector2 collisionNormal)
-        // {
-        //     return Vector2.Reflect(lastVelocity.normalized, collisionNormal).normalized;
-        // }
+        public static Vector2 GetNormalizedDirection(Vector2 lastVelocity, Vector2 collisionNormal)
+        {
+            return Vector2.Reflect(lastVelocity.normalized, collisionNormal).normalized;
+        }
     }
 }

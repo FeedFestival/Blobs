@@ -17,6 +17,7 @@ public class Game : MonoBehaviour
     public bool RestartLevel;
     private string LevelToLoad;
     private int _uniqueId;
+    public bool GameOver;
 
     void Awake()
     {
@@ -62,7 +63,7 @@ public class Game : MonoBehaviour
     {
         RestartLevel = true;
         LevelToLoad = LevelController.LevelName;
-        SceneManager.LoadScene("Loading");
+        LoadScene("Loading");
     }
 
     public void LoadWaitedLevel()
@@ -70,7 +71,7 @@ public class Game : MonoBehaviour
         if (RestartLevel)
         {
             RestartLevel = false;
-            SceneManager.LoadScene(LevelToLoad);
+            LoadScene(LevelToLoad);
             return;
         }
     }
@@ -80,12 +81,19 @@ public class Game : MonoBehaviour
         LevelToLoad = "Game";
         UIController._.LoadingController.TransitionOverlay(show: false, instant: false, () =>
         {
-            SceneManager.LoadScene(LevelToLoad);
+            LoadScene(LevelToLoad);
         });
     }
 
-    internal void GameOver()
+    private void LoadScene(string level)
     {
+        GameOver = false;
+        SceneManager.LoadScene(level);
+    }
+
+    internal void OnGameOver()
+    {
+        GameOver = true;
         UIController._.DialogController.ShowDialog(true, GameplayState.Failed);
     }
 

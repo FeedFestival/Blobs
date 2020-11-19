@@ -14,7 +14,6 @@ public class LevelRandomRanked : MonoBehaviour, ILevel
     public List<Blob> Blobs;
     public int _increment = -1;
     public bool FirstLevel = true;
-    public List<int> LevelIncreseThreshhold;
     public delegate void AndRunCallback();
     private IEnumerator _tryDestroyNeighbors;
     [HideInInspector]
@@ -215,7 +214,10 @@ public class LevelRandomRanked : MonoBehaviour, ILevel
             _tryDestroyNeighbors = DestroyNeighbors(blob);
             StartCoroutine(_tryDestroyNeighbors);
         }
-        DificultyService.CheckIfAddingNewRow();
+        else
+        {
+            AfterDestroy();
+        }
     }
 
     private IEnumerator DestroyNeighbors(Blob blob)
@@ -229,8 +231,18 @@ public class LevelRandomRanked : MonoBehaviour, ILevel
         DestroyBlobs();
         CheckAffected();
 
-        StopCoroutine(_tryDestroyNeighbors);
-        _tryDestroyNeighbors = null;
+        AfterDestroy();
+    }
+
+    private void AfterDestroy()
+    {
+        DificultyService.CheckIfAddingNewRow();
+
+        if (_tryDestroyNeighbors != null)
+        {
+            StopCoroutine(_tryDestroyNeighbors);
+            _tryDestroyNeighbors = null;
+        }
     }
 
     public void FindNeighborsToDestroy(Blob blob)
