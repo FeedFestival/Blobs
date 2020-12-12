@@ -15,15 +15,13 @@ public class Player : MonoBehaviour
     public Transform CenteroidBlob;
     public Transform Centroid;
     public List<BlobFLight> BlobFlightPositions;
-    public Bounce FirstBounceBlob;
-    public Bounce SecondBounceBlob;
+    public BlobProjectile FirstProjectile;
+    public BlobProjectile SecondProjectile;
     public Vector2 SecondBlobPos;
     public bool BlobInMotion;
     public bool MakingBlob;
     public bool IsInPointArea;
-    private float _radius = 0.24f;
     private int _stopAfter;
-    private int? _flightTweenId;
     private int _inFlightIndex;
     private bool _firstAndOnly;
     private bool _last;
@@ -33,6 +31,7 @@ public class Player : MonoBehaviour
     private int _lastBlobFlightBlobId;
     public Vector2 LastDir;
     private int _layerMask;
+    private int? _flightTweenId;
 
     void Start()
     {
@@ -45,27 +44,27 @@ public class Player : MonoBehaviour
         {
             if (firstLevel)
             {
-                FirstBounceBlob = GetRandomBlob().GetComponent<Bounce>();
-                SecondBounceBlob = GetRandomBlob().GetComponent<Bounce>();
+                FirstProjectile = GetRandomBlob().GetComponent<BlobProjectile>();
+                SecondProjectile = GetRandomBlob().GetComponent<BlobProjectile>();
             }
             else
             {
-                FirstBounceBlob = SecondBounceBlob;
-                SecondBounceBlob = GetRandomBlob().GetComponent<Bounce>();
+                FirstProjectile = SecondProjectile;
+                SecondProjectile = GetRandomBlob().GetComponent<BlobProjectile>();
             }
 
-            FirstBounceBlob.transform.position = StartPos;
-            FirstBounceBlob.GetComponent<Blob>().SetId();
-            _lastBlobFlightBlobId = FirstBounceBlob.GetComponent<Blob>().Id;
+            FirstProjectile.transform.position = StartPos;
+            FirstProjectile.GetComponent<Blob>().SetId();
+            _lastBlobFlightBlobId = FirstProjectile.GetComponent<Blob>().Id;
 
-            SecondBounceBlob.transform.position = SecondBlobPos;
+            SecondProjectile.transform.position = SecondBlobPos;
             MakingBlob = false;
         }, 0.2f);
     }
 
     public void Shoot()
     {
-        if (BlobInMotion || FirstBounceBlob == null)
+        if (BlobInMotion || FirstProjectile == null)
         {
             return;
         }
@@ -77,8 +76,8 @@ public class Player : MonoBehaviour
             Destroy(CenteroidBlob.gameObject);
             Destroy(Centroid.gameObject);
         }
-        FirstBounceBlob.GetComponent<CircleCollider2D>().enabled = true;
-        SecondBounceBlob.GetComponent<CircleCollider2D>().enabled = true;
+        FirstProjectile.GetComponent<CircleCollider2D>().enabled = true;
+        SecondProjectile.GetComponent<CircleCollider2D>().enabled = true;
 
         if (Game._.Level<LevelRandomRanked>().debugLvl._shooting)
         {
@@ -110,7 +109,7 @@ public class Player : MonoBehaviour
         if (_inFlightIndex == 0)
         {
             BlobFlightPositions[_inFlightIndex].distanceToPrevious =
-                Vector2.Distance(FirstBounceBlob.transform.position, BlobFlightPositions[_inFlightIndex].Pos);
+                Vector2.Distance(FirstProjectile.transform.position, BlobFlightPositions[_inFlightIndex].Pos);
         }
         else
         {
@@ -131,28 +130,33 @@ public class Player : MonoBehaviour
 
         if (_firstAndOnly || _last)
         {
-            if (FirstBounceBlob == null)
+            if (FirstProjectile == null)
             {
                 Debug.Log("We probably <b>HIT SOMETHING</b> on the way.");
                 EndAnimatedShot();
                 return;
             }
-            LastDir = (blobFLight.Pos - (Vector2)FirstBounceBlob.transform.position).normalized;
-            if (_performSecondCheck != null)
-            {
-                StopCoroutine(_performSecondCheck);
-                _performSecondCheck = null;
-            }
-            _performSecondCheck = CalculateNewPossibleHit(blobFLight);
-            StartCoroutine(_performSecondCheck);
+            LastDir = (blobFLight.Pos - (Vector2)FirstProjectile.transform.position).normalized;
+            DoSecondCheck(blobFLight);
         }
 
-        _flightTweenId = LeanTween.move(FirstBounceBlob.gameObject, blobFLight.Pos, blobFLight.time).id;
+        _flightTweenId = LeanTween.move(FirstProjectile.gameObject, blobFLight.Pos, blobFLight.time).id;
         LeanTween.descr(_flightTweenId.Value).setEase(LeanTweenType.linear);
         LeanTween.descr(_flightTweenId.Value).setOnComplete(() =>
         {
             ShootAnimated();
         });
+    }
+
+    private void DoSecondCheck(BlobFLight blobFLight)
+    {
+        if (_performSecondCheck != null)
+        {
+            StopCoroutine(_performSecondCheck);
+            _performSecondCheck = null;
+        }
+        _performSecondCheck = CalculateNewPossibleHit(blobFLight);
+        StartCoroutine(_performSecondCheck);
     }
 
     private void EndAnimatedShot()
@@ -174,10 +178,10 @@ public class Player : MonoBehaviour
 
         yield return new WaitForSeconds(timeToWait);
 
-        if (FirstBounceBlob != null)
+        if (FirstProjectile != null)
         {
-            FirstBounceBlob.transform.GetComponent<CircleCollider2D>().enabled = false;
-            Vector2 origin = FirstBounceBlob.transform.position;
+            FirstProjectile.transform.GetComponent<CircleCollider2D>().enabled = false;
+            Vector2 origin = FirstProjectile.transform.position;
             RaycastHit2D hit = FakeShootBlob(origin: origin, towards: blobFlight.Pos);
             if (hit)
             {
@@ -204,7 +208,7 @@ public class Player : MonoBehaviour
                     OnHitSomething(hit, origin);
                 }
             }
-            FirstBounceBlob.transform.GetComponent<CircleCollider2D>().enabled = true;
+            FirstProjectile.transform.GetComponent<CircleCollider2D>().enabled = true;
             StopCoroutine(_performSecondCheck);
             _performSecondCheck = null;
         }
@@ -224,13 +228,13 @@ public class Player : MonoBehaviour
             bool areStickedToAfterAll = _lastBlobFlight.Blob.StickedTo.Contains(_lastBlobFlightBlobId);
             if (areStickedToAfterAll == false)
             {
-                if (FirstBounceBlob != null)
+                if (FirstProjectile != null)
                 {
                     Debug.Log("We didn't <b>HIT ANYTHING</b> _lastBlobFlight.BlobId: " + _lastBlobFlightBlobId + "LastDir: " + LastDir);
-                    Vector2 origin = FirstBounceBlob.transform.position;
-                    Vector2 targetPos = (Vector2)FirstBounceBlob.transform.position + LastDir;
+                    Vector2 origin = FirstProjectile.transform.position;
+                    Vector2 targetPos = (Vector2)FirstProjectile.transform.position + LastDir;
                     BlobInMotion = false;
-                    FirstBounceBlob.GetComponent<CircleCollider2D>().enabled = false;
+                    FirstProjectile.GetComponent<CircleCollider2D>().enabled = false;
                     BlobFlightPositions = new List<BlobFLight>();
                     PrepShot(origin, targetPos);
                     Shoot();
@@ -252,7 +256,7 @@ public class Player : MonoBehaviour
 
         blobHitStickyInfo.blob.SetPosition(blobHitStickyInfo.blob.transform.position, createdInRow: false);
 
-        blobHitStickyInfo.blob.AnimateElasticSettle(blobHitStickyInfo);
+        blobHitStickyInfo.blob.BlobReveries.AnimateElasticSettle(blobHitStickyInfo);
 
         blobHitStickyInfo.blob.CheckSurroundings(blobHitStickyInfo.otherBlob);
 
@@ -260,7 +264,7 @@ public class Player : MonoBehaviour
         // ! important to try to destroy AFTER adding
         Game._.Level<LevelRandomRanked>().TryDestroyNeighbors(blobHitStickyInfo.blob);
 
-        FirstBounceBlob = null;
+        FirstProjectile = null;
         MakeBlob();
         MakingBlob = true;
         BlobInMotion = false;
@@ -268,10 +272,8 @@ public class Player : MonoBehaviour
 
     private GameObject GetRandomBlob()
     {
-        var go = HiddenSettings._.GetAnInstantiated(
-            Game._.Level<LevelRandomRanked>().debugLvl._debugBlobs ? PrefabBank._.DebugNewBlob : PrefabBank._.NewBlob
-        );
-        go.GetComponent<Blob>().SetColor(
+        var go = HiddenSettings._.GetAnInstantiated(PrefabBank._.NewBlob);
+        go.GetComponent<Blob>().BlobReveries.SetColor(
             Game._.Level<LevelRandomRanked>().DificultyService.GetColorByDificulty()
         );
         return go;
@@ -289,15 +291,13 @@ public class Player : MonoBehaviour
             return;
         }
 
-        if (BlobInMotion || FirstBounceBlob == null)
+        if (BlobInMotion || FirstProjectile == null)
         {
             return;
         }
 
-        FirstBounceBlob.GetComponent<CircleCollider2D>().enabled = false;
-        SecondBounceBlob.GetComponent<CircleCollider2D>().enabled = false;
-
-        _stopAfter = 0;
+        FirstProjectile.GetComponent<CircleCollider2D>().enabled = false;
+        SecondProjectile.GetComponent<CircleCollider2D>().enabled = false;
 
         Vector3 pointerDataPos = (baseEventData as PointerEventData).position;
         Vector3 p = Camera.main.ScreenToWorldPoint(new Vector3(pointerDataPos.x, pointerDataPos.y));
@@ -308,7 +308,9 @@ public class Player : MonoBehaviour
             Target.position = targetPos;
         }
 
-        Vector2 origin = FirstBounceBlob.transform.position;
+
+        _stopAfter = 0;
+        Vector2 origin = FirstProjectile.transform.position;
         BlobFlightPositions = new List<BlobFLight>();
         PrepShot(origin, targetPos);
         Shoot();
@@ -328,7 +330,8 @@ public class Player : MonoBehaviour
         {
             Debug.Log("direction: " + direction);
         }
-        return Physics2D.CircleCast(origin, _radius, direction, Mathf.Infinity, _layerMask);
+        float radius = FirstProjectile.GetComponent<Blob>().GetRadius();
+        return Physics2D.CircleCast(origin, radius, direction, Mathf.Infinity, _layerMask);
     }
 
     private void OnHitSomething(RaycastHit2D hit, Vector2 origin)

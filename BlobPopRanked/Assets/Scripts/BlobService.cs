@@ -1,5 +1,6 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 namespace Assets.Scripts
@@ -17,6 +18,22 @@ namespace Assets.Scripts
                 return distance < HiddenSettings._.NeighborProximity;
             }
             return distance < HiddenSettings._.NeighborTestDistance;
+        }
+
+        public static List<Blob> FindBlobsInProximity(List<Blob> blobs, Blob blob)
+        {
+            return blobs
+                .Where(b =>
+                {
+                    float distance = 0;
+                    bool inProximity = BlobService.AreClose(blob.transform, b.transform, ref distance, proximity: true);
+                    if (Game._.Level<LevelRandomRanked>().debugLvl._proximity)
+                    {
+                        Debug.Log("blob" + blob.Id + " and proximityBlob" + b.Id + " distance: " + distance +
+                            "(min: " + HiddenSettings._.NeighborProximity + ") inProximity: " + inProximity);
+                    }
+                    return inProximity;
+                }).ToList();
         }
     }
 }

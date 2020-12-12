@@ -229,7 +229,7 @@ public class DificultyService : MonoBehaviour
     public void CheckIfAddingNewRow()
     {
         bool isAtLeastOnBlobConnectedToCeil = (_levelRandomRanked.Blobs == null || _levelRandomRanked.Blobs.Count == 0) == false;
-        Debug.Log("_levelRandomRanked.Blobs.Count: " + _levelRandomRanked.Blobs.Count);
+        // Debug.Log("_levelRandomRanked.Blobs.Count: " + _levelRandomRanked.Blobs.Count);
         if (isAtLeastOnBlobConnectedToCeil == false)
         {
             isAtLeastOnBlobConnectedToCeil = _levelRandomRanked.Blobs.Exists(b =>
@@ -268,7 +268,7 @@ public class DificultyService : MonoBehaviour
             {
                 HitsToReset = MaxHits;
             }
-            Debug.Log("HitsToReset: " + HitsToReset);
+            // Debug.Log("HitsToReset: " + HitsToReset);
 
             Hits++;
             if (Hits >= HitsToReset)

@@ -94,7 +94,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 904b4cbad8e1b2246a5e70ad8ea9f5aa, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  Sprite: {fileID: 0}
   StickedTo: 0
 --- !u!1 &1750723479
 GameObject:
@@ -190,7 +189,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 904b4cbad8e1b2246a5e70ad8ea9f5aa, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  Sprite: {fileID: 0}
   StickedTo: 0
 --- !u!1 &1885364513
 GameObject:
@@ -286,7 +284,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 904b4cbad8e1b2246a5e70ad8ea9f5aa, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  Sprite: {fileID: 0}
   StickedTo: 0
 --- !u!1 &2130193056
 GameObject:
@@ -382,7 +379,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 904b4cbad8e1b2246a5e70ad8ea9f5aa, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  Sprite: {fileID: 0}
   StickedTo: 0
 --- !u!1 &4145380659047735843
 GameObject:
@@ -478,7 +474,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 904b4cbad8e1b2246a5e70ad8ea9f5aa, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  Sprite: {fileID: 0}
   StickedTo: 0
 --- !u!1 &5860757720808198434
 GameObject:
@@ -490,6 +485,7 @@ GameObject:
   m_Component:
   - component: {fileID: 5860757720808198437}
   - component: {fileID: 1632285352}
+  - component: {fileID: 13703847343240896}
   - component: {fileID: 93647181}
   m_Layer: 0
   m_Name: _Blob
@@ -532,15 +528,27 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   Id: 0
   Pos: {x: 0, y: 0, z: 0}
-  BlobColor: 0
-  Sprite: {fileID: 4471285940417444453}
+  BlobReveries: {fileID: 13703847343240896}
   IdText: {fileID: 0}
   NeighborText: {fileID: 0}
   Neighbors: 
   StickedTo: 
-  Radius: 0
   HasAnyNeighbors: 0
   CanDestroyNeighbors: 0
+--- !u!114 &13703847343240896
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5860757720808198434}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 665c6061bbd425a42a720a55975afe2f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  Sprite: {fileID: 4471285940417444453}
+  BlobColor: 0
   StickingGlues:
   - {fileID: 4145380659047735844}
   - {fileID: 865902946}

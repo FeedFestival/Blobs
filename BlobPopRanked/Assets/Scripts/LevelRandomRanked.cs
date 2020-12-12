@@ -178,9 +178,7 @@ public class LevelRandomRanked : MonoBehaviour, ILevel
         {
             i = _increment;
         }
-        GameObject go = HiddenSettings._.GetAnInstantiated(
-            debugLvl._debugBlobs ? PrefabBank._.DebugBlob : PrefabBank._.Blob
-        );
+        GameObject go = HiddenSettings._.GetAnInstantiated(PrefabBank._.Blob);
         Vector3 pos;
         if (i == 0)
         {
@@ -197,7 +195,7 @@ public class LevelRandomRanked : MonoBehaviour, ILevel
         go.transform.SetParent(BlobsParentT);
         var blob = go.GetComponent<Blob>();
         blob.SetPosition(pos, true);
-        blob.SetColor(DificultyService.GetColorByDificulty());
+        blob.BlobReveries.SetColor(DificultyService.GetColorByDificulty());
         blob.CalculateNeighbors(Blobs);
         Blobs.Add(blob);
     }
@@ -268,7 +266,7 @@ public class LevelRandomRanked : MonoBehaviour, ILevel
         foreach (int id in _toDestroy)
         {
             Blob oneBlobFromToDestroy = Blobs.Find(b => b.Id == id);
-            int colorIndex = (int)oneBlobFromToDestroy.BlobColor;
+            int colorIndex = (int)oneBlobFromToDestroy.BlobReveries.BlobColor;
             DificultyService.ChangeColorNumbers(colorIndex, false);
         }
 

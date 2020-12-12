@@ -3,15 +3,44 @@ using System.Collections.Generic;
 using Assets.Scripts.utils;
 using UnityEngine;
 
-public class Bounce : MonoBehaviour
+public class BlobProjectile : MonoBehaviour
 {
     private Rigidbody2D _rb;
+    private int? _flightTweenId;
 
     void Awake()
     {
         _rb = gameObject.GetComponent<Rigidbody2D>();
         gameObject.layer = LayerMask.NameToLayer("BlobProjectile");
     }
+
+    // public void PlayFlight(BlobFLight blobFLight)
+    // {
+    //     if (_flightTweenId.HasValue)
+    //     {
+    //         LeanTween.cancel(_flightTweenId.Value);
+    //         _flightTweenId = null;
+    //     }
+
+    //     if (_firstAndOnly || _last)
+    //     {
+    //         if (FirstProjectile == null)
+    //         {
+    //             Debug.Log("We probably <b>HIT SOMETHING</b> on the way.");
+    //             EndAnimatedShot();
+    //             return;
+    //         }
+    //         LastDir = (blobFLight.Pos - (Vector2)FirstProjectile.transform.position).normalized;
+    //         DoSecondCheck(blobFLight);
+    //     }
+
+    //     _flightTweenId = LeanTween.move(FirstProjectile.gameObject, blobFLight.Pos, blobFLight.time).id;
+    //     LeanTween.descr(_flightTweenId.Value).setEase(LeanTweenType.linear);
+    //     LeanTween.descr(_flightTweenId.Value).setOnComplete(() =>
+    //     {
+    //         ShootAnimated();
+    //     });
+    // }
 
     void OnCollisionEnter2D(Collision2D col)
     {

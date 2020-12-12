@@ -1,10 +1,7 @@
-﻿using System;
-using System.Collections;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using Assets.Scripts;
 using UnityEngine;
 using System.Linq;
-using UnityEngine.UI;
 using Assets.Scripts.utils;
 
 public class Blob : MonoBehaviour
@@ -12,30 +9,21 @@ public class Blob : MonoBehaviour
     public int Id;
     public Vector3 Pos;
     [SerializeField]
-    public BlobColor BlobColor;
-    public SpriteRenderer Sprite;
-    public TextMesh IdText;
-    public TextMesh NeighborText;
+    public BlobReveries BlobReveries;
+    private BlobDebugInfo _blobDebugInfo;
     [Header("Game Props")]
     public List<int> Neighbors;
     public List<int> StickedTo;
-    public float Radius;
     private float? _radius;
     public bool HasAnyNeighbors;
     public bool CanDestroyNeighbors;
-    private int? _forcePushTweenId;
-    private Vector2 _initialPos;
-    private int? _reflectTweenId;
-    private Vector2 _reflectToPos;
     List<int> _linkedNeighbors;
-    public List<StickingGlue> StickingGlues;
 
     internal float GetRadius()
     {
         if (_radius.HasValue == false)
         {
             _radius = GetComponent<CircleCollider2D>().radius;
-            Radius = _radius.Value;
         }
         return _radius.Value;
     }
@@ -54,11 +42,6 @@ public class Blob : MonoBehaviour
         }
         gameObject.layer = LayerMask.NameToLayer("Blob");
 
-        if (Game._.Level<LevelRandomRanked>().debugLvl._debugBlobs)
-        {
-            if (IdText != null) IdText.text = Id.ToString();
-        }
-
         SetWorldPosition(pos);
         gameObject.transform.position = Pos;
     }
@@ -67,6 +50,13 @@ public class Blob : MonoBehaviour
     {
         Id = Game._.GetUniqueId();
         gameObject.name = "_Blob " + Id;
+
+        if (Game._.Level<LevelRandomRanked>().debugLvl._debugBlobs)
+        {
+            var go = HiddenSettings._.GetAnInstantiated(PrefabBank._.BlobDebugInfoPrefab);
+            _blobDebugInfo = go.GetComponent<BlobDebugInfo>();
+            _blobDebugInfo.SetId(transform, Id);
+        }
     }
 
     internal void Descend()
@@ -82,16 +72,6 @@ public class Blob : MonoBehaviour
     private void SetWorldPosition(Vector3 pos)
     {
         Pos = pos;
-        // Debug.Log("blob" + Id + " Pos: " + Pos);
-    }
-
-    internal void SetColor(BlobColor blobColor, bool instant = true)
-    {
-        BlobColor = blobColor;
-        if (instant)
-        {
-            Sprite.color = Game._.Level<LevelRandomRanked>().GetColorByBlobColor(BlobColor);
-        }
     }
 
     internal void AddNeighbor(int? id, Blob otherBlob = null, bool goDeep = true)
@@ -109,7 +89,6 @@ public class Blob : MonoBehaviour
         {
             otherBlob = Game._.Level<LevelRandomRanked>().GetBlobById(id.Value);
         }
-
 
         if (Neighbors.Contains(id.Value))
         {
@@ -133,7 +112,7 @@ public class Blob : MonoBehaviour
         if (Game._.Level<LevelRandomRanked>().debugLvl._debugBlobs
             && Game._.Level<LevelRandomRanked>().debugLvl._neighborsProcess)
         {
-            if (NeighborText != null) NeighborText.text = utils.DebugList<int>(Neighbors);
+            if (_blobDebugInfo != null) _blobDebugInfo.NeighborText.text = utils.DebugList<int>(Neighbors);
         }
     }
 
@@ -158,16 +137,7 @@ public class Blob : MonoBehaviour
         GetComponent<CircleCollider2D>().enabled = false;
         if (Game._.Level<LevelRandomRanked>().debugLvl._blobKilling)
         {
-            float transparency = 0.15f;
-            Color color = Game._.Level<LevelRandomRanked>().GetColorByBlobColor(BlobColor);
-            color.a = transparency;
-            Sprite.color = color;
-            color = HiddenSettings._.White;
-            color.a = transparency;
-            IdText.color = color;
-            color = HiddenSettings._.White;
-            color.a = transparency;
-            NeighborText.color = color;
+            _blobDebugInfo.FakeKill(BlobReveries.BlobColor, ref BlobReveries.Sprite);
         }
         else
         {
@@ -215,7 +185,7 @@ public class Blob : MonoBehaviour
                 + HiddenSettings._.NeighborTestDistance);
         }
 
-        var areSameColor = BlobColor == otherBlob.BlobColor;
+        var areSameColor = BlobReveries.BlobColor == otherBlob.BlobReveries.BlobColor;
         return areClose && areSameColor;
     }
 
@@ -228,10 +198,10 @@ public class Blob : MonoBehaviour
                 Debug.Log("blob" + Id + " sticked to otherBlob" + otherBlob.Id);
             }
 
-            int index = StickingGlues.FindIndex(sG => sG.gameObject.activeSelf == false);
+            int index = BlobReveries.StickingGlues.FindIndex(sG => sG.gameObject.activeSelf == false);
             if (otherBlob.StickedTo.Contains(Id) == false)
             {
-                StickingGlues[index].SetStickedTo(stickedTo: otherBlob, BlobColor);
+                BlobReveries.StickingGlues[index].SetStickedTo(stickedTo: otherBlob, BlobReveries.BlobColor);
             }
 
             otherBlob.StickTo(this, viceVersa: false);
@@ -255,12 +225,7 @@ public class Blob : MonoBehaviour
                 Debug.Log("blob" + Id + " removed stickedBlob[" + id + "]");
             }
             StickedTo.RemoveAt(index);
-
-            index = StickingGlues.FindIndex(sG => sG.StickedTo == id);
-            if (index >= 0)
-            {
-                StickingGlues[index].Unstick();
-            }
+            BlobReveries.RemoveStickingGlue(id);
         }
     }
 
@@ -271,26 +236,10 @@ public class Blob : MonoBehaviour
             StickedTo.Add(HiddenSettings._.CeilId);
         }
 
-        List<Blob> proximityBlobs = FindBlobsInProximity();
-        AnimateShockwave(proximityBlobs);
+        List<Blob> proximityBlobs = BlobService.FindBlobsInProximity(Game._.Level<LevelRandomRanked>().Blobs, this);
+        BlobReveries.AnimateShockwave(proximityBlobs);
         SetupNeighbors(proximityBlobs, otherBlob);
         CanDestroyNeighbors = MeetsRequirementsToDestroy();
-    }
-
-    private List<Blob> FindBlobsInProximity()
-    {
-        return Game._.Level<LevelRandomRanked>().Blobs
-            .Where(b =>
-            {
-                float distance = 0;
-                bool inProximity = BlobService.AreClose(transform, b.transform, ref distance, proximity: true);
-                if (Game._.Level<LevelRandomRanked>().debugLvl._proximity)
-                {
-                    Debug.Log("blob" + Id + " and proximityBlob" + b.Id + " distance: " + distance +
-                        "(min: " + HiddenSettings._.NeighborProximity + ") inProximity: " + inProximity);
-                }
-                return inProximity;
-            }).ToList();
     }
 
     private void SetupNeighbors(List<Blob> proximityBlobs, Blob otherBlob)
@@ -313,99 +262,6 @@ public class Blob : MonoBehaviour
                 HasAnyNeighbors = true;
             }
         }
-    }
-
-    public void AnimateElasticSettle(BlobHitStickyInfo blobHitStickyInfo)
-    {
-
-        if (_reflectTweenId.HasValue)
-        {
-            LeanTween.cancel(_reflectTweenId.Value);
-            _reflectTweenId = null;
-        }
-
-        bool hitSomethingElseThenABlob = blobHitStickyInfo.otherBlob == null;
-        if (hitSomethingElseThenABlob)
-        {
-            _initialPos = new Vector2(transform.localPosition.x, 4.44f - Game._.Level<LevelRandomRanked>().BlobsParentT.position.y);
-        }
-        else
-        {
-            Vector2 dirFromOtherBlobToThisOne = (transform.localPosition - blobHitStickyInfo.otherBlob.transform.localPosition).normalized;
-            // Debug.Log("dirFromOtherBlobToThisOne: " + dirFromOtherBlobToThisOne);
-
-            Ray ray = new Ray(blobHitStickyInfo.otherBlob.transform.localPosition, dirFromOtherBlobToThisOne);
-            Vector2 pos = ray.GetPoint(0.5f);
-            _initialPos = pos;
-        }
-        // Debug.Log("_initialPos: " + _initialPos);
-
-        _reflectToPos = (Vector2)transform.localPosition + ((Vector2)blobHitStickyInfo.ReflectDir.normalized * HiddenSettings._.BallStickyReflectDistanceModifier);
-        _reflectTweenId = LeanTween.moveLocal(gameObject,
-            _reflectToPos,
-            HiddenSettings._.BlobForcePushAnimL
-            ).id;
-        LeanTween.descr(_reflectTweenId.Value).setEase(LeanTweenType.easeOutExpo);
-        LeanTween.descr(_reflectTweenId.Value).setOnComplete(() =>
-        {
-            ElasticBack();
-        });
-    }
-
-    private void AnimateShockwave(List<Blob> proximityBlobs)
-    {
-        foreach (Blob proxiBlob in proximityBlobs)
-        {
-            float distance = Vector2.Distance(
-                        new Vector2(transform.position.x, transform.position.y),
-                        new Vector2(proxiBlob.transform.position.x, proxiBlob.transform.position.y)
-                    );
-            Vector2 dir = (proxiBlob.transform.position - transform.position).normalized;
-            var proxiBlobDir = (dir * ((1 - distance) + 0.1f)) * 0.2f;
-            proxiBlob.ForcePush(proxiBlobDir);
-        }
-    }
-
-    private void ForcePush(Vector2 proxiBlobDir)
-    {
-        if (_forcePushTweenId.HasValue)
-        {
-            LeanTween.cancel(_forcePushTweenId.Value);
-            _forcePushTweenId = null;
-        }
-        _initialPos = transform.localPosition;
-        _forcePushTweenId = LeanTween.moveLocal(gameObject,
-            _initialPos + proxiBlobDir,
-            HiddenSettings._.BlobForcePushAnimL
-            ).id;
-        LeanTween.descr(_forcePushTweenId.Value).setEase(LeanTweenType.easeOutExpo);
-        LeanTween.descr(_forcePushTweenId.Value).setOnComplete(() =>
-        {
-            ElasticBack();
-        });
-    }
-
-    private void ElasticBack(bool worldMove = false)
-    {
-        if (_forcePushTweenId.HasValue)
-        {
-            LeanTween.cancel(_forcePushTweenId.Value);
-            _forcePushTweenId = null;
-        }
-
-        _forcePushTweenId = LeanTween.moveLocal(gameObject,
-            _initialPos,
-            HiddenSettings._.BlobElasticBackAnimL
-            ).id;
-
-        List<int> eases = new List<int>() {
-            (int)LeanTweenType.easeInOutBack,
-            (int)LeanTweenType.easeOutElastic,
-            (int)LeanTweenType.easeOutBounce
-        };
-        LeanTweenType ease = (LeanTweenType)percent.GetRandomFromList<int>(eases);
-
-        LeanTween.descr(_forcePushTweenId.Value).setEase(ease);
     }
 
     private bool MeetsRequirementsToDestroy()

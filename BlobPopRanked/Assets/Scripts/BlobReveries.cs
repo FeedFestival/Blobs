@@ -1,18 +1,127 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
+using Assets.Scripts.utils;
 using UnityEngine;
 
 public class BlobReveries : MonoBehaviour
 {
-    // Start is called before the first frame update
-    void Start()
+    public SpriteRenderer Sprite;
+    public BlobColor BlobColor;
+    public List<StickingGlue> StickingGlues;
+    private int? _forcePushTweenId;
+    private int? _reflectTweenId;
+    private Vector2 _initialPos;
+    private Vector2 _reflectToPos;
+
+    internal void SetColor(BlobColor blobColor, bool instant = true)
     {
-        
+        BlobColor = blobColor;
+        if (instant)
+        {
+            Sprite.color = Game._.Level<LevelRandomRanked>().GetColorByBlobColor(BlobColor);
+        }
     }
 
-    // Update is called once per frame
-    void Update()
+    public void AnimateElasticSettle(BlobHitStickyInfo blobHitStickyInfo)
     {
-        
+
+        if (_reflectTweenId.HasValue)
+        {
+            LeanTween.cancel(_reflectTweenId.Value);
+            _reflectTweenId = null;
+        }
+
+        bool hitSomethingElseThenABlob = blobHitStickyInfo.otherBlob == null;
+        if (hitSomethingElseThenABlob)
+        {
+            _initialPos = new Vector2(transform.localPosition.x, 4.44f - Game._.Level<LevelRandomRanked>().BlobsParentT.position.y);
+        }
+        else
+        {
+            Vector2 dirFromOtherBlobToThisOne = (transform.localPosition - blobHitStickyInfo.otherBlob.transform.localPosition).normalized;
+            // Debug.Log("dirFromOtherBlobToThisOne: " + dirFromOtherBlobToThisOne);
+
+            Ray ray = new Ray(blobHitStickyInfo.otherBlob.transform.localPosition, dirFromOtherBlobToThisOne);
+            Vector2 pos = ray.GetPoint(0.5f);
+            _initialPos = pos;
+        }
+        // Debug.Log("_initialPos: " + _initialPos);
+
+        _reflectToPos = (Vector2)transform.localPosition + ((Vector2)blobHitStickyInfo.ReflectDir.normalized * HiddenSettings._.BallStickyReflectDistanceModifier);
+        _reflectTweenId = LeanTween.moveLocal(gameObject,
+            _reflectToPos,
+            HiddenSettings._.BlobForcePushAnimL
+            ).id;
+        LeanTween.descr(_reflectTweenId.Value).setEase(LeanTweenType.easeOutExpo);
+        LeanTween.descr(_reflectTweenId.Value).setOnComplete(() =>
+        {
+            ElasticBack();
+        });
+    }
+
+    public void AnimateShockwave(List<Blob> proximityBlobs)
+    {
+        foreach (Blob proxiBlob in proximityBlobs)
+        {
+            float distance = Vector2.Distance(
+                        new Vector2(transform.position.x, transform.position.y),
+                        new Vector2(proxiBlob.transform.position.x, proxiBlob.transform.position.y)
+                    );
+            Vector2 dir = (proxiBlob.transform.position - transform.position).normalized;
+            var proxiBlobDir = (dir * ((1 - distance) + 0.1f)) * 0.2f;
+            proxiBlob.BlobReveries.ForcePush(proxiBlobDir);
+        }
+    }
+
+    public void ForcePush(Vector2 proxiBlobDir)
+    {
+        if (_forcePushTweenId.HasValue)
+        {
+            LeanTween.cancel(_forcePushTweenId.Value);
+            _forcePushTweenId = null;
+        }
+        _initialPos = transform.localPosition;
+        _forcePushTweenId = LeanTween.moveLocal(gameObject,
+            _initialPos + proxiBlobDir,
+            HiddenSettings._.BlobForcePushAnimL
+            ).id;
+        LeanTween.descr(_forcePushTweenId.Value).setEase(LeanTweenType.easeOutExpo);
+        LeanTween.descr(_forcePushTweenId.Value).setOnComplete(() =>
+        {
+            ElasticBack();
+        });
+    }
+
+    public void ElasticBack(bool worldMove = false)
+    {
+        if (_forcePushTweenId.HasValue)
+        {
+            LeanTween.cancel(_forcePushTweenId.Value);
+            _forcePushTweenId = null;
+        }
+
+        _forcePushTweenId = LeanTween.moveLocal(gameObject,
+            _initialPos,
+            HiddenSettings._.BlobElasticBackAnimL
+            ).id;
+
+        List<int> eases = new List<int>() {
+            (int)LeanTweenType.easeInOutBack,
+            (int)LeanTweenType.easeOutElastic,
+            (int)LeanTweenType.easeOutBounce
+        };
+        LeanTweenType ease = (LeanTweenType)percent.GetRandomFromList<int>(eases);
+
+        LeanTween.descr(_forcePushTweenId.Value).setEase(ease);
+    }
+
+    internal void RemoveStickingGlue(int id)
+    {
+        int index = StickingGlues.FindIndex(sG => sG.StickedTo == id);
+        if (index >= 0)
+        {
+            StickingGlues[index].Unstick();
+        }
     }
 }
