@@ -43,7 +43,10 @@ public class HiddenSettings : MonoBehaviour
     public float BlobForcePushAnimL;
     public float BlobElasticBackAnimL;
     public float BallStickyReflectDistanceModifier;
-
+    public float StretchSpeed;
+    public float StretchSpeedSticky;
+    public float StartTravelSpeed;
+    public float TravelSpeed;
     public GameObject PrefabBankPrefab;
 
     [Header("Colors")]

@@ -27,6 +27,7 @@ public class BlobFLight
     public float time;
     public Vector2 Pos;
     public Blob Blob;
+    public Vector2 normal;
 
     public BlobFLight() { }
 

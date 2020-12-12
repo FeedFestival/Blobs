@@ -31,11 +31,55 @@ public class Player : MonoBehaviour
     private int _lastBlobFlightBlobId;
     public Vector2 LastDir;
     private int _layerMask;
-    private int? _flightTweenId;
 
     void Start()
     {
-        _layerMask = utils.CreateLayerMask(aExclude: true, LayerMask.NameToLayer("BlobProjectile"), LayerMask.NameToLayer("EndGame"));
+        _layerMask = utils.CreateLayerMask(aExclude: true, LayerMask.NameToLayer(LAYER.BlobProjectile), LayerMask.NameToLayer(LAYER.EndGame));
+    }
+
+    void Update()
+    {
+        if (Input.GetKeyUp(KeyCode.Return))
+        {
+            Shoot();
+        }
+    }
+
+    public void SetIsInPointArea(bool val)
+    {
+        IsInPointArea = val;
+    }
+
+    public void PointerUp(BaseEventData baseEventData)
+    {
+        if (Game._.Level<LevelRandomRanked>().debugLvl._noFiring)
+        {
+            return;
+        }
+
+        if (BlobInMotion || FirstProjectile == null)
+        {
+            return;
+        }
+
+        FirstProjectile.GetComponent<CircleCollider2D>().enabled = false;
+        SecondProjectile.GetComponent<CircleCollider2D>().enabled = false;
+
+        Vector3 pointerDataPos = (baseEventData as PointerEventData).position;
+        Vector3 p = Camera.main.ScreenToWorldPoint(new Vector3(pointerDataPos.x, pointerDataPos.y));
+        Vector2 targetPos = new Vector3(p.x, p.y, 0);
+
+        if (Game._.Level<LevelRandomRanked>().debugLvl._shooting)
+        {
+            Target.position = targetPos;
+        }
+
+
+        _stopAfter = 0;
+        Vector2 origin = FirstProjectile.transform.position;
+        BlobFlightPositions = new List<BlobFLight>();
+        PrepShot(origin, targetPos);
+        Shoot();
     }
 
     internal void MakeBlob(bool firstLevel = false)
@@ -87,6 +131,9 @@ public class Player : MonoBehaviour
         _firstAndOnly = BlobFlightPositions.Count == 1;
         _last = false;
         _inFlightIndex = -1;
+
+        // Time.timeScale = 0.2f;
+
         ShootAnimated();
 
         BlobInMotion = true;
@@ -106,27 +153,18 @@ public class Player : MonoBehaviour
             _last = _inFlightIndex == BlobFlightPositions.Count - 1;
         }
 
+        BlobFLight blobFLight = BlobFlightPositions[_inFlightIndex];
         if (_inFlightIndex == 0)
         {
-            BlobFlightPositions[_inFlightIndex].distanceToPrevious =
-                Vector2.Distance(FirstProjectile.transform.position, BlobFlightPositions[_inFlightIndex].Pos);
+            blobFLight.distanceToPrevious =
+                Vector2.Distance(FirstProjectile.transform.position, blobFLight.Pos);
         }
         else
         {
-            BlobFlightPositions[_inFlightIndex].distanceToPrevious =
-                Vector2.Distance(BlobFlightPositions[_inFlightIndex - 1].Pos, BlobFlightPositions[_inFlightIndex].Pos);
+            blobFLight.distanceToPrevious =
+                Vector2.Distance(BlobFlightPositions[_inFlightIndex - 1].Pos, blobFLight.Pos);
         }
-        BlobFlightPositions[_inFlightIndex].time = 0.09f * BlobFlightPositions[_inFlightIndex].distanceToPrevious;
-        PlayFlight(BlobFlightPositions[_inFlightIndex]);
-    }
-
-    private void PlayFlight(BlobFLight blobFLight)
-    {
-        if (_flightTweenId.HasValue)
-        {
-            LeanTween.cancel(_flightTweenId.Value);
-            _flightTweenId = null;
-        }
+        blobFLight.time = 0.09f * blobFLight.distanceToPrevious;
 
         if (_firstAndOnly || _last)
         {
@@ -140,12 +178,7 @@ public class Player : MonoBehaviour
             DoSecondCheck(blobFLight);
         }
 
-        _flightTweenId = LeanTween.move(FirstProjectile.gameObject, blobFLight.Pos, blobFLight.time).id;
-        LeanTween.descr(_flightTweenId.Value).setEase(LeanTweenType.linear);
-        LeanTween.descr(_flightTweenId.Value).setOnComplete(() =>
-        {
-            ShootAnimated();
-        });
+        FirstProjectile.PlayFlight(blobFLight, ShootAnimated);
     }
 
     private void DoSecondCheck(BlobFLight blobFLight)
@@ -161,6 +194,7 @@ public class Player : MonoBehaviour
 
     private void EndAnimatedShot()
     {
+        // Time.timeScale = 1f;
         _lastBlobFlight = BlobFlightPositions[BlobFlightPositions.Count - 1];
         if (_performLastCheck != null)
         {
@@ -185,7 +219,7 @@ public class Player : MonoBehaviour
             RaycastHit2D hit = FakeShootBlob(origin: origin, towards: blobFlight.Pos);
             if (hit)
             {
-                if (hit.transform.tag == "Blob")
+                if (hit.transform.tag == TAG.Blob)
                 {
                     Blob newHitBlob = hit.transform.GetComponent<Blob>();
                     if (newHitBlob.Id != blobFlight.Blob.Id)
@@ -198,7 +232,7 @@ public class Player : MonoBehaviour
                         // Debug.Log("Route kept: newHitBlob[" + newHitBlob.Id + "] is the <b>SAME</b>, we expected blobFlight.blob[" + blobFlight.Blob.Id + "]");
                     }
                 }
-                else if (hit.transform.tag == "StickySurface")
+                else if (hit.transform.tag == TAG.StickySurface)
                 {
                     // Debug.Log("<b>StickySurface</b>");
                 }
@@ -273,47 +307,8 @@ public class Player : MonoBehaviour
     private GameObject GetRandomBlob()
     {
         var go = HiddenSettings._.GetAnInstantiated(PrefabBank._.NewBlob);
-        go.GetComponent<Blob>().BlobReveries.SetColor(
-            Game._.Level<LevelRandomRanked>().DificultyService.GetColorByDificulty()
-        );
+        go.GetComponent<Blob>().BlobReveries.SetColor(Game._.Level<LevelRandomRanked>().DificultyService.GetColorByDificulty());
         return go;
-    }
-
-    public void SetIsInPointArea(bool val)
-    {
-        IsInPointArea = val;
-    }
-
-    public void PointerUp(BaseEventData baseEventData)
-    {
-        if (Game._.Level<LevelRandomRanked>().debugLvl._noFiring)
-        {
-            return;
-        }
-
-        if (BlobInMotion || FirstProjectile == null)
-        {
-            return;
-        }
-
-        FirstProjectile.GetComponent<CircleCollider2D>().enabled = false;
-        SecondProjectile.GetComponent<CircleCollider2D>().enabled = false;
-
-        Vector3 pointerDataPos = (baseEventData as PointerEventData).position;
-        Vector3 p = Camera.main.ScreenToWorldPoint(new Vector3(pointerDataPos.x, pointerDataPos.y));
-        Vector2 targetPos = new Vector3(p.x, p.y, 0);
-
-        if (Game._.Level<LevelRandomRanked>().debugLvl._shooting)
-        {
-            Target.position = targetPos;
-        }
-
-
-        _stopAfter = 0;
-        Vector2 origin = FirstProjectile.transform.position;
-        BlobFlightPositions = new List<BlobFLight>();
-        PrepShot(origin, targetPos);
-        Shoot();
     }
 
     private void PrepShot(Vector2 origin, Vector2 targetPos)
@@ -365,7 +360,9 @@ public class Player : MonoBehaviour
                 }
 
                 Vector2 newOrigin = (Vector2)hit.centroid;
-                BlobFlightPositions.Add(new BlobFLight(newOrigin));
+                BlobFLight blobFLight = new BlobFLight(newOrigin);
+                blobFLight.normal = hit.normal;
+                BlobFlightPositions.Add(blobFLight);
                 Vector2 oldDir = ((Vector2)newOrigin - (Vector2)origin).normalized;
                 Vector2 reflectDir = Vector2.Reflect(oldDir, hit.normal.normalized);
                 Vector2 newTowards = (Vector2)newOrigin + reflectDir;
@@ -389,7 +386,7 @@ public class Player : MonoBehaviour
                 RaycastHit2D newHit = FakeShootBlob(origin: newOrigin, towards: newTowards);
                 OnHitSomething(newHit, newOrigin);
             }
-            else if (hit.transform.tag == "StickySurface" || hit.transform.tag == "Blob")
+            else if (hit.transform.tag == TAG.StickySurface || hit.transform.tag == TAG.Blob)
             {
                 FakeHitBlob(hit);
             }
@@ -406,13 +403,5 @@ public class Player : MonoBehaviour
         }
         Blob blob = hit.transform.GetComponent<Blob>();
         BlobFlightPositions.Add(new BlobFLight(newOrigin, blob));
-    }
-
-    void Update()
-    {
-        if (Input.GetKeyUp(KeyCode.Return))
-        {
-            Shoot();
-        }
     }
 }

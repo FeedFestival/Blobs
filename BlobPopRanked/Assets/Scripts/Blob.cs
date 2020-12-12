@@ -38,9 +38,9 @@ public class Blob : MonoBehaviour
         }
         else
         {
-            gameObject.tag = "Blob";
+            gameObject.tag = TAG.Blob;
         }
-        gameObject.layer = LayerMask.NameToLayer("Blob");
+        gameObject.layer = LayerMask.NameToLayer(LAYER.Blob);
 
         SetWorldPosition(pos);
         gameObject.transform.position = Pos;
@@ -237,7 +237,11 @@ public class Blob : MonoBehaviour
         }
 
         List<Blob> proximityBlobs = BlobService.FindBlobsInProximity(Game._.Level<LevelRandomRanked>().Blobs, this);
+
         BlobReveries.AnimateShockwave(proximityBlobs);
+        otherBlob.BlobReveries
+            .StretchOnCollision((otherBlob.transform.position - transform.position).normalized, null, hitSticky: true);
+
         SetupNeighbors(proximityBlobs, otherBlob);
         CanDestroyNeighbors = MeetsRequirementsToDestroy();
     }

@@ -56,28 +56,11 @@ MonoBehaviour:
   BlobForcePushAnimL: 0.15
   BlobElasticBackAnimL: 0.5
   BallStickyReflectDistanceModifier: 0.33
+  StretchSpeed: 4.44
+  StretchSpeedSticky: 2.5
+  StartTravelSpeed: 7
+  TravelSpeed: 2
   PrefabBankPrefab: {fileID: 4110335019297747375, guid: ab4ac96b18902cd4290bc37e629eb5aa,
     type: 3}
-  MineShaftLightColor: {r: 0.18431373, g: 0.18431373, b: 0.18431373, a: 1}
-  MineShaft: {r: 0.121568635, g: 0.121568635, b: 0.121568635, a: 1}
-  CodGrayColor: {r: 0.06666667, g: 0.06666667, b: 0.06666667, a: 1}
   TransparentColor: {r: 0, g: 0, b: 0, a: 0}
-  OrangeColor: {r: 0.9960785, g: 0.3372549, b: 0.121568635, a: 1}
-  PomegranateColor: {r: 0.94117653, g: 0.227451, b: 0.1764706, a: 1}
-  AlizarinCrimsonColor: {r: 0.89019614, g: 0.10588236, b: 0.23137257, a: 1}
-  VioletLightColor: {r: 0.882353, g: 0.33333334, b: 0.8862746, a: 1}
-  MediumPurple: {r: 0.7254902, g: 0.28235295, b: 0.8980393, a: 1}
-  VioletDarkColor: {r: 0.58431375, g: 0.23529413, b: 0.9176471, a: 1}
-  RoyalBlueLightColor: {r: 0.23529412, g: 0.5137255, b: 0.91764706, a: 1}
-  RoyalBlue: {r: 0.28235295, g: 0.3647059, b: 0.8980392, a: 1}
-  RoyalBlueDarkColor: {r: 0.32941177, g: 0.23137257, b: 0.882353, a: 1}
-  Conifer: {r: 0.627451, g: 0.9176471, b: 0.23137257, a: 1}
-  AtlantisColor: {r: 0.5294118, g: 0.8352941, b: 0.21176471, a: 1}
-  AtlantisDarkColor: {r: 0.427451, g: 0.7607844, b: 0.18823531, a: 1}
-  Gorse: {r: 0.9960785, g: 0.9333334, b: 0.24705884, a: 1}
-  Candlelight: {r: 1, g: 0.8470589, b: 0.12941177, a: 1}
-  Amber: {r: 1, g: 0.7607844, b: 0, a: 1}
-  YellowColor: {r: 0.7254902, g: 0.28235295, b: 0.8980393, a: 1}
-  LightBlueColor: {r: 0, g: 0, b: 0, a: 0}
   White: {r: 1, g: 1, b: 1, a: 1}
-  WhiteTransparent: {r: 0, g: 0, b: 0, a: 0}

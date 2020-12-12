@@ -11,7 +11,7 @@ public class EndGame : MonoBehaviour
         {
             return;
         }
-        if (col.transform.tag == "Blob")
+        if (col.transform.tag == TAG.Blob)
         {
             Game._.OnGameOver();
         }
@@ -23,7 +23,7 @@ public class EndGame : MonoBehaviour
         {
             return;
         }
-        if (col.transform.tag == "Blob")
+        if (col.transform.tag == TAG.Blob)
         {
             Game._.OnGameOver();
         }

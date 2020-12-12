@@ -86,6 +86,12 @@ TextureImporter:
   - first:
       213: 3063593429259555148
     second: Blob_27
+  - first:
+      213: -2482672287128053535
+    second: Blob_28
+  - first:
+      213: -5936914398721345386
+    second: Blob_29
   externalObjects: {}
   serializedVersion: 11
   mipmaps:
@@ -115,7 +121,7 @@ TextureImporter:
   maxTextureSize: 2048
   textureSettings:
     serializedVersion: 2
-    filterMode: -1
+    filterMode: 0
     aniso: -1
     mipBias: -100
     wrapU: 1
@@ -148,7 +154,7 @@ TextureImporter:
     maxTextureSize: 2048
     resizeAlgorithm: 0
     textureFormat: -1
-    textureCompression: 2
+    textureCompression: 1
     compressionQuality: 50
     crunchedCompression: 0
     allowsAlphaSplitting: 0
@@ -160,7 +166,7 @@ TextureImporter:
     maxTextureSize: 2048
     resizeAlgorithm: 0
     textureFormat: -1
-    textureCompression: 2
+    textureCompression: 1
     compressionQuality: 50
     crunchedCompression: 0
     allowsAlphaSplitting: 0
@@ -172,7 +178,7 @@ TextureImporter:
     maxTextureSize: 2048
     resizeAlgorithm: 0
     textureFormat: -1
-    textureCompression: 2
+    textureCompression: 1
     compressionQuality: 50
     crunchedCompression: 0
     allowsAlphaSplitting: 0
@@ -184,7 +190,7 @@ TextureImporter:
     maxTextureSize: 2048
     resizeAlgorithm: 0
     textureFormat: -1
-    textureCompression: 2
+    textureCompression: 1
     compressionQuality: 50
     crunchedCompression: 0
     allowsAlphaSplitting: 0
@@ -199,7 +205,7 @@ TextureImporter:
       rect:
         serializedVersion: 2
         x: 0
-        y: 3072
+        y: 2048
         width: 512
         height: 512
       alignment: 0
@@ -220,7 +226,7 @@ TextureImporter:
       rect:
         serializedVersion: 2
         x: 512
-        y: 3072
+        y: 2048
         width: 512
         height: 512
       alignment: 0
@@ -241,7 +247,7 @@ TextureImporter:
       rect:
         serializedVersion: 2
         x: 1024
-        y: 3072
+        y: 2048
         width: 512
         height: 512
       alignment: 0
@@ -262,7 +268,7 @@ TextureImporter:
       rect:
         serializedVersion: 2
         x: 1536
-        y: 3072
+        y: 2048
         width: 512
         height: 512
       alignment: 0
@@ -282,8 +288,8 @@ TextureImporter:
       name: Blob_4
       rect:
         serializedVersion: 2
-        x: 0
-        y: 2560
+        x: 2048
+        y: 2048
         width: 512
         height: 512
       alignment: 0
@@ -303,8 +309,8 @@ TextureImporter:
       name: Blob_5
       rect:
         serializedVersion: 2
-        x: 512
-        y: 2560
+        x: 2560
+        y: 2048
         width: 512
         height: 512
       alignment: 0
@@ -324,8 +330,8 @@ TextureImporter:
       name: Blob_6
       rect:
         serializedVersion: 2
-        x: 1024
-        y: 2560
+        x: 0
+        y: 1536
         width: 512
         height: 512
       alignment: 0
@@ -345,8 +351,8 @@ TextureImporter:
       name: Blob_7
       rect:
         serializedVersion: 2
-        x: 1536
-        y: 2560
+        x: 512
+        y: 1536
         width: 512
         height: 512
       alignment: 0
@@ -366,8 +372,8 @@ TextureImporter:
       name: Blob_8
       rect:
         serializedVersion: 2
-        x: 0
-        y: 2048
+        x: 1024
+        y: 1536
         width: 512
         height: 512
       alignment: 0
@@ -387,8 +393,8 @@ TextureImporter:
       name: Blob_9
       rect:
         serializedVersion: 2
-        x: 512
-        y: 2048
+        x: 1536
+        y: 1536
         width: 512
         height: 512
       alignment: 0
@@ -408,8 +414,8 @@ TextureImporter:
       name: Blob_10
       rect:
         serializedVersion: 2
-        x: 1024
-        y: 2048
+        x: 2048
+        y: 1536
         width: 512
         height: 512
       alignment: 0
@@ -429,8 +435,8 @@ TextureImporter:
       name: Blob_11
       rect:
         serializedVersion: 2
-        x: 1536
-        y: 2048
+        x: 2560
+        y: 1536
         width: 512
         height: 512
       alignment: 0
@@ -451,7 +457,7 @@ TextureImporter:
       rect:
         serializedVersion: 2
         x: 0
-        y: 1536
+        y: 1024
         width: 512
         height: 512
       alignment: 0
@@ -472,7 +478,7 @@ TextureImporter:
       rect:
         serializedVersion: 2
         x: 512
-        y: 1536
+        y: 1024
         width: 512
         height: 512
       alignment: 0
@@ -493,7 +499,7 @@ TextureImporter:
       rect:
         serializedVersion: 2
         x: 1024
-        y: 1536
+        y: 1024
         width: 512
         height: 512
       alignment: 0
@@ -514,7 +520,7 @@ TextureImporter:
       rect:
         serializedVersion: 2
         x: 1536
-        y: 1536
+        y: 1024
         width: 512
         height: 512
       alignment: 0
@@ -534,7 +540,7 @@ TextureImporter:
       name: Blob_16
       rect:
         serializedVersion: 2
-        x: 0
+        x: 2048
         y: 1024
         width: 512
         height: 512
@@ -555,7 +561,7 @@ TextureImporter:
       name: Blob_17
       rect:
         serializedVersion: 2
-        x: 512
+        x: 2560
         y: 1024
         width: 512
         height: 512
@@ -576,8 +582,8 @@ TextureImporter:
       name: Blob_18
       rect:
         serializedVersion: 2
-        x: 1024
-        y: 1024
+        x: 0
+        y: 512
         width: 512
         height: 512
       alignment: 0
@@ -597,8 +603,8 @@ TextureImporter:
       name: Blob_19
       rect:
         serializedVersion: 2
-        x: 1536
-        y: 1024
+        x: 512
+        y: 512
         width: 512
         height: 512
       alignment: 0
@@ -618,7 +624,7 @@ TextureImporter:
       name: Blob_20
       rect:
         serializedVersion: 2
-        x: 0
+        x: 1024
         y: 512
         width: 512
         height: 512
@@ -639,7 +645,7 @@ TextureImporter:
       name: Blob_21
       rect:
         serializedVersion: 2
-        x: 512
+        x: 1536
         y: 512
         width: 512
         height: 512
@@ -660,7 +666,7 @@ TextureImporter:
       name: Blob_22
       rect:
         serializedVersion: 2
-        x: 1024
+        x: 2048
         y: 512
         width: 512
         height: 512
@@ -681,7 +687,7 @@ TextureImporter:
       name: Blob_23
       rect:
         serializedVersion: 2
-        x: 1536
+        x: 2560
         y: 512
         width: 512
         height: 512
@@ -778,6 +784,48 @@ TextureImporter:
       bones: []
       spriteID: c419c370ef1148a20800000000000000
       internalID: 3063593429259555148
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Blob_28
+      rect:
+        serializedVersion: 2
+        x: 2048
+        y: 0
+        width: 512
+        height: 512
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 1e8960865b6cb8dd0800000000000000
+      internalID: -2482672287128053535
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Blob_29
+      rect:
+        serializedVersion: 2
+        x: 2560
+        y: 0
+        width: 512
+        height: 512
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 698ff4a3fc7db9da0800000000000000
+      internalID: -5936914398721345386
       vertices: []
       indices: 
       edges: []
