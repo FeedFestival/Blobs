@@ -35,5 +35,18 @@ namespace Assets.Scripts
                     return inProximity;
                 }).ToList();
         }
+
+        public static Vector3[] GetLinePrediction(Vector3 start, Vector3[] positions)
+        {
+            int count = 1;
+            count += positions.Length > 3 ? 3 : positions.Length;
+            Vector3[] list = new Vector3[count];
+            list[0] = new Vector3(start.x, start.y, 2);
+            for (var i = 1; i < list.Length; i++)
+            {
+                list[i] = new Vector3(positions[i - 1].x, positions[i - 1].y, 2);
+            }
+            return list;
+        }
     }
 }

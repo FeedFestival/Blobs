@@ -55,3 +55,7 @@ MonoBehaviour:
   NewBlob: {fileID: 485944421924740932, guid: 7be4a1cbef7bcc24c8bdb084012c56c7, type: 3}
   BlobDebugInfoPrefab: {fileID: 9205759509074552445, guid: c83c86be79c09fa4f8f14eb70bbb4c68,
     type: 3}
+  SmallHitParticle: {fileID: 2160214357854624232, guid: a03cc52b8c92ae842bf6134ea1626100,
+    type: 3}
+  ExplosionParticle: {fileID: 4916094281174691089, guid: 13d69336d4c31cd47be5eeeb893af3e4,
+    type: 3}

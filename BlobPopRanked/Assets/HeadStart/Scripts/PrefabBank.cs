@@ -15,6 +15,10 @@ public class PrefabBank : MonoBehaviour
     public GameObject NewBlob;
     public GameObject BlobDebugInfoPrefab;
 
+    [Header("Particle Systems")]
+    public GameObject SmallHitParticle;
+    public GameObject ExplosionParticle;
+
     void Awake()
     {
         _prefabBank = this;

@@ -6,6 +6,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.EventSystems;
 using Assets.Scripts.utils;
+using System.Linq;
 
 public class Player : MonoBehaviour
 {
@@ -20,7 +21,8 @@ public class Player : MonoBehaviour
     public Vector2 SecondBlobPos;
     public bool BlobInMotion;
     public bool MakingBlob;
-    public bool IsInPointArea;
+    public bool IsDragging;
+    public PredictionManager PredictionManager;
     private int _stopAfter;
     private int _inFlightIndex;
     private bool _firstAndOnly;
@@ -45,18 +47,9 @@ public class Player : MonoBehaviour
         }
     }
 
-    public void SetIsInPointArea(bool val)
+    public void PointerDrag(BaseEventData baseEventData)
     {
-        IsInPointArea = val;
-    }
-
-    public void PointerUp(BaseEventData baseEventData)
-    {
-        if (Game._.Level<LevelRandomRanked>().debugLvl._noFiring)
-        {
-            return;
-        }
-
+        IsDragging = true;
         if (BlobInMotion || FirstProjectile == null)
         {
             return;
@@ -74,11 +67,29 @@ public class Player : MonoBehaviour
             Target.position = targetPos;
         }
 
-
         _stopAfter = 0;
         Vector2 origin = FirstProjectile.transform.position;
         BlobFlightPositions = new List<BlobFLight>();
         PrepShot(origin, targetPos);
+
+        PredictionManager.ShowPrediction(FirstProjectile.transform.position, BlobFlightPositions.Select(bf => (Vector3)bf.Pos).ToArray());
+    }
+
+    public void PointerUp(BaseEventData baseEventData)
+    {
+        IsDragging = false;
+        PredictionManager.Reset();
+
+        if (Game._.Level<LevelRandomRanked>().debugLvl._noFiring)
+        {
+            return;
+        }
+
+        if (BlobInMotion || FirstProjectile == null)
+        {
+            return;
+        }
+
         Shoot();
     }
 
@@ -98,8 +109,10 @@ public class Player : MonoBehaviour
             }
 
             FirstProjectile.transform.position = StartPos;
-            FirstProjectile.GetComponent<Blob>().SetId();
-            _lastBlobFlightBlobId = FirstProjectile.GetComponent<Blob>().Id;
+            Blob currentBlob = FirstProjectile.GetComponent<Blob>();
+            PredictionManager.ChangeColor(currentBlob.BlobReveries.BlobColor);
+            currentBlob.SetId();
+            _lastBlobFlightBlobId = currentBlob.Id;
 
             SecondProjectile.transform.position = SecondBlobPos;
             MakingBlob = false;

@@ -21,6 +21,25 @@ namespace Assets.Scripts.utils
                 return num.ToString();
         }
 
+        public static Color SetColorAlpha(Color color, int value)
+        {
+            Color tempColor = color;
+            tempColor.a = GetAlphaValue(value);
+            return tempColor;
+        }
+
+        public static float GetAlphaValue(int value)
+        {
+            var perc = percent.What(value, 255);
+            return perc * 0.01f;
+        }
+
+        public static int GetRGBAAlphaValue(float value)
+        {
+            float perc = value * 100;
+            return (int)percent.Find(perc, 255);
+        }
+
         public static void VarDump<T>(T obj)
         {
             foreach (var propertyInfo in obj.GetType()

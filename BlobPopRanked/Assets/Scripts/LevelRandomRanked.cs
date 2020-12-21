@@ -577,7 +577,6 @@ public class LevelRandomRanked : MonoBehaviour, ILevel
             case BlobColor.RED:
             default:
                 return "Red_Torch";
-
         }
     }
 }

@@ -463,9 +463,11 @@ MonoBehaviour:
   ReflectDir: {fileID: 1596043163}
   CenteroidBlob: {fileID: 1464176888}
   Centroid: {fileID: 2134570870}
-  FirstBounceBlob: {fileID: 0}
-  SecondBounceBlob: {fileID: 0}
+  FirstProjectile: {fileID: 0}
+  SecondProjectile: {fileID: 0}
   SecondBlobPos: {x: 1, y: -4.44}
   BlobInMotion: 0
   MakingBlob: 0
   IsInPointArea: 0
+  PredictionManager: {fileID: 0}
+  LastDir: {x: 0, y: 0}
