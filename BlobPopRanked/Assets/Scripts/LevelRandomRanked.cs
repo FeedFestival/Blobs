@@ -21,6 +21,7 @@ public class LevelRandomRanked : MonoBehaviour, ILevel
     private List<int> _toDestroy;
     private List<int> _verified;
     private List<int> _checked;
+    [HideInInspector]
     public DificultyService DificultyService;
     public int Points;
     public Transform BlobsParentT;

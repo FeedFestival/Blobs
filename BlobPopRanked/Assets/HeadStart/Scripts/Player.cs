@@ -373,7 +373,9 @@ public class Player : MonoBehaviour
                 }
 
                 Vector2 newOrigin = (Vector2)hit.centroid;
+                // Debug.Log("newOrigin: " + newOrigin);
                 BlobFLight blobFLight = new BlobFLight(newOrigin);
+                blobFLight.hitPoint = hit.point;
                 blobFLight.normal = hit.normal;
                 BlobFlightPositions.Add(blobFLight);
                 Vector2 oldDir = ((Vector2)newOrigin - (Vector2)origin).normalized;

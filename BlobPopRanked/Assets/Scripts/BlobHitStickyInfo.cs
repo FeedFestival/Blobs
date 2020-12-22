@@ -28,6 +28,7 @@ public class BlobFLight
     public Vector2 Pos;
     public Blob Blob;
     public Vector2 normal;
+    public Vector2 hitPoint;
 
     public BlobFLight() { }
 

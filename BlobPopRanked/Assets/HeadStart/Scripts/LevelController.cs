@@ -8,13 +8,14 @@ using System.Linq;
 
 public class LevelController : MonoBehaviour
 {
-    public static readonly string _version = "1.0.1 (Updated - added ILevel)";
+    public static readonly string _version = "1.0.2 (Updated - added ILevel, added EffectsParentT)";
     public bool DebugThis;
     public bool IsMainMenu;
     public string LevelName;
     [SerializeField]
     public GameplayState GameplayState;
     public GameObject LevelGo;
+    public EffectsPool EffectsPool;
     public ILevel Level;
 
     public void Init()
@@ -31,6 +32,7 @@ public class LevelController : MonoBehaviour
     public void PreStartGame()
     {
         Debug.Log("Level - Pre Start Game");
+        EffectsPool.GenerateParticleControllers();
     }
 
     public void StartGame()

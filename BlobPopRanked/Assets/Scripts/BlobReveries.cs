@@ -213,4 +213,10 @@ public class BlobReveries : MonoBehaviour
             StickingGlues[index].Unstick();
         }
     }
+
+    public void PlayHitEffect(Vector2 point)
+    {
+        ParticleController pc = Game._.LevelController.EffectsPool.GetParticle();
+        pc.Play(point);
+    }
 }

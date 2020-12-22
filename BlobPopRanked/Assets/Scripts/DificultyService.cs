@@ -5,6 +5,8 @@ using System.Collections.Generic;
 
 public class DificultyService : MonoBehaviour
 {
+    [Range(0.0f, 100.0f)]
+    public float PercentIncrease = 0f;
     public int AdditionalRows = 0;
     public int Dificulty = 2;
     public int DificultySeed;
@@ -255,18 +257,20 @@ public class DificultyService : MonoBehaviour
             float healthPercent = percent.What(_is: newBlobY, _of: newDashedLine);
             // Debug.Log("healthPercent: " + healthPercent);
 
-            HitsToReset = (int)Mathf.Ceil(percent.Find(healthPercent, _of: MaxHits));
+            float maxHits = percent.Find(PercentIncrease, MaxHits) + MaxHits;
+            float minHits = percent.Find(PercentIncrease, MinHits) + MinHits;
+            HitsToReset = (int)Mathf.Ceil(percent.Find(healthPercent, _of: maxHits));
 
             // HitsToReset = HitsToReset + (int)Mathf.Floor(percent.Find(healthPercent, Dificulty));
             // Debug.Log("HitsToReset: " + HitsToReset);
 
-            if (HitsToReset < MinHits)
+            if (HitsToReset < minHits)
             {
-                HitsToReset = MinHits;
+                HitsToReset = (int)Mathf.Ceil(minHits);
             }
-            else if (HitsToReset > MaxHits)
+            else if (HitsToReset > maxHits)
             {
-                HitsToReset = MaxHits;
+                HitsToReset = (int)Mathf.Ceil(maxHits);
             }
             // Debug.Log("HitsToReset: " + HitsToReset);
 

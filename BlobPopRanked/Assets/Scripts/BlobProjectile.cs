@@ -33,6 +33,8 @@ public class BlobProjectile : MonoBehaviour
             _flightTweenId = LeanTween.move(gameObject, blobFLight.Pos, blobFLight.time).id;
             LeanTween.descr(_flightTweenId.Value).setOnComplete(() =>
             {
+                BlobReveries.PlayHitEffect(blobFLight.hitPoint);
+
                 var normalDir = new Vector2(blobFLight.normal.x, 0);
                 BlobReveries.StretchOnCollision(normalDir, () =>
                 {
