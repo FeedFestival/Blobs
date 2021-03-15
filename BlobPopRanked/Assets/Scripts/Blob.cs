@@ -112,7 +112,7 @@ public class Blob : MonoBehaviour
         if (Game._.Level<LevelRandomRanked>().debugLvl._debugBlobs
             && Game._.Level<LevelRandomRanked>().debugLvl._neighborsProcess)
         {
-            if (_blobDebugInfo != null) _blobDebugInfo.NeighborText.text = utils.DebugList<int>(Neighbors);
+            if (_blobDebugInfo != null) _blobDebugInfo.NeighborText.text = __debug.DebugList<int>(Neighbors);
         }
     }
 
@@ -126,12 +126,12 @@ public class Blob : MonoBehaviour
             if (index >= 0 && index < blobsRef.Count)
             {
                 blobsRef[index].RemoveSticked(Id);
-                utils.AddIfNone(blobsRef[index].Id, ref Game._.Level<LevelRandomRanked>().Affected);
+                __utils.AddIfNone(blobsRef[index].Id, ref Game._.Level<LevelRandomRanked>().Affected);
             }
         }
         if (Game._.Level<LevelRandomRanked>().debugLvl._stickingProcess)
         {
-            Debug.Log(utils.DebugList<int>(StickedTo, "StickedTo"));
+            Debug.Log(__debug.DebugList<int>(StickedTo, "StickedTo"));
         }
 
         GetComponent<CircleCollider2D>().enabled = false;
@@ -281,7 +281,7 @@ public class Blob : MonoBehaviour
 
             if (Game._.Level<LevelRandomRanked>().debugLvl._destroyCheck)
             {
-                Debug.Log(utils.DebugList<int>(_linkedNeighbors, "_linkedNeighbors"));
+                Debug.Log(__debug.DebugList<int>(_linkedNeighbors, "_linkedNeighbors"));
             }
 
             if (_linkedNeighbors.Count > HiddenSettings._.MinNeighborCountToDestroy)

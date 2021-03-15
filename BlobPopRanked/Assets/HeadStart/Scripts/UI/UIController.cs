@@ -22,6 +22,7 @@ public class UIController : MonoBehaviour
     {
         if (UiDataController != null)
         {
+            UiDataController.gameObject.SetActive(true);
             UiDataController.Init();
         }
 
@@ -34,19 +35,38 @@ public class UIController : MonoBehaviour
         LoadingController.TransitionOverlay(show: true, instant: false);
     }
 
-    public void InitMainMenu(bool isLevelMainMenu)
+    public void ShowInputNameView()
     {
-        if (MainMenu != null)
+        if (MainMenu == null)
         {
-            Debug.Log("Init Main Menu");
-            if (isLevelMainMenu)
-            {
-                MainMenu.Init(showMenu: true, hasSavedGame: Game._.User.HasSavedGame);
-            }
-            else
-            {
-                Destroy(MainMenu.gameObject);
-            }
+            return;
         }
+        MainMenu.Init(showMenu: true, overrideView: VIEW.InputName);
+        MainMenu.InputNameView.OnAdvanceDelegate = (string name) =>
+        {
+            User user = Game._.User;
+            user.Name = name;
+            user.IsFirstTime = false;
+            Game._.DataService.UpdateUser(user);
+            InitMainMenu();
+        };
+    }
+
+    public void InitMainMenu()
+    {
+        if (MainMenu == null)
+        {
+            return;
+        }
+        MainMenu.Init(showMenu: true);
+    }
+
+    public void DestroyMainMenu()
+    {
+        if (MainMenu == null)
+        {
+            return;
+        }
+        Destroy(MainMenu.gameObject);
     }
 }

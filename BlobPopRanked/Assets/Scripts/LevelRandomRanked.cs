@@ -39,7 +39,10 @@ public class LevelRandomRanked : MonoBehaviour, ILevel
 
     public void StartLevel()
     {
-        Debug.Log("Starting Level....");
+        if (Game._.PlayingUser == null) {
+            Game._.PlayingUser = Game._.User;
+        }
+        Debug.Log("Starting Level.... [" + Game._.PlayingUser.Name + "]");
 
         Game._.Player.MakeBlob(firstLevel: FirstLevel);
 
@@ -290,7 +293,7 @@ public class LevelRandomRanked : MonoBehaviour, ILevel
 
         if (debugLvl._destroyProcess)
         {
-            Debug.Log(utils.DebugList(_toDestroy, "_toDestroy"));
+            Debug.Log(__debug.DebugList(_toDestroy, "_toDestroy"));
         }
 
         if (affectedCheck)
@@ -337,7 +340,7 @@ public class LevelRandomRanked : MonoBehaviour, ILevel
 
         if (debugLvl._destroyProcess)
         {
-            Debug.Log(utils.DebugList(Affected, "Affected"));
+            Debug.Log(__debug.DebugList(Affected, "Affected"));
         }
 
         foreach (int id in Affected)
@@ -361,7 +364,7 @@ public class LevelRandomRanked : MonoBehaviour, ILevel
                 _checked = new List<int>();
                 if (isTouchingCeil(blob) == false)
                 {
-                    utils.AddIfNone(blob.Id, ref _toDestroy);
+                    __utils.AddIfNone(blob.Id, ref _toDestroy);
                 }
             }
         }
@@ -372,21 +375,21 @@ public class LevelRandomRanked : MonoBehaviour, ILevel
 
     private bool isTouchingCeil(Blob blob)
     {
-        utils.AddIfNone(blob.Id, ref _checked,
-            debugAdd: debugLvl._destroyProcess ? "------------- blob" + blob.Id + " added to " + utils.DebugList(_checked, "_checked") : null);
+        __utils.AddIfNone(blob.Id, ref _checked,
+            debugAdd: debugLvl._destroyProcess ? "------------- blob" + blob.Id + " added to " + __debug.DebugList(_checked, "_checked") : null);
         if (blob.StickedTo.Contains(HiddenSettings._.CeilId))
         {
             if (debugLvl._destroyProcess)
             {
                 Debug.Log("------------- blob" + blob.Id + " touches ceiling.");
             }
-            utils.AddIfNone(blob.Id, ref _verified,
+            __utils.AddIfNone(blob.Id, ref _verified,
                 debugAdd: debugLvl._destroyProcess ? "------------- blob" + blob.Id + " added to _verified." : null);
             return true;
         }
         if (debugLvl._destroyProcess)
         {
-            Debug.Log("------------- " + utils.DebugList(blob.StickedTo, "blob" + blob.Id + ".StickedTo"));
+            Debug.Log("------------- " + __debug.DebugList(blob.StickedTo, "blob" + blob.Id + ".StickedTo"));
         }
         foreach (var blobId in blob.StickedTo)
         {
@@ -394,7 +397,7 @@ public class LevelRandomRanked : MonoBehaviour, ILevel
             {
                 if (debugLvl._destroyProcess)
                 {
-                    Debug.Log("------------- " + utils.DebugList(_checked, "_checked") +
+                    Debug.Log("------------- " + __debug.DebugList(_checked, "_checked") +
                         " contains blob" + blobId + " so we are not checking him.");
                 }
                 continue;
@@ -419,7 +422,7 @@ public class LevelRandomRanked : MonoBehaviour, ILevel
                 {
                     Debug.Log("------------- one of it's sticking blobs(" + stickedBlob.Id + ") touches ceil");
                 }
-                utils.AddIfNone(blob.Id, ref _verified,
+                __utils.AddIfNone(blob.Id, ref _verified,
                     debugAdd: debugLvl._destroyProcess ? "------------- blob" + blob.Id + " added to _verified." : null);
                 return true;
             }

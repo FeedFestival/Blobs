@@ -62,7 +62,7 @@ public class DificultyService : MonoBehaviour
 
         if (_levelRandomRanked.debugLvl._colorDistribution)
         {
-            Debug.Log("GetColorByDificulty() ------------------- " + utils.DebugList(Colors, "Colors"));
+            Debug.Log("GetColorByDificulty() ------------------- " + __debug.DebugList(Colors, "Colors"));
         }
 
         int colorInt;
@@ -88,8 +88,8 @@ public class DificultyService : MonoBehaviour
 
                 if (_levelRandomRanked.debugLvl._colorDistribution)
                 {
-                    Debug.Log(utils.DebugList<int>(percentages, "percentages"));
-                    Debug.Log(utils.DebugList<int>(percentageDistribution, "percentageDistribution"));
+                    Debug.Log(__debug.DebugList<int>(percentages, "percentages"));
+                    Debug.Log(__debug.DebugList<int>(percentageDistribution, "percentageDistribution"));
                 }
 
                 colorInt = ExtractRandomColor(percentageDistribution);
@@ -129,7 +129,7 @@ public class DificultyService : MonoBehaviour
         if (_levelRandomRanked.debugLvl._colorDistribution)
         {
             Debug.Log("maxValue: " + maxValue);
-            Debug.Log(utils.DebugList<float>(coeficientColors, "coeficientColors"));
+            Debug.Log(__debug.DebugList<float>(coeficientColors, "coeficientColors"));
             Debug.Log("coeficientSum: " + coeficientSum);
             Debug.Log("commonD: " + commonD);
         }
@@ -147,8 +147,8 @@ public class DificultyService : MonoBehaviour
         if (_levelRandomRanked.debugLvl._colorDistribution)
         {
             Debug.Log("remaineder: " + remaineder);
-            Debug.Log(utils.DebugList<int>(percentages, "percentages"));
-            Debug.Log(utils.DebugList<int>(percentageDistribution, "percentageDistribution"));
+            Debug.Log(__debug.DebugList<int>(percentages, "percentages"));
+            Debug.Log(__debug.DebugList<int>(percentageDistribution, "percentageDistribution"));
         }
 
         colorInt = ExtractRandomColor(percentageDistribution);
@@ -206,7 +206,7 @@ public class DificultyService : MonoBehaviour
         }
         if (_levelRandomRanked.debugLvl._colorDistribution)
         {
-            Debug.Log(utils.DebugList<int>(Colors, "Colors"));
+            Debug.Log(__debug.DebugList<int>(Colors, "Colors"));
         }
     }
 

@@ -387,7 +387,7 @@ public class ColorBank : MonoBehaviour
         {
             SetupHexes();
         }
-        // Debug.Log(utils.DebugDict<string>(_hexes));
+        // Debug.Log(__utils.DebugDict<string>(_hexes));
 
         Color newCol;
         if (ColorUtility.TryParseHtmlString(_hexes[colorName], out newCol))

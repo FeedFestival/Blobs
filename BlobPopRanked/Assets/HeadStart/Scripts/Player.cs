@@ -36,7 +36,7 @@ public class Player : MonoBehaviour
 
     void Start()
     {
-        _layerMask = utils.CreateLayerMask(aExclude: true, LayerMask.NameToLayer(LAYER.BlobProjectile), LayerMask.NameToLayer(LAYER.EndGame));
+        _layerMask = __utils.CreateLayerMask(aExclude: true, LayerMask.NameToLayer(LAYER.BlobProjectile), LayerMask.NameToLayer(LAYER.EndGame));
     }
 
     void Update()

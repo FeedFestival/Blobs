@@ -18,7 +18,7 @@ public class Main : MonoBehaviour
 
     void Awake()
     {
-        Debug.Log("Starting... Make Sure Everything is running");
+        Debug.Log("Starting... Checking to Make Sure Everything is running");
 
         _firstCheck = FirstCheck();
         StartCoroutine(_firstCheck);

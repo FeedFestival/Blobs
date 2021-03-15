@@ -25,6 +25,7 @@ public class LevelRandomRankedDebug : MonoBehaviour
     public bool _neighborsProcess;
     public bool _noFiring;
     public bool _blobKilling;
+    public bool _keepScore;
     public List<Blob> DeadBlobs = new List<Blob>();
     [HideInInspector]
     public bool WhenFinishedAddingDescend;
@@ -83,11 +84,16 @@ public class LevelRandomRankedDebug : MonoBehaviour
                 ChangeDebugState(LevelDebugState.CreatingBlobsIncremental);
             }
         }
+
+        if (Input.GetKeyUp(KeyCode.D))
+        {
+            ChangeDebugState(LevelDebugState.DebugKeepScore);
+        }
     }
 
     public void ChangeDebugState(LevelDebugState levelDebugState)
     {
-        if (_blobGen || _newLevel)
+        if (_blobGen || _newLevel || _keepScore)
         {
             LevelDebugState = levelDebugState;
             switch (LevelDebugState)
@@ -95,6 +101,7 @@ public class LevelRandomRankedDebug : MonoBehaviour
                 case LevelDebugState.DebugSelecting:
                     TextHelper.text = "State [ " + LevelDebugState.DebugSelecting.ToString() + " ]" +
                     "\n - Press A to Enter Add Blobs Incremental [State]" +
+                    "\n - Press D to Test Keep Score and Finish the Game with random points." +
                     "\n - Press C to Cancel";
                     break;
                 case LevelDebugState.CreatingBlobsIncremental:
@@ -109,8 +116,16 @@ public class LevelRandomRankedDebug : MonoBehaviour
                     "\n - Press C to Cancel";
                     LevelRandomRanked.ResetIncrement_Debug();
                     break;
+                case LevelDebugState.DebugKeepScore:
+                    Game._.OnGameOver();
+                    break;
+                default:
+                    TextHelper.text = "";
+                    break;
             }
-        } else {
+        }
+        else
+        {
             TextHelper.text = "";
         }
     }
@@ -120,5 +135,6 @@ public enum LevelDebugState
 {
     DebugSelecting,
     CreatingBlobsIncremental,
-    AddNewRow
+    AddNewRow,
+    DebugKeepScore
 }

@@ -44,6 +44,10 @@ public class MusicManager : MonoBehaviour
         if (_backgroundMusicId.HasValue)
         {
             audio = EazySoundManager.GetAudio(_backgroundMusicId.Value);
+            if (audio == null) {
+                Debug.LogError("audio has a problem");
+                return;
+            }
             audio.Stop();
         }
         _backgroundMusicId = EazySoundManager.PrepareMusic(Sounds[musicName].AudioClip, 0.7f, loop, false);
@@ -76,6 +80,10 @@ public class MusicManager : MonoBehaviour
         {
             Audio audio = null;
             audio = EazySoundManager.GetAudio(_ambientMusicId.Value);
+            if (audio == null) {
+                Debug.LogError("audio has a problem");
+                return;
+            }
             audio.Stop();
             audio = null;
         }

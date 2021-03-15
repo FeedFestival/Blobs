@@ -1,16 +1,17 @@
 ﻿using System;
 using System.Collections;
+using System.Globalization;
 using System.IO;
 using UnityEngine;
 using Object = UnityEngine.Object;
 
 namespace Assets.Scripts.utils
 {
-    public static class DataUtils
+    public static class __data
     {
-        #pragma warning disable 0414 // private field assigned but not used.
-        public static readonly string _version = "1.0.1";
-        #pragma warning restore 0414 //
+#pragma warning disable 0414 // private field assigned but not used.
+        public static readonly string _version = "1.0.2";
+#pragma warning restore 0414 //
         public static string GetDataValue(string data, string index)
         {
             string value = data.Substring(data.IndexOf(index, System.StringComparison.Ordinal) + index.Length);
@@ -228,6 +229,24 @@ namespace Assets.Scripts.utils
             char[] chArray = new char[bytes.Length / 2];
             System.Buffer.BlockCopy((System.Array)bytes, 0, (System.Array)chArray, 0, bytes.Length);
             return new string(chArray);
+        }
+
+        public static int GetWeekNumberOfTheYear(out int year)
+        {
+            DateTime now = DateTime.Now;
+            year = now.Year;
+            return CultureInfo.InvariantCulture.Calendar.GetWeekOfYear(now, CalendarWeekRule.FirstDay, DayOfWeek.Sunday);
+        }
+
+        public static WeekDetails GetWeekDetails()
+        {
+            DateTime now = DateTime.Now;
+            WeekDetails week = new WeekDetails {
+                Year = now.Year,
+                Nr = CultureInfo.InvariantCulture.Calendar.GetWeekOfYear(now, CalendarWeekRule.FirstDay, DayOfWeek.Sunday),
+            };
+            week.Id = (Convert.ToInt32(week.Year.ToString() + "00") + week.Nr);
+            return week;
         }
     }
 }

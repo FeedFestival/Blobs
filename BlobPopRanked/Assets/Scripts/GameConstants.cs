@@ -44,6 +44,23 @@ public static class ANIM_PARAM
     public const string TravelMultiplier = "TravelMultiplier";
 }
 
+public static class SCENE
+{
+    public const string MainMenu = "MainMenu";
+    public const string Loading = "Loading";
+    public const string Game = "Game";
+}
+
+public static class VIEW
+{
+    public const string Nothing = "Nothing";
+    public const string InputName = "InputName";
+    public const string Main = "Main";
+    public const string Options = "Options";
+    public const string HighScore = "HighScore";
+    public const string HotSeat = "HotSeat";
+}
+
 public enum BlobAnim
 {
     Idle, Stretch, Travel

@@ -53,7 +53,7 @@ public class Timer : MonoBehaviour
         }
         waitOption.WaitCallback();
         _internalWaits.Dequeue();
-        // Debug.Log(utils.DebugQueue<WaitOption>(_internalWaits, "_internalWaits"));
+        // Debug.Log(__utils.DebugQueue<WaitOption>(_internalWaits, "_internalWaits"));
     }
 
     public void Debounce(InternalWaitCallback debounceWait, float? seconds = null)

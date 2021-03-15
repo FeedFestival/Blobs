@@ -9,7 +9,7 @@ namespace Assets.Scripts.utils
         string ToJsonString();
     }
 
-    public static class JsonHelper
+    public static class __json
     {
         public static readonly string _version = "1.0.1";
         public static T[] FromJson<T>(string json)

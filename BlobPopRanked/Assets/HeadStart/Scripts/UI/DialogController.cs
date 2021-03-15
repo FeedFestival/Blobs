@@ -30,7 +30,7 @@ public class DialogController : MonoBehaviour
                     Title.text = "Too bad!";
                     Info.text = "You lost...";
                     RetryButton.SetActive(true);
-                    ContinueButton.SetActive(false);
+                    ContinueButton.SetActive(true);
                     break;
             }
         }
@@ -38,7 +38,7 @@ public class DialogController : MonoBehaviour
 
     public void OnContinue()
     {
-        Game._.Restart();
+        Game._.GoToMainMenu();
     }
 
     public void OnRestart()
