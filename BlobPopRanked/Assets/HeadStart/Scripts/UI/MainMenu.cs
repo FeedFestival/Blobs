@@ -5,7 +5,6 @@ using UnityEngine.UI;
 
 public class MainMenu : MonoBehaviour
 {
-    public Button Continue;
     public Button Start;
     public Button HighCharts;
     public Button Options;
@@ -13,26 +12,39 @@ public class MainMenu : MonoBehaviour
     public GameObject ActualMainMenuView;
     public GameObject OptionsView;
     public GameObject HighScoreView;
-    private bool _hasSavedGame;
+
+    void Awake()
+    {
+        SwitchView("Nothing");
+    }
 
     public void Init(bool showMenu = true, bool hasSavedGame = true)
     {
-        _hasSavedGame = hasSavedGame;
         MusicManager._.PlayBackgroundMusic("MainMenuMusic");
         gameObject.SetActive(showMenu);
+
         SwitchView("Main");
     }
 
     public void SwitchView(string view)
     {
-        MusicManager._.PlaySound("Click");
+        if (MusicManager._ != null)
+        {
+            MusicManager._.PlaySound("Click");
+        }
         switch (view)
         {
+            case "Nothing":
+                ActualMainMenuView.SetActive(false);
+                OptionsView.SetActive(false);
+                HighScoreView.SetActive(false);
+                Options.gameObject.SetActive(false);
+                Back.gameObject.SetActive(false);
+                break;
             case "Main":
                 ActualMainMenuView.SetActive(true);
                 OptionsView.SetActive(false);
                 HighScoreView.SetActive(false);
-                Continue.interactable = _hasSavedGame;
                 Options.gameObject.SetActive(true);
                 Back.gameObject.SetActive(false);
                 break;
@@ -55,4 +67,9 @@ public class MainMenu : MonoBehaviour
                 break;
         }
     }
+}
+
+public enum MenuView
+{
+    Nothing, Main, Options, HighScore
 }

@@ -10,6 +10,8 @@ public class UIController : MonoBehaviour
     void Awake()
     {
         _uIController = this;
+        UiDataController.gameObject.SetActive(false);
+        LoadingController.Init(totalBlackness: true);
     }
     public DialogController DialogController;
     public UiDataController UiDataController;
@@ -18,11 +20,9 @@ public class UIController : MonoBehaviour
 
     public void Init()
     {
-        LoadingController.Init();
-
-        if (UIController._.UiDataController != null)
+        if (UiDataController != null)
         {
-            UIController._.UiDataController.Init();
+            UiDataController.Init();
         }
 
         if (DialogController != null)
@@ -30,12 +30,15 @@ public class UIController : MonoBehaviour
             DialogController.gameObject.SetActive(true);
             DialogController.ShowDialog(false);
         }
+
+        LoadingController.TransitionOverlay(show: true, instant: false);
     }
 
     public void InitMainMenu(bool isLevelMainMenu)
     {
         if (MainMenu != null)
         {
+            Debug.Log("Init Main Menu");
             if (isLevelMainMenu)
             {
                 MainMenu.Init(showMenu: true, hasSavedGame: Game._.User.HasSavedGame);

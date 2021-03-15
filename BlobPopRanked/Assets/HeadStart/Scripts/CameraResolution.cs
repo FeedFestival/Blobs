@@ -5,11 +5,20 @@ using UnityEngine;
 
 public class CameraResolution : MonoBehaviour
 {
+    private static CameraResolution _cameraResolution;
+    public static CameraResolution _ { get { return _cameraResolution; } }
     public static readonly string _version = "1.0.1";
-    private int ScreenSizeX = 0;
-    private int ScreenSizeY = 0;
+    [HideInInspector]
+    public int ScreenSizeX = 0;
+    [HideInInspector]
+    public int ScreenSizeY = 0;
     public bool IsPortrait;
     public Vector2 TargetAspect = new Vector2(16, 9);
+
+    void Awake()
+    {
+        _cameraResolution = this;
+    }
 
     void Start()
     {
@@ -60,14 +69,13 @@ public class CameraResolution : MonoBehaviour
         else
         {
             float targetaspect = TargetAspect.y / TargetAspect.x;
-            float windowaspect = (float)Screen.height / (float)Screen.width ;
+            float windowaspect = (float)Screen.height / (float)Screen.width;
             float scaleheight = windowaspect / targetaspect;
             Camera camera = GetComponent<Camera>();
         }
 
         ScreenSizeX = Screen.width;
         ScreenSizeY = Screen.height;
-        HiddenSettings._.ActualScreenSize = new Vector2Int(ScreenSizeX, ScreenSizeY);
     }
 
     void OnPreCull()

@@ -10,7 +10,7 @@ public class LevelController : MonoBehaviour
 {
     public static readonly string _version = "1.0.2 (Updated - added ILevel, added EffectsParentT)";
     public bool DebugThis;
-    public bool IsMainMenu;
+    public LevelType LevelType;
     public string LevelName;
     [SerializeField]
     public GameplayState GameplayState;
@@ -20,9 +20,8 @@ public class LevelController : MonoBehaviour
 
     public void Init()
     {
-        UIController._.InitMainMenu(IsMainMenu);
-
-        if (IsMainMenu == false)
+        Debug.Log("LevelType: " + LevelType);
+        if (LevelType == LevelType.TheGame)
         {
             PreStartGame();
             StartGame();
@@ -51,4 +50,9 @@ public class LevelController : MonoBehaviour
 public enum GameplayState
 {
     Starting, DuringPlay, Failed, Finished
+}
+
+public enum LevelType
+{
+    MainMenu, Loading, TheGame
 }

@@ -14,7 +14,7 @@ public class Game : MonoBehaviour
     public Player Player;
     public DataService DataService;
     public User User;
-    public bool RestartLevel;
+    public AfterLoading AfterLoading;
     private string LevelToLoad;
     private int _uniqueId;
     public bool GameOver;
@@ -36,7 +36,7 @@ public class Game : MonoBehaviour
 
         LevelController.Init();
 
-        UIController._.LoadingController.TransitionOverlay(show: true, instant: false);
+        UIController._.InitMainMenu(LevelController.LevelType == LevelType.MainMenu);
     }
 
     private void GetUser()
@@ -61,27 +61,32 @@ public class Game : MonoBehaviour
 
     public void Restart()
     {
-        RestartLevel = true;
+        AfterLoading = AfterLoading.RestartLevel;
         LevelToLoad = LevelController.LevelName;
         LoadScene("Loading");
     }
 
     public void LoadWaitedLevel()
     {
-        if (RestartLevel)
+        switch (AfterLoading)
         {
-            RestartLevel = false;
-            LoadScene(LevelToLoad);
-            return;
+            case AfterLoading.RestartLevel:
+                LoadScene(LevelToLoad);
+                break;
+            case AfterLoading.GoToGame:
+            default:
+                LoadScene("Game");
+                break;
         }
+        AfterLoading = AfterLoading.Nothing;
     }
 
     public void LoadFirstLevel()
     {
-        LevelToLoad = "Game";
+        AfterLoading = AfterLoading.GoToGame;
         UIController._.LoadingController.TransitionOverlay(show: false, instant: false, () =>
         {
-            LoadScene(LevelToLoad);
+            LoadScene("Loading");
         });
     }
 
@@ -107,4 +112,9 @@ public class Game : MonoBehaviour
         _uniqueId++;
         return _uniqueId;
     }
+}
+
+public enum AfterLoading
+{
+    Nothing, RestartLevel, GoToGame
 }

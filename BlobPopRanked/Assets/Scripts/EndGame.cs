@@ -4,9 +4,14 @@ using UnityEngine;
 
 public class EndGame : MonoBehaviour
 {
-    
+
     void OnCollisionEnter2D(Collision2D col)
     {
+        if (Game._ == null)
+        {
+            return;
+        }
+
         if (Game._.GameOver)
         {
             return;
@@ -19,7 +24,7 @@ public class EndGame : MonoBehaviour
 
     void OnCollisionStay2D(Collision2D col)
     {
-        if (Game._.GameOver)
+        if (Game._ == null || Game._.GameOver)
         {
             return;
         }

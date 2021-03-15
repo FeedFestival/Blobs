@@ -1680,6 +1680,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: aab6b554190cc7f4fbfd8a11ab200b6e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  ScreenSizeX: 0
+  ScreenSizeY: 0
   IsPortrait: 0
   TargetAspect: {x: 9, y: 16}
 --- !u!1 &538963946
@@ -1769,6 +1771,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0c366a43481447c479b899e252cb49de, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _overlay: {fileID: 538963948}
   LoadingText: {fileID: 0}
   ContinueButton: {fileID: 0}
   PlaceholderElements: []
@@ -1776,6 +1779,8 @@ MonoBehaviour:
   _fadeInTimeout: 0.5
   _loadingTextString: Loading
   _dotsAnimationTimeout: 1
+  Faded: {r: 0, g: 0, b: 0, a: 1}
+  Clear: {r: 0, g: 0, b: 0, a: 0}
 --- !u!1 &640657187
 GameObject:
   m_ObjectHideFlags: 0
@@ -3175,7 +3180,7 @@ GameObject:
   - component: {fileID: 1429335983}
   - component: {fileID: 1429335984}
   m_Layer: 0
-  m_Name: Background
+  m_Name: _Background
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -3604,7 +3609,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 891313037edc10c4aa6b694f7220bd49, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  IsThisTheLoadingScene: 0
   HiddenSettingsPrefab: {fileID: 6781357454992910085, guid: 463f6a49383fa784c8132683a8946964,
     type: 3}
   LevelController: {fileID: 1640418443}
@@ -3882,7 +3886,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   DebugThis: 0
-  IsMainMenu: 0
+  LevelType: 2
   LevelName: Game
   GameplayState: 0
   LevelGo: {fileID: 1814022076}

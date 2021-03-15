@@ -1,6 +1,4 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
 
 public class HiddenSettings : MonoBehaviour
 {
@@ -25,10 +23,8 @@ public class HiddenSettings : MonoBehaviour
 
     [Header("Default")]
     public Vector2Int ActualScreenSize;
-
     [Header("Debug Settings")]
     public bool InstantDebug;
-
     [Header("Game Configuration")]
     public int CeilId;
     public float WallStickLimit;
