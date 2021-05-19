@@ -2006,16 +2006,16 @@ MonoBehaviour:
   TextHelper: {fileID: 1547149046}
   _dificulty: 0
   _colorDistribution: 0
-  _shooting: 0
+  _shooting: 1
   _stickingProcess: 0
   _proximity: 0
   _destroyCheck: 0
   _destroyProcess: 0
   _gameOver: 0
-  _debugBlobs: 0
+  _debugBlobs: 1
   _blobGen: 0
   _newLevel: 0
-  _neighborsProcess: 0
+  _neighborsProcess: 1
   _noFiring: 0
   _blobKilling: 0
   _keepScore: 0
