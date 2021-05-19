@@ -3350,10 +3350,12 @@ MonoBehaviour:
   m_GameObject: {fileID: 1450516080}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 7b6b73b62747a94499e8ab7e05824ce9, type: 3}
+  m_Script: {fileID: 11500000, guid: 7b819b7aa2e700a4b9a28a96ca776d3f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  ParticleControllers: []
+  ParticleControllers:
+  - {fileID: 4916094281174691091, guid: 13d69336d4c31cd47be5eeeb893af3e4, type: 3}
+  - {fileID: 2160214357854624233, guid: a03cc52b8c92ae842bf6134ea1626100, type: 3}
 --- !u!1 &1477216282
 GameObject:
   m_ObjectHideFlags: 0

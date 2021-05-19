@@ -11,11 +11,11 @@ public class VersionChecker : MonoBehaviour
 #if UNITY_EDITOR
     readonly List<VersionCheckFile> versionCheckFiles = new List<VersionCheckFile>()
     {
-        new VersionCheckFile("utils",
+        new VersionCheckFile("__utils",
             "HeadStart/Assets/HeadStart/Scripts/utils/__utils.cs",
             __utils._version
         ),
-        new VersionCheckFile("DataUtils",
+        new VersionCheckFile("__data",
             "HeadStart/Assets/HeadStart/Scripts/utils/__data.cs",
             __data._version
         ),
@@ -23,7 +23,7 @@ public class VersionChecker : MonoBehaviour
             "HeadStart/Assets/HeadStart/Scripts/utils/FpsDisplay.cs",
             FpsDisplay._version
         ),
-        new VersionCheckFile("JsonHelper",
+        new VersionCheckFile("__json",
             "HeadStart/Assets/HeadStart/Scripts/utils/__json.cs",
             __json._version
         ),
