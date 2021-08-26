@@ -19,7 +19,7 @@ public class StickingGlue : MonoBehaviour
         if (Sprite == null) {
             Sprite = GetComponent<SpriteRenderer>();
         }
-        Sprite.color = Game._.Level<LevelRandomRanked>().GetLinkColor(blobColor, stickedTo.BlobReveries.BlobColor);
+        Sprite.color = ClasicLv._.ClasicColorManager.GetLinkColor(blobColor, stickedTo.BlobReveries.BlobColor);
     }
 
     public void Unstick()

@@ -62,7 +62,7 @@ public class Player : MonoBehaviour
         Vector3 p = Camera.main.ScreenToWorldPoint(new Vector3(pointerDataPos.x, pointerDataPos.y));
         Vector2 targetPos = new Vector3(p.x, p.y, 0);
 
-        if (Game._.Level<LevelRandomRanked>().debugLvl._shooting)
+        if (ClasicLv._.__debug__._shooting)
         {
             Target.position = targetPos;
         }
@@ -80,7 +80,7 @@ public class Player : MonoBehaviour
         IsDragging = false;
         PredictionManager.Reset();
 
-        if (Game._.Level<LevelRandomRanked>().debugLvl._noFiring)
+        if (ClasicLv._.__debug__._noFiring)
         {
             return;
         }
@@ -126,7 +126,7 @@ public class Player : MonoBehaviour
             return;
         }
 
-        if (Game._.Level<LevelRandomRanked>().debugLvl._shooting == false && Target != null)
+        if (ClasicLv._.__debug__._shooting == false && Target != null)
         {
             Destroy(Target.gameObject);
             Destroy(ReflectDir.gameObject);
@@ -136,7 +136,7 @@ public class Player : MonoBehaviour
         FirstProjectile.GetComponent<CircleCollider2D>().enabled = true;
         SecondProjectile.GetComponent<CircleCollider2D>().enabled = true;
 
-        if (Game._.Level<LevelRandomRanked>().debugLvl._shooting)
+        if (ClasicLv._.__debug__._shooting)
         {
             Debug.Log("SHOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOT \n ___________________" + BlobFlightPositions.Count + "_______________________");
         }
@@ -270,6 +270,7 @@ public class Player : MonoBehaviour
         yield return new WaitForSeconds(0.1f);
 
         bool hitSomethingElseThenABlob = _lastBlobFlight.Blob == null;
+        // bool hitSomethingElseThenABlob = true;
         if (hitSomethingElseThenABlob == false)
         {
             bool areStickedToAfterAll = _lastBlobFlight.Blob.StickedTo.Contains(_lastBlobFlightBlobId);
@@ -299,7 +300,7 @@ public class Player : MonoBehaviour
             return;
         }
 
-        blobHitStickyInfo.blob.transform.SetParent(Game._.Level<LevelRandomRanked>().BlobsParentT);
+        blobHitStickyInfo.blob.transform.SetParent(ClasicLv._.BlobsParentT);
 
         blobHitStickyInfo.blob.SetPosition(blobHitStickyInfo.blob.transform.position, createdInRow: false);
 
@@ -307,9 +308,9 @@ public class Player : MonoBehaviour
 
         blobHitStickyInfo.blob.CheckSurroundings(blobHitStickyInfo.otherBlob);
 
-        Game._.Level<LevelRandomRanked>().Blobs.Add(blobHitStickyInfo.blob);
+        ClasicLv._.Blobs.Add(blobHitStickyInfo.blob);
         // ! important to try to destroy AFTER adding
-        Game._.Level<LevelRandomRanked>().TryDestroyNeighbors(blobHitStickyInfo.blob);
+        ClasicLv._.TryDestroyNeighbors(blobHitStickyInfo.blob);
 
         FirstProjectile = null;
         MakeBlob();
@@ -320,7 +321,7 @@ public class Player : MonoBehaviour
     private GameObject GetRandomBlob()
     {
         var go = HiddenSettings._.GetAnInstantiated(PrefabBank._.NewBlob);
-        go.GetComponent<Blob>().BlobReveries.SetColor(Game._.Level<LevelRandomRanked>().DificultyService.GetColorByDificulty());
+        go.GetComponent<Blob>().BlobReveries.SetColor(ClasicLv._.DificultyService.GetColorByDificulty());
         return go;
     }
 
@@ -328,13 +329,13 @@ public class Player : MonoBehaviour
     {
         RaycastHit2D hit = FakeShootBlob(origin: origin, towards: targetPos);
         OnHitSomething(hit, origin);
-        Game._.Level<LevelRandomRanked>().DisableWalls(DisableWallOp.Both, false);
+        ClasicLv._.DisableWalls(DisableWallOp.Both, false);
     }
 
     private RaycastHit2D FakeShootBlob(Vector2 origin, Vector2 towards)
     {
         var direction = (towards - origin).normalized;
-        if (Game._.Level<LevelRandomRanked>().debugLvl._shooting)
+        if (ClasicLv._.__debug__._shooting)
         {
             Debug.Log("direction: " + direction);
         }
@@ -344,7 +345,7 @@ public class Player : MonoBehaviour
 
     private void OnHitSomething(RaycastHit2D hit, Vector2 origin)
     {
-        if (Game._.Level<LevelRandomRanked>().debugLvl._shooting)
+        if (ClasicLv._.__debug__._shooting)
         {
             Debug.Log("origin: " + origin);
         }
@@ -356,7 +357,7 @@ public class Player : MonoBehaviour
 
         if (hit)
         {
-            if (Game._.Level<LevelRandomRanked>().debugLvl._shooting)
+            if (ClasicLv._.__debug__._shooting)
             {
                 Debug.Log("hit.transform.gameObject.name: " + hit.transform.gameObject.name);
                 Debug.Log("hit.transform.tag: " + hit.transform.tag);
@@ -365,11 +366,11 @@ public class Player : MonoBehaviour
             {
                 if (hit.transform.gameObject.name.Contains("RWall"))
                 {
-                    Game._.Level<LevelRandomRanked>().DisableWalls(DisableWallOp.RightInverse);
+                    ClasicLv._.DisableWalls(DisableWallOp.RightInverse);
                 }
                 else
                 {
-                    Game._.Level<LevelRandomRanked>().DisableWalls(DisableWallOp.LeftInverse);
+                    ClasicLv._.DisableWalls(DisableWallOp.LeftInverse);
                 }
 
                 Vector2 newOrigin = (Vector2)hit.centroid;
@@ -382,7 +383,7 @@ public class Player : MonoBehaviour
                 Vector2 reflectDir = Vector2.Reflect(oldDir, hit.normal.normalized);
                 Vector2 newTowards = (Vector2)newOrigin + reflectDir;
 
-                if (Game._.Level<LevelRandomRanked>().debugLvl._shooting)
+                if (ClasicLv._.__debug__._shooting)
                 {
                     Debug.Log("newOrigin: " + newOrigin);
                     if (_stopAfter == 1)
@@ -411,7 +412,7 @@ public class Player : MonoBehaviour
     private void FakeHitBlob(RaycastHit2D hit)
     {
         Vector2 newOrigin = (Vector2)hit.centroid;
-        if (Game._.Level<LevelRandomRanked>().debugLvl._shooting)
+        if (ClasicLv._.__debug__._shooting)
         {
             Debug.Log("newOrigin: " + newOrigin);
             CenteroidBlob.position = newOrigin;

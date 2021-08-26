@@ -17,7 +17,7 @@ public class BlobDebugInfo : MonoBehaviour
     public void FakeKill(BlobColor blobColor, ref SpriteRenderer spriteColor)
     {
         float transparency = 0.15f;
-        Color color = Game._.Level<LevelRandomRanked>().GetColorByBlobColor(blobColor);
+        Color color = ClasicLv._.ClasicColorManager.GetColorByBlobColor(blobColor);
         color.a = transparency;
         spriteColor.color = color;
         color = HiddenSettings._.White;

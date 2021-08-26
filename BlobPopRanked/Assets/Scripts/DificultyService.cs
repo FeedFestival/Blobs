@@ -14,13 +14,13 @@ public class DificultyService : MonoBehaviour
     public int MaxHits;
     public int HitsToReset;
     public int Hits;
-    private LevelRandomRanked _levelRandomRanked;
+    private ClasicLv _clasicLv;
     public List<int> Colors;
     public List<int> LevelIncreseThreshhold;
 
-    public void Init(LevelRandomRanked levelRandomRanked)
+    public void Init(ClasicLv levelRandomRanked)
     {
-        _levelRandomRanked = levelRandomRanked;
+        _clasicLv = levelRandomRanked;
 
         Colors = new List<int>();
         Colors.Add(0);
@@ -35,7 +35,7 @@ public class DificultyService : MonoBehaviour
             zeros += "0";
         }
         DificultySeed = System.Convert.ToInt32("1" + zeros);
-        if (_levelRandomRanked.debugLvl._dificulty)
+        if (_clasicLv.__debug__._dificulty)
         {
             Debug.Log("DificultySeed: " + DificultySeed);
         }
@@ -60,7 +60,7 @@ public class DificultyService : MonoBehaviour
             Colors.Add(0);
         }
 
-        if (_levelRandomRanked.debugLvl._colorDistribution)
+        if (_clasicLv.__debug__._colorDistribution)
         {
             Debug.Log("GetColorByDificulty() ------------------- " + __debug.DebugList(Colors, "Colors"));
         }
@@ -75,7 +75,7 @@ public class DificultyService : MonoBehaviour
             int countOfZeros = Colors.Count(c => c == 0);
             splitPercentage = 100 / Colors.Count;
 
-            if (_levelRandomRanked.debugLvl._colorDistribution)
+            if (_clasicLv.__debug__._colorDistribution)
             {
                 Debug.Log("countOfZeros: " + countOfZeros);
                 Debug.Log("splitPercentage: " + splitPercentage);
@@ -86,7 +86,7 @@ public class DificultyService : MonoBehaviour
                 percentages = GetWithZeroPercentages(splitPercentage, splitPercentage);
                 percentageDistribution = SetupPercentages(percentages);
 
-                if (_levelRandomRanked.debugLvl._colorDistribution)
+                if (_clasicLv.__debug__._colorDistribution)
                 {
                     Debug.Log(__debug.DebugList<int>(percentages, "percentages"));
                     Debug.Log(__debug.DebugList<int>(percentageDistribution, "percentageDistribution"));
@@ -101,7 +101,7 @@ public class DificultyService : MonoBehaviour
             int remainingPercentage = 100 - (numbersPercentage * countOfNumbers);
             int zerosPercentage = remainingPercentage / countOfZeros;
 
-            if (_levelRandomRanked.debugLvl._colorDistribution)
+            if (_clasicLv.__debug__._colorDistribution)
             {
                 Debug.Log("countOfNumbers: " + countOfNumbers);
                 Debug.Log("numbersPercentage: " + numbersPercentage);
@@ -126,7 +126,7 @@ public class DificultyService : MonoBehaviour
         float coeficientSum = coeficientColors.Sum();
         float commonD = 100 / coeficientSum;
 
-        if (_levelRandomRanked.debugLvl._colorDistribution)
+        if (_clasicLv.__debug__._colorDistribution)
         {
             Debug.Log("maxValue: " + maxValue);
             Debug.Log(__debug.DebugList<float>(coeficientColors, "coeficientColors"));
@@ -144,7 +144,7 @@ public class DificultyService : MonoBehaviour
         percentages[percentages.Count - 1] += remaineder;
         percentageDistribution = SetupPercentages(percentages);
 
-        if (_levelRandomRanked.debugLvl._colorDistribution)
+        if (_clasicLv.__debug__._colorDistribution)
         {
             Debug.Log("remaineder: " + remaineder);
             Debug.Log(__debug.DebugList<int>(percentages, "percentages"));
@@ -186,7 +186,7 @@ public class DificultyService : MonoBehaviour
         int randomNumber = UnityEngine.Random.Range(0, 100);
         int index = percentages.FindIndex(p => randomNumber < p);
 
-        if (_levelRandomRanked.debugLvl._colorDistribution)
+        if (_clasicLv.__debug__._colorDistribution)
         {
             Debug.Log("randomNumber: " + randomNumber + ", indexIn_colors: " + index);
         }
@@ -204,7 +204,7 @@ public class DificultyService : MonoBehaviour
         {
             Colors[index]--;
         }
-        if (_levelRandomRanked.debugLvl._colorDistribution)
+        if (_clasicLv.__debug__._colorDistribution)
         {
             Debug.Log(__debug.DebugList<int>(Colors, "Colors"));
         }
@@ -230,11 +230,11 @@ public class DificultyService : MonoBehaviour
 
     public void CheckIfAddingNewRow()
     {
-        bool isAtLeastOnBlobConnectedToCeil = (_levelRandomRanked.Blobs == null || _levelRandomRanked.Blobs.Count == 0) == false;
-        // Debug.Log("_levelRandomRanked.Blobs.Count: " + _levelRandomRanked.Blobs.Count);
+        bool isAtLeastOnBlobConnectedToCeil = (_clasicLv.Blobs == null || _clasicLv.Blobs.Count == 0) == false;
+        // Debug.Log("_clasicLv.Blobs.Count: " + _clasicLv.Blobs.Count);
         if (isAtLeastOnBlobConnectedToCeil == false)
         {
-            isAtLeastOnBlobConnectedToCeil = _levelRandomRanked.Blobs.Exists(b =>
+            isAtLeastOnBlobConnectedToCeil = _clasicLv.Blobs.Exists(b =>
             {
                 bool isConnectedToCeil = b.StickedTo.Exists(s => s == HiddenSettings._.CeilId);
                 return isConnectedToCeil;
@@ -243,7 +243,7 @@ public class DificultyService : MonoBehaviour
 
         if (isAtLeastOnBlobConnectedToCeil)
         {
-            float blobY = _levelRandomRanked.Blobs.Min(b => b.transform.position.y);
+            float blobY = _clasicLv.Blobs.Min(b => b.transform.position.y);
 
             // Debug.Log("blobY: " + blobY);
             float overZero = 4.44f;
@@ -278,12 +278,12 @@ public class DificultyService : MonoBehaviour
             if (Hits >= HitsToReset)
             {
                 Hits = 0;
-                _levelRandomRanked.AddAnotherBlobLevel();
+                _clasicLv.AddAnotherBlobLevel();
             }
         }
         else
         {
-            _levelRandomRanked.AddAnotherBlobLevel();
+            _clasicLv.AddAnotherBlobLevel();
         }
     }
 }

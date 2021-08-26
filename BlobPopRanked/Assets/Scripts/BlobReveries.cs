@@ -29,11 +29,11 @@ public class BlobReveries : MonoBehaviour
         BlobColor = blobColor;
         if (instant)
         {
-            Sprite.color = Game._.Level<LevelRandomRanked>().GetColorByBlobColor(BlobColor);
+            Sprite.color = ClasicLv._.ClasicColorManager.GetColorByBlobColor(BlobColor);
             if (TrailRenderer != null)
             {
-                TrailRenderer.startColor = Game._.Level<LevelRandomRanked>().GetColorByBlobColor(BlobColor);
-                TrailRenderer.endColor = Game._.Level<LevelRandomRanked>().GetColorByBlobColor(BlobColor);
+                TrailRenderer.startColor = ClasicLv._.ClasicColorManager.GetColorByBlobColor(BlobColor);
+                TrailRenderer.endColor = ClasicLv._.ClasicColorManager.GetColorByBlobColor(BlobColor);
             }
         }
 
@@ -44,7 +44,7 @@ public class BlobReveries : MonoBehaviour
 
         if (TravelSprite != null)
         {
-            TravelSprite.color = Game._.Level<LevelRandomRanked>().GetColorByBlobColor(BlobColor);
+            TravelSprite.color = ClasicLv._.ClasicColorManager.GetColorByBlobColor(BlobColor);
             TravelSprite.gameObject.SetActive(false);
         }
     }
@@ -61,7 +61,7 @@ public class BlobReveries : MonoBehaviour
         bool hitSomethingElseThenABlob = blobHitStickyInfo.otherBlob == null;
         if (hitSomethingElseThenABlob)
         {
-            _initialPos = new Vector2(transform.localPosition.x, 4.44f - Game._.Level<LevelRandomRanked>().BlobsParentT.position.y);
+            _initialPos = new Vector2(transform.localPosition.x, 4.44f - ClasicLv._.BlobsParentT.position.y);
         }
         else
         {

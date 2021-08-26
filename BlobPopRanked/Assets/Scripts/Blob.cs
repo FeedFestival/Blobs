@@ -51,7 +51,7 @@ public class Blob : MonoBehaviour
         Id = Game._.GetUniqueId();
         gameObject.name = "_Blob " + Id;
 
-        if (Game._.Level<LevelRandomRanked>().debugLvl._debugBlobs)
+        if (ClasicLv._.__debug__._debugBlobs)
         {
             var go = HiddenSettings._.GetAnInstantiated(PrefabBank._.BlobDebugInfoPrefab);
             _blobDebugInfo = go.GetComponent<BlobDebugInfo>();
@@ -61,7 +61,7 @@ public class Blob : MonoBehaviour
 
     internal void Descend()
     {
-        float spacing = Game._.Level<LevelRandomRanked>().Spacing;
+        float spacing = ClasicLv._.Spacing;
         SetWorldPosition(new Vector3(Pos.x, Pos.y - spacing, Pos.z));
         if (Pos.y < HiddenSettings._.WallStickLimit)
         {
@@ -87,12 +87,12 @@ public class Blob : MonoBehaviour
         }
         if (otherBlob == null)
         {
-            otherBlob = Game._.Level<LevelRandomRanked>().GetBlobById(id.Value);
+            otherBlob = ClasicLv._.GetBlobById(id.Value);
         }
 
         if (Neighbors.Contains(id.Value))
         {
-            if (Game._.Level<LevelRandomRanked>().debugLvl._neighborsProcess)
+            if (ClasicLv._.__debug__._neighborsProcess)
             {
                 Debug.LogWarning("      - blob(" + Id + ") has " + id + " as neighbor.");
             }
@@ -109,8 +109,8 @@ public class Blob : MonoBehaviour
 
         Neighbors.Add(id.Value);
 
-        if (Game._.Level<LevelRandomRanked>().debugLvl._debugBlobs
-            && Game._.Level<LevelRandomRanked>().debugLvl._neighborsProcess)
+        if (ClasicLv._.__debug__._debugBlobs
+            && ClasicLv._.__debug__._neighborsProcess)
         {
             if (_blobDebugInfo != null) _blobDebugInfo.NeighborText.text = __debug.DebugList<int>(Neighbors);
         }
@@ -118,7 +118,7 @@ public class Blob : MonoBehaviour
 
     internal void Kill()
     {
-        List<Blob> blobsRef = Game._.Level<LevelRandomRanked>().Blobs;
+        List<Blob> blobsRef = ClasicLv._.Blobs;
 
         foreach (var stickedTo in StickedTo)
         {
@@ -126,16 +126,16 @@ public class Blob : MonoBehaviour
             if (index >= 0 && index < blobsRef.Count)
             {
                 blobsRef[index].RemoveSticked(Id);
-                __utils.AddIfNone(blobsRef[index].Id, ref Game._.Level<LevelRandomRanked>().Affected);
+                __utils.AddIfNone(blobsRef[index].Id, ref ClasicLv._.Affected);
             }
         }
-        if (Game._.Level<LevelRandomRanked>().debugLvl._stickingProcess)
+        if (ClasicLv._.__debug__._stickingProcess)
         {
             Debug.Log(__debug.DebugList<int>(StickedTo, "StickedTo"));
         }
 
         GetComponent<CircleCollider2D>().enabled = false;
-        if (Game._.Level<LevelRandomRanked>().debugLvl._blobKilling)
+        if (ClasicLv._.__debug__._blobKilling)
         {
             _blobDebugInfo.FakeKill(BlobReveries.BlobColor, ref BlobReveries.Sprite);
         }
@@ -173,7 +173,7 @@ public class Blob : MonoBehaviour
             StickTo(otherBlob);
         }
 
-        if (Game._.Level<LevelRandomRanked>().debugLvl._neighborsProcess)
+        if (ClasicLv._.__debug__._neighborsProcess)
         {
             var pre = "NO ... distance: " + distance;
             if (areClose)
@@ -193,7 +193,7 @@ public class Blob : MonoBehaviour
     {
         if (viceVersa)
         {
-            if (Game._.Level<LevelRandomRanked>().debugLvl._stickingProcess)
+            if (ClasicLv._.__debug__._stickingProcess)
             {
                 Debug.Log("blob" + Id + " sticked to otherBlob" + otherBlob.Id);
             }
@@ -220,7 +220,7 @@ public class Blob : MonoBehaviour
         int index = StickedTo.FindIndex(s => s == id);
         if (index >= 0)
         {
-            if (Game._.Level<LevelRandomRanked>().debugLvl._stickingProcess)
+            if (ClasicLv._.__debug__._stickingProcess)
             {
                 Debug.Log("blob" + Id + " removed stickedBlob[" + id + "]");
             }
@@ -236,7 +236,7 @@ public class Blob : MonoBehaviour
             StickedTo.Add(HiddenSettings._.CeilId);
         }
 
-        List<Blob> proximityBlobs = BlobService.FindBlobsInProximity(Game._.Level<LevelRandomRanked>().Blobs, this);
+        List<Blob> proximityBlobs = BlobService.FindBlobsInProximity(ClasicLv._.Blobs, this);
 
         BlobReveries.AnimateShockwave(proximityBlobs);
 
@@ -261,7 +261,7 @@ public class Blob : MonoBehaviour
                 continue;
             }
             bool areNeighbors = IfNeighborAdd(otherBlob: proximityBlob);
-            if (Game._.Level<LevelRandomRanked>().debugLvl._proximity && areNeighbors)
+            if (ClasicLv._.__debug__._proximity && areNeighbors)
             {
                 Debug.Log("From Proximity found blob" + proximityBlob.Id + " as neighbor");
             }
@@ -279,7 +279,7 @@ public class Blob : MonoBehaviour
             _linkedNeighbors = new List<int>();
             FindLinkedNeighbors(this);
 
-            if (Game._.Level<LevelRandomRanked>().debugLvl._destroyCheck)
+            if (ClasicLv._.__debug__._destroyCheck)
             {
                 Debug.Log(__debug.DebugList<int>(_linkedNeighbors, "_linkedNeighbors"));
             }
@@ -291,7 +291,7 @@ public class Blob : MonoBehaviour
             }
         }
 
-        if (Game._.Level<LevelRandomRanked>().debugLvl._destroyCheck)
+        if (ClasicLv._.__debug__._destroyCheck)
         {
             Debug.Log("Has no Neighbors to Destroy");
         }
@@ -306,7 +306,7 @@ public class Blob : MonoBehaviour
             {
                 continue;
             }
-            Blob foundNeighbor = Game._.Level<LevelRandomRanked>().Blobs
+            Blob foundNeighbor = ClasicLv._.Blobs
                     .FirstOrDefault(b => b.Id == neighborId);
             _linkedNeighbors.Add(neighborId);
 

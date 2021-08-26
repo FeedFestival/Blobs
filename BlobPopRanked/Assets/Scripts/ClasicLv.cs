@@ -1,13 +1,15 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using System.Linq;
 using Assets.Scripts.LevelService;
 using Assets.Scripts.utils;
 
-public class LevelRandomRanked : MonoBehaviour, ILevel
+public class ClasicLv : MonoBehaviour, ILevel
 {
-    public LevelRandomRankedDebug debugLvl;
+    private static ClasicLv _clasicLv;
+    public static ClasicLv _ { get { return _clasicLv; } }
+    public ClasicLvDebug __debug__;
+    //
     public int BlobsPerRow;
     public Vector2 StartPos;
     public float Spacing;
@@ -25,11 +27,16 @@ public class LevelRandomRanked : MonoBehaviour, ILevel
     public DificultyService DificultyService;
     public int Points;
     public Transform BlobsParentT;
+    public ClasicColorManager ClasicColorManager;
 
     private int? _descendTweenId;
     public Collider2D LeftWall;
     public Collider2D RightWall;
     public PolygonCollider2D EndGameCollider;
+
+    void Awake() {
+        _clasicLv = this;
+    }
 
     void Start()
     {
@@ -46,7 +53,7 @@ public class LevelRandomRanked : MonoBehaviour, ILevel
 
         Game._.Player.MakeBlob(firstLevel: FirstLevel);
 
-        if (debugLvl._blobGen == false)
+        if (__debug__._blobGen == false)
         {
             GenerateBlobLevel();
         }
@@ -77,9 +84,9 @@ public class LevelRandomRanked : MonoBehaviour, ILevel
         {
             blob.Descend();
         }
-        if (debugLvl._blobKilling)
+        if (__debug__._blobKilling)
         {
-            foreach (Blob blob in debugLvl.DeadBlobs)
+            foreach (Blob blob in __debug__.DeadBlobs)
             {
                 blob.Descend();
             }
@@ -91,9 +98,9 @@ public class LevelRandomRanked : MonoBehaviour, ILevel
         DificultyService.CalculateDificulty();
         DificultyService.CalculateDificultySeed();
 
-        if (debugLvl._blobGen)
+        if (__debug__._blobGen)
         {
-            debugLvl.WhenFinishedAddingDescend = true;
+            __debug__.WhenFinishedAddingDescend = true;
         }
         else
         {
@@ -109,7 +116,7 @@ public class LevelRandomRanked : MonoBehaviour, ILevel
             DificultyService.CalculateDificultySeed();
         }
 
-        if (debugLvl._blobGen == false)
+        if (__debug__._blobGen == false)
         {
             for (var i = 0; i < BlobsPerRow; i++)
             {
@@ -130,7 +137,6 @@ public class LevelRandomRanked : MonoBehaviour, ILevel
         {
             DescendBlobs();
         }
-        // Debug.Log("-----------------------------------------------------");
     }
 
     public void CreateBlob_Debug()
@@ -143,7 +149,7 @@ public class LevelRandomRanked : MonoBehaviour, ILevel
         bool reachedMax = (length - 2) < _increment;
         if (reachedMax)
         {
-            debugLvl.ChangeDebugState(LevelDebugState.AddNewRow);
+            __debug__.ChangeDebugState(LevelDebugState.AddNewRow);
             return;
         }
         else
@@ -155,9 +161,9 @@ public class LevelRandomRanked : MonoBehaviour, ILevel
 
     public void ResetIncrement_Debug()
     {
-        if (debugLvl.WhenFinishedAddingDescend)
+        if (__debug__.WhenFinishedAddingDescend)
         {
-            debugLvl.WhenFinishedAddingDescend = false;
+            __debug__.WhenFinishedAddingDescend = false;
             OnFinishedMakingBlobLevel();
         }
         else
@@ -284,14 +290,14 @@ public class LevelRandomRanked : MonoBehaviour, ILevel
         {
             int index = Blobs.FindIndex(b => b.Id == bId);
             Blobs[index].Kill();
-            if (debugLvl._blobKilling)
+            if (__debug__._blobKilling)
             {
-                debugLvl.DeadBlobs.Add(Blobs[index]);
+                __debug__.DeadBlobs.Add(Blobs[index]);
             }
             Blobs.RemoveAt(index);
         }
 
-        if (debugLvl._destroyProcess)
+        if (__debug__._destroyProcess)
         {
             Debug.Log(__debug.DebugList(_toDestroy, "_toDestroy"));
         }
@@ -328,7 +334,7 @@ public class LevelRandomRanked : MonoBehaviour, ILevel
         }
         if (Affected == null || Affected.Count == 0)
         {
-            if (debugLvl._destroyProcess)
+            if (__debug__._destroyProcess)
             {
                 Debug.Log("Affected not found.");
             }
@@ -338,7 +344,7 @@ public class LevelRandomRanked : MonoBehaviour, ILevel
         _toDestroy = new List<int>();
         _verified = new List<int>();
 
-        if (debugLvl._destroyProcess)
+        if (__debug__._destroyProcess)
         {
             Debug.Log(__debug.DebugList(Affected, "Affected"));
         }
@@ -349,7 +355,7 @@ public class LevelRandomRanked : MonoBehaviour, ILevel
             var blob = Blobs[index];
             if (blob.StickedTo.Count == 0)
             {
-                if (debugLvl._destroyProcess)
+                if (__debug__._destroyProcess)
                 {
                     Debug.Log("blob" + blob.Id + " is isolated so it get's destroyed.");
                 }
@@ -357,7 +363,7 @@ public class LevelRandomRanked : MonoBehaviour, ILevel
             }
             else
             {
-                if (debugLvl._destroyProcess)
+                if (__debug__._destroyProcess)
                 {
                     Debug.Log("blob" + blob.Id + " - checking To See If is touching ceil");
                 }
@@ -376,18 +382,18 @@ public class LevelRandomRanked : MonoBehaviour, ILevel
     private bool isTouchingCeil(Blob blob)
     {
         __utils.AddIfNone(blob.Id, ref _checked,
-            debugAdd: debugLvl._destroyProcess ? "------------- blob" + blob.Id + " added to " + __debug.DebugList(_checked, "_checked") : null);
+            debugAdd: __debug__._destroyProcess ? "------------- blob" + blob.Id + " added to " + __debug.DebugList(_checked, "_checked") : null);
         if (blob.StickedTo.Contains(HiddenSettings._.CeilId))
         {
-            if (debugLvl._destroyProcess)
+            if (__debug__._destroyProcess)
             {
                 Debug.Log("------------- blob" + blob.Id + " touches ceiling.");
             }
             __utils.AddIfNone(blob.Id, ref _verified,
-                debugAdd: debugLvl._destroyProcess ? "------------- blob" + blob.Id + " added to _verified." : null);
+                debugAdd: __debug__._destroyProcess ? "------------- blob" + blob.Id + " added to _verified." : null);
             return true;
         }
-        if (debugLvl._destroyProcess)
+        if (__debug__._destroyProcess)
         {
             Debug.Log("------------- " + __debug.DebugList(blob.StickedTo, "blob" + blob.Id + ".StickedTo"));
         }
@@ -395,7 +401,7 @@ public class LevelRandomRanked : MonoBehaviour, ILevel
         {
             if (_checked.Contains(blobId))
             {
-                if (debugLvl._destroyProcess)
+                if (__debug__._destroyProcess)
                 {
                     Debug.Log("------------- " + __debug.DebugList(_checked, "_checked") +
                         " contains blob" + blobId + " so we are not checking him.");
@@ -404,30 +410,30 @@ public class LevelRandomRanked : MonoBehaviour, ILevel
             }
             if (_verified.Contains(blobId))
             {
-                if (debugLvl._destroyProcess)
+                if (__debug__._destroyProcess)
                 {
                     Debug.Log("------------- _verified contains blob" + blobId + " so it's touching Ceil.");
                 }
                 return true;
             }
             var stickedBlob = GetBlobById(blobId);
-            if (debugLvl._destroyProcess)
+            if (__debug__._destroyProcess)
             {
                 Debug.Log("------------- blob" + stickedBlob.Id + " - checking To See If is touching ceil");
             }
             bool isTouching = isTouchingCeil(stickedBlob);
             if (isTouching)
             {
-                if (debugLvl._destroyProcess)
+                if (__debug__._destroyProcess)
                 {
                     Debug.Log("------------- one of it's sticking blobs(" + stickedBlob.Id + ") touches ceil");
                 }
                 __utils.AddIfNone(blob.Id, ref _verified,
-                    debugAdd: debugLvl._destroyProcess ? "------------- blob" + blob.Id + " added to _verified." : null);
+                    debugAdd: __debug__._destroyProcess ? "------------- blob" + blob.Id + " added to _verified." : null);
                 return true;
             }
         }
-        if (debugLvl._destroyProcess)
+        if (__debug__._destroyProcess)
         {
             Debug.Log("------------- blob" + blob.Id + " doesn't touch ceiling.");
         }
@@ -436,7 +442,7 @@ public class LevelRandomRanked : MonoBehaviour, ILevel
 
     public bool CanFireBlob(Vector3? point = null)
     {
-        if (debugLvl._noFiring)
+        if (__debug__._noFiring)
         {
             return false;
         }
@@ -475,122 +481,9 @@ public class LevelRandomRanked : MonoBehaviour, ILevel
         // Debug.Log(LeftWall.gameObject.name + " - " + LeftWall.enabled);
         // Debug.Log(RightWall.gameObject.name + " - " + RightWall.enabled);
     }
-
-    public Color GetColorByBlobColor(BlobColor blobColor)
-    {
-        return ColorBank._.GetColorByName(ColorName(blobColor));
-    }
-
-    internal Color GetLinkColor(BlobColor fromColor, BlobColor toColor)
-    {
-        Color color;
-        // Debug.Log("fromColor: " + fromColor + " toColor: " + toColor);
-        if (fromColor == BlobColor.RED && toColor == BlobColor.RED)
-        {
-            color = ColorBank._.Pink_Dark_Night_Shadz;
-        }
-        else if (fromColor == BlobColor.BLUE && toColor == BlobColor.BLUE)
-        {
-            color = ColorBank._.Blue_San_Marino;
-        }
-        else if (fromColor == BlobColor.YELLOW && toColor == BlobColor.YELLOW)
-        {
-            color = ColorBank._.Yellow_Gold_Sand;
-        }
-        else if (fromColor == BlobColor.GREEN && toColor == BlobColor.GREEN)
-        {
-            color = ColorBank._.Green_Aqua_Forest;
-        }
-        else if (fromColor == BlobColor.BROWN && toColor == BlobColor.BROWN)
-        {
-            color = ColorBank._.Brown_Ferra;
-        }
-
-        //
-        else if (fromColor == BlobColor.BLUE && toColor == BlobColor.RED
-            || fromColor == BlobColor.RED && toColor == BlobColor.BLUE)
-        {
-            color = ColorBank._.Purple_Studio;
-        }
-        else if (fromColor == BlobColor.BLUE && toColor == BlobColor.YELLOW ||
-            fromColor == BlobColor.YELLOW && toColor == BlobColor.BLUE)
-        {
-            color = ColorBank._.Green_Yellow;
-        }
-        else if (fromColor == BlobColor.BLUE && toColor == BlobColor.GREEN ||
-            fromColor == BlobColor.GREEN && toColor == BlobColor.BLUE)
-        {
-            color = ColorBank._.Green_Blue_Wedgewood;
-        }
-        else if (fromColor == BlobColor.BLUE && toColor == BlobColor.BROWN ||
-            fromColor == BlobColor.BROWN && toColor == BlobColor.BLUE)
-        {
-            color = ColorBank._.Purple_Salt_Box;
-        }
-        else if (fromColor == BlobColor.RED && toColor == BlobColor.YELLOW
-            || fromColor == BlobColor.YELLOW && toColor == BlobColor.RED)
-        {
-            color = ColorBank._.Orange_Burnt_Sienna;
-        }
-        else if (fromColor == BlobColor.RED && toColor == BlobColor.GREEN
-            || fromColor == BlobColor.GREEN && toColor == BlobColor.RED)
-        {
-            color = ColorBank._.Green_Red_Xanadu;
-        }
-        else if (fromColor == BlobColor.RED && toColor == BlobColor.BROWN
-            || fromColor == BlobColor.BROWN && toColor == BlobColor.RED)
-        {
-            color = ColorBank._.Brown_Buccaneer;
-        }
-        else if (fromColor == BlobColor.YELLOW && toColor == BlobColor.GREEN
-                    || fromColor == BlobColor.GREEN && toColor == BlobColor.YELLOW)
-        {
-            color = ColorBank._.Green_Wild_Willow;
-        }
-        else if (fromColor == BlobColor.YELLOW && toColor == BlobColor.BROWN
-                    || fromColor == BlobColor.BROWN && toColor == BlobColor.YELLOW)
-        {
-            color = ColorBank._.Brown_Muddy_Waters;
-        }
-        else if (fromColor == BlobColor.GREEN && toColor == BlobColor.BROWN
-                    || fromColor == BlobColor.BROWN && toColor == BlobColor.GREEN)
-        {
-            color = ColorBank._.Brown_Flint;
-        }
-        //
-        else
-        {
-            color = HiddenSettings._.TransparentColor;
-        }
-        color.a = 0.75f;
-        return color;
-    }
-
-    public string ColorName(BlobColor clobColor)
-    {
-        switch (clobColor)
-        {
-            case BlobColor.BLUE:
-                return "Blue_Cornflower";
-            case BlobColor.YELLOW:
-                return "Orange_Koromiko";
-            case BlobColor.GREEN:
-                return "Green_Ocean";
-            case BlobColor.BROWN:
-                return "Brown_Ferra";
-            case BlobColor.RED:
-            default:
-                return "Red_Torch";
-        }
-    }
 }
 
 public enum DisableWallOp
 {
     Both, LeftInverse, RightInverse, JustLeft, JustRight
-}
-
-public enum BlobColor
-{
-    RED, BLUE, YELLOW, GREEN, BROWN
 }

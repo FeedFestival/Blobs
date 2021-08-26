@@ -27,7 +27,7 @@ namespace Assets.Scripts
                 {
                     float distance = 0;
                     bool inProximity = BlobService.AreClose(blob.transform, b.transform, ref distance, proximity: true);
-                    if (Game._.Level<LevelRandomRanked>().debugLvl._proximity)
+                    if (ClasicLv._.__debug__._proximity)
                     {
                         Debug.Log("blob" + blob.Id + " and proximityBlob" + b.Id + " distance: " + distance +
                             "(min: " + HiddenSettings._.NeighborProximity + ") inProximity: " + inProximity);
