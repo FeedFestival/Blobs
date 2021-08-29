@@ -1,7 +1,5 @@
 ﻿using System.Collections;
-using System.Collections.Generic;
 using Assets.Scripts;
-using Assets.Scripts.utils;
 using UnityEngine;
 
 public class PredictionManager : MonoBehaviour
@@ -21,6 +19,8 @@ public class PredictionManager : MonoBehaviour
     public Color YellowPrediction;
     public Color GreenPrediction;
     public Color BrownPrediction;
+    [Header("Background Colors")]
+    public Color Background_Light;
 
     // Start is called before the first frame update
     void Start()
@@ -30,32 +30,32 @@ public class PredictionManager : MonoBehaviour
 
     public void ChangeColor(BlobColor blobColor)
     {
-        Color color;
-        switch (blobColor)
-        {
-            case BlobColor.BLUE:
-                color = BluePrediction;
-                break;
-            case BlobColor.YELLOW:
-                color = YellowPrediction;
-                break;
-            case BlobColor.GREEN:
-                color = GreenPrediction;
-                break;
-            case BlobColor.BROWN:
-                color = BrownPrediction;
-                break;
-            case BlobColor.RED:
-            default:
-                color = RedPrediction;
-                break;
-        }
+        // Color color = GetPredictionColor(blobColor);
+        Color color = Background_Light;
+        
         LineRenderer1.startColor = color;
         LineRenderer1.endColor = color;
         LineRenderer2.startColor = color;
         LineRenderer2.endColor = color;
         LineRenderer3.startColor = color;
         LineRenderer3.endColor = color;
+    }
+
+    public Color GetPredictionColor(BlobColor blobColor) {
+        switch (blobColor)
+        {
+            case BlobColor.BLUE:
+                return BluePrediction;
+            case BlobColor.YELLOW:
+                return YellowPrediction;
+            case BlobColor.GREEN:
+                return GreenPrediction;
+            case BlobColor.BROWN:
+                return BrownPrediction;
+            case BlobColor.RED:
+            default:
+                return RedPrediction;
+        }
     }
 
     public void Reset()

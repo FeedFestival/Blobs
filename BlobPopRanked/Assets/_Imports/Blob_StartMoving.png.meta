@@ -455,6 +455,8 @@ TextureImporter:
   isReadable: 0
   streamingMipmaps: 0
   streamingMipmapsPriority: 0
+  vTOnly: 0
+  ignoreMasterTextureLimit: 0
   grayScaleToAlpha: 0
   generateCubemap: 6
   cubemapConvolution: 0
@@ -463,9 +465,9 @@ TextureImporter:
   maxTextureSize: 2048
   textureSettings:
     serializedVersion: 2
-    filterMode: -1
-    aniso: -1
-    mipBias: -100
+    filterMode: 1
+    aniso: 1
+    mipBias: 0
     wrapU: 1
     wrapV: 1
     wrapW: 1
@@ -486,9 +488,12 @@ TextureImporter:
   textureType: 8
   textureShape: 1
   singleChannelComponent: 0
+  flipbookRows: 1
+  flipbookColumns: 1
   maxTextureSizeSet: 0
   compressionQualitySet: 0
   textureFormatSet: 0
+  ignorePngGamma: 0
   applyGammaDecoding: 0
   platformSettings:
   - serializedVersion: 3
@@ -1203,6 +1208,38 @@ TextureImporter:
     edges: []
     weights: []
     secondaryTextures: []
+    nameFileIdTable:
+      Blob_StartMoving_10: 5113810536267600148
+      Blob_StartMoving_17: -1054801216381915587
+      Blob_StartMoving_26: 1346939870156633776
+      Blob_StartMoving_4: 6002023301445655795
+      Blob_StartMoving_2: -2571929638880550206
+      Blob_StartMoving_15: 7480878787642061232
+      Blob_StartMoving_6: -3895627106307989256
+      Blob_StartMoving_20: -8716136724551570009
+      Blob_StartMoving_13: -7035984253220400173
+      Blob_StartMoving_16: 4112103375047692005
+      Blob_StartMoving_21: 8739406261468569035
+      Blob_StartMoving_11: 4396035509881313584
+      Blob_StartMoving_0: 3568642895028455234
+      Blob_StartMoving_19: -2881345669989311202
+      Blob_StartMoving_8: 792317173098235167
+      Blob_StartMoving_1: 4086385253981629260
+      Blob_StartMoving_9: 2149456443424668081
+      Blob_StartMoving_14: -1178175719002787732
+      Blob_StartMoving_12: -5882572759046589595
+      Blob_StartMoving_27: 3090270290788346399
+      Blob_StartMoving_28: 507062636523472458
+      Blob_StartMoving_3: -5443134780437564887
+      Blob_StartMoving_7: 2013234041850580732
+      Blob_StartMoving_18: 1169352908030155473
+      Blob_StartMoving_29: 2390146951073673242
+      Blob_StartMoving_5: 6673728627258997901
+      Blob_StartMoving_30: -468475482848229629
+      Blob_StartMoving_22: 5085703343032392511
+      Blob_StartMoving_25: 2794020712229492829
+      Blob_StartMoving_23: 3944328033961180433
+      Blob_StartMoving_24: -697757589452789090
   spritePackingTag: 
   pSDRemoveMatte: 0
   pSDShowRemoveMatteOption: 0

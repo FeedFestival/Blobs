@@ -11,6 +11,7 @@ public class BlobReveries : MonoBehaviour
     public List<StickingGlue> StickingGlues;
     public Animator BlobStretchAnimator;
     public SpriteRenderer TravelSprite;
+    public SpriteRenderer AuraSprite;
     public Animator TravelAnimator;
     public Transform TravelPivot;
     public TrailRenderer TrailRenderer;
@@ -46,6 +47,11 @@ public class BlobReveries : MonoBehaviour
         {
             TravelSprite.color = ClasicLv._.ClasicColorManager.GetColorByBlobColor(BlobColor);
             TravelSprite.gameObject.SetActive(false);
+        }
+
+        if (AuraSprite != null) {
+            AuraSprite.color = Game._.Player.PredictionManager.GetPredictionColor(blobColor);
+            // AuraSprite.color = Game._.Player.PredictionManager.Background_Light;
         }
     }
 

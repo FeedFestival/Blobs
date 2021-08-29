@@ -106,6 +106,7 @@ public class ClasicColorManager : MonoBehaviour
                 return "Green_Ocean";
             case BlobColor.BROWN:
                 return "Brown_Ferra";
+                // return "White_Black_Haze";
             case BlobColor.RED:
             default:
                 return "Red_Torch";

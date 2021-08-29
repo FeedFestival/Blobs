@@ -383,6 +383,8 @@ TextureImporter:
   isReadable: 0
   streamingMipmaps: 0
   streamingMipmapsPriority: 0
+  vTOnly: 0
+  ignoreMasterTextureLimit: 0
   grayScaleToAlpha: 0
   generateCubemap: 6
   cubemapConvolution: 0
@@ -392,8 +394,8 @@ TextureImporter:
   textureSettings:
     serializedVersion: 2
     filterMode: 0
-    aniso: -1
-    mipBias: -100
+    aniso: 1
+    mipBias: 0
     wrapU: 1
     wrapV: 1
     wrapW: 1
@@ -414,9 +416,12 @@ TextureImporter:
   textureType: 8
   textureShape: 1
   singleChannelComponent: 0
+  flipbookRows: 1
+  flipbookColumns: 1
   maxTextureSizeSet: 0
   compressionQualitySet: 0
   textureFormatSet: 0
+  ignorePngGamma: 0
   applyGammaDecoding: 0
   platformSettings:
   - serializedVersion: 3
@@ -3000,6 +3005,127 @@ TextureImporter:
     edges: []
     weights: []
     secondaryTextures: []
+    nameFileIdTable:
+      Blob_Moving_102: 3822200872426783344
+      Blob_Moving_99: -713510577418200253
+      Blob_Moving_113: -5840589517914736222
+      Blob_Moving_49: -2491939448332735544
+      Blob_Moving_25: -6984633156165056589
+      Blob_Moving_115: 3119672870274027131
+      Blob_Moving_60: -9155668523430442019
+      Blob_Moving_79: -2040688951219354637
+      Blob_Moving_77: -8321604418989328099
+      Blob_Moving_67: -6121577170815764757
+      Blob_Moving_110: 4135634473143583417
+      Blob_Moving_44: 1849375127395176522
+      Blob_Moving_84: 5857152987060328215
+      Blob_Moving_10: -1720785650020900316
+      Blob_Moving_6: -5832603038244556951
+      Blob_Moving_5: -1743211400427191650
+      Blob_Moving_75: 2172921112360919114
+      Blob_Moving_20: -4429135851223881812
+      Blob_Moving_21: 6619522951262432214
+      Blob_Moving_31: 2689518584881819725
+      Blob_Moving_106: -2224865407698983040
+      Blob_Moving_63: 4287158248287065085
+      Blob_Moving_48: -3765279345340003936
+      Blob_Moving_89: -5536028079587132660
+      Blob_Moving_17: 2706175633525323012
+      Blob_Moving_61: 5802934308580857934
+      Blob_Moving_52: -7619412655998829059
+      Blob_Moving_58: 6591118873428355756
+      Blob_Moving_34: 6874013944499015723
+      Blob_Moving_14: -820915932495612382
+      Blob_Moving_32: 6889353271678971399
+      Blob_Moving_73: -402369239652880052
+      Blob_Moving_96: -8452820200365124394
+      Blob_Moving_47: 6555048016381281541
+      Blob_Moving_97: 3922671050633977630
+      Blob_Moving_109: -4090979201598347660
+      Blob_Moving_114: 8309796290203565495
+      Blob_Moving_50: 3028439297963743399
+      Blob_Moving_9: -3903457083490272213
+      Blob_Moving_43: 6550582738712485506
+      Blob_Moving_29: -10458403390207468
+      Blob_Moving_87: -5576533225572718966
+      Blob_Moving_62: 4665692750878903862
+      Blob_Moving_28: 3841063788031319123
+      Blob_Moving_74: 8226000429020174258
+      Blob_Moving_27: -7342799618365551059
+      Blob_Moving_3: -4114752001308926055
+      Blob_Moving_92: -7766783078288307086
+      Blob_Moving_16: -5570766500250746988
+      Blob_Moving_8: -6694116803949785014
+      Blob_Moving_51: -2871058573155196666
+      Blob_Moving_85: 1529160245719980231
+      Blob_Moving_18: -4482794515909337602
+      Blob_Moving_103: -1498087927660069123
+      Blob_Moving_105: 6590377032123130046
+      Blob_Moving_19: -2324538934935188202
+      Blob_Moving_66: 1040099240762354679
+      Blob_Moving_7: 2353042318375232830
+      Blob_Moving_82: 9087454485638694440
+      Blob_Moving_12: -4721622100442867932
+      Blob_Moving_94: -1667146073829435683
+      Blob_Moving_33: -5585627053477018445
+      Blob_Moving_26: -3841612463332896647
+      Blob_Moving_112: 4821432784221039638
+      Blob_Moving_76: -1831163255095654564
+      Blob_Moving_70: 7254192888193797839
+      Blob_Moving_118: -5928062759691736293
+      Blob_Moving_22: 4755083524868491738
+      Blob_Moving_39: 3160867247742432584
+      Blob_Moving_56: -6088702648959206263
+      Blob_Moving_42: 2789491391221968839
+      Blob_Moving_24: -7257777393767885636
+      Blob_Moving_64: -6910342179660103062
+      Blob_Moving_45: -7465619928471723892
+      Blob_Moving_41: 7700006574559840128
+      Blob_Moving_57: 7622347978758034290
+      Blob_Moving_13: 6520813676859582136
+      Blob_Moving_23: 7748851598305926759
+      Blob_Moving_80: -1436838179234819430
+      Blob_Moving_88: 3441417515817479207
+      Blob_Moving_4: -5327830024553305108
+      Blob_Moving_111: -3679562470399026842
+      Blob_Moving_30: -7513666702969378482
+      Blob_Moving_68: -3662696444701287688
+      Blob_Moving_108: -7112680038309441309
+      Blob_Moving_78: -7392034663218631043
+      Blob_Moving_1: 7721127833169403842
+      Blob_Moving_98: 8061580493641190260
+      Blob_Moving_91: -1083167490717173773
+      Blob_Moving_54: 4218083966166824506
+      Blob_Moving_119: 1346296438068075989
+      Blob_Moving_36: 1124269049695634171
+      Blob_Moving_72: 1092701114651505261
+      Blob_Moving_116: 3039269140469082587
+      Blob_Moving_104: -5168896461920688005
+      Blob_Moving_15: 5640230273151976038
+      Blob_Moving_11: 7694149444228658681
+      Blob_Moving_35: -7263054236706719218
+      Blob_Moving_65: -8897173191093484572
+      Blob_Moving_46: 8356153233333553734
+      Blob_Moving_0: -8110516870046003636
+      Blob_Moving_86: 8075937328815835705
+      Blob_Moving_81: 2882920346723812502
+      Blob_Moving_100: -8094455495108611214
+      Blob_Moving_107: 5172301369527634066
+      Blob_Moving_117: -4788207609616006078
+      Blob_Moving_93: 8096696052314393542
+      Blob_Moving_83: 3668637026177088312
+      Blob_Moving_40: -8184296342531929773
+      Blob_Moving_53: -2160369696943197503
+      Blob_Moving_71: -2924619600858929620
+      Blob_Moving_59: 2712243642312938688
+      Blob_Moving_2: 5234114189803067344
+      Blob_Moving_38: -7571861026895544736
+      Blob_Moving_69: -2565271563849590634
+      Blob_Moving_101: -1317954698664774682
+      Blob_Moving_90: -4503619714348303881
+      Blob_Moving_55: -3882772615549014606
+      Blob_Moving_95: 4896010031998137408
+      Blob_Moving_37: -4818169627221068895
   spritePackingTag: 
   pSDRemoveMatte: 0
   pSDShowRemoveMatteOption: 0
