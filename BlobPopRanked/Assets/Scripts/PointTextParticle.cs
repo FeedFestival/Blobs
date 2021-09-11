@@ -3,7 +3,7 @@ using Assets.Scripts.utils;
 using UnityEngine;
 using UnityEngine.UI;
 
-public class PointsParticles : MonoBehaviour, IPointPool
+public class PointTextParticle : MonoBehaviour, IPointPool
 {
     private int _id;
     private bool _isUsed;
@@ -32,7 +32,8 @@ public class PointsParticles : MonoBehaviour, IPointPool
         _textComponent = text;
         _rt = this.gameObject.GetComponent<RectTransform>();
     }
-    void IPointPool.Show(bool show = true) => InternalShow(show);
+    void IPointPool.Show() => InternalShow(true);
+    void IPointPool.Hide() => InternalShow(false);
     public void ChangeValue(int points, BlobColor blobColor)
     {
         _pointsValue = points;

@@ -11,7 +11,7 @@ GameObject:
   - component: {fileID: 4472081050924165609}
   - component: {fileID: 4472081050924165615}
   - component: {fileID: 4472081050924165614}
-  - component: {fileID: -3110139628706317263}
+  - component: {fileID: 993251837478367860}
   m_Layer: 5
   m_Name: PointText
   m_TagString: Untagged
@@ -82,7 +82,7 @@ MonoBehaviour:
     m_VerticalOverflow: 0
     m_LineSpacing: 1
   m_Text: 8
---- !u!114 &-3110139628706317263
+--- !u!114 &993251837478367860
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}

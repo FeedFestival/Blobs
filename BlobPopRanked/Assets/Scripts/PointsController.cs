@@ -47,7 +47,7 @@ public class PointsController : MonoBehaviour
     public void ShowPoints(BlobColor blobColor, BlobPointInfo blobPointInfo)
     {
         var pointText = GetAvailablePointText();
-        (pointText as PointsParticles).ChangeValue(blobPointInfo.Points, blobColor);
+        (pointText as PointTextParticle).ChangeValue(blobPointInfo.Points, blobColor);
         pointText.Show();
 
         // TODO: get a start position for the particle
@@ -55,7 +55,7 @@ public class PointsController : MonoBehaviour
         Debug.Log("ballsCenterPos: " + ballsCenterPos);
 
         var blobHitStickyInfo = Game._.Player.GetBlobHitStickyInfo();
-        (pointText as PointsParticles).ShowOnScreen(ballsCenterPos, blobHitStickyInfo);
+        (pointText as PointTextParticle).ShowOnScreen(ballsCenterPos, blobHitStickyInfo);
     }
 
     public void UpdatePoints(int toAdd, BlobColor blobColor)
@@ -166,7 +166,7 @@ public class PointsController : MonoBehaviour
     IPointPool GenerateNewPoint(int? index = null)
     {
         var pointText = GetNewText(index);
-        pointText.Show(false);
+        pointText.Hide();
         _pointTexts.Add(pointText);
         return pointText;
     }
@@ -182,7 +182,7 @@ public class PointsController : MonoBehaviour
         var rect = go.GetComponent<RectTransform>();
         rect.localScale = Vector3.one;
         var textComponent = go.GetComponent<Text>();
-        var pointParticle = go.GetComponent<PointsParticles>() as IPointPool;
+        var pointParticle = go.GetComponent<PointTextParticle>() as IPointPool;
         pointParticle.Init(index.Value, textComponent);
         return pointParticle;
     }
