@@ -1,10 +1,7 @@
 ﻿#pragma warning disable 0414 // private field assigned but not used.
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 using Assets.Scripts.LevelService;
-using Assets.Scripts.utils;
-using System.Linq;
+using System.Collections;
 
 public class LevelController : MonoBehaviour
 {
@@ -17,29 +14,41 @@ public class LevelController : MonoBehaviour
     public GameObject LevelGo;
     public EffectsPool EffectsPool;
     public ILevel Level;
+    IEnumerator _preStartGameCo;
+    IEnumerator _startGameCo;
 
     public void Init()
     {
-        Debug.Log("LevelType: " + LevelType);
-        if (LevelType == LevelType.TheGame)
-        {
-            PreStartGame();
-            StartGame();
-        }
+        _preStartGameCo = PreStartGame();
+        StartCoroutine(_preStartGameCo);
     }
 
-    public void PreStartGame()
+    IEnumerator PreStartGame()
     {
         Debug.Log("Level - Pre Start Game");
+
+        yield return new WaitForSeconds(0.1f);
+
         EffectsPool.GenerateParticleControllers();
         UIController._.PointsController.GeneratePoints();
+
+        _startGameCo = StartGame();
+        StartCoroutine(_startGameCo);
     }
 
-    public void StartGame()
+    IEnumerator StartGame()
     {
+        StopCoroutine(_preStartGameCo);
+        _preStartGameCo = null;
         Debug.Log("Level - Start Game");
+
+        yield return new WaitForSeconds(0.1f);
+
         Level = LevelGo.GetComponent<ILevel>();
         Level.StartLevel();
+
+        StopCoroutine(_startGameCo);
+        _startGameCo = null;
     }
 
     public void Restart()

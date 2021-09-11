@@ -32,7 +32,6 @@ public class PredictionManager : MonoBehaviour
 
     public void ChangeColor(BlobColor blobColor)
     {
-        // Color color = GetPredictionColor(blobColor);
         Color color = Background_Light;
         
         LineRenderer1.startColor = color;
@@ -41,25 +40,6 @@ public class PredictionManager : MonoBehaviour
         LineRenderer2.endColor = color;
         LineRenderer3.startColor = color;
         LineRenderer3.endColor = color;
-    }
-
-    public Color GetPredictionColor(BlobColor blobColor) {
-        switch (blobColor)
-        {
-            case BlobColor.BLUE:
-                return BluePrediction;
-            case BlobColor.YELLOW:
-                return YellowPrediction;
-            case BlobColor.GREEN:
-                return GreenPrediction;
-            case BlobColor.BROWN:
-                return BrownPrediction;
-            case BlobColor.PINK:
-                return BrownPrediction;
-            case BlobColor.RED:
-            default:
-                return RedPrediction;
-        }
     }
 
     public void Reset()

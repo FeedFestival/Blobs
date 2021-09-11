@@ -1,5 +1,4 @@
-﻿using System.Collections;
-using System.Collections.Generic;
+﻿using Assets.Scripts;
 using UnityEngine;
 
 public class StickingGlue : MonoBehaviour
@@ -19,7 +18,7 @@ public class StickingGlue : MonoBehaviour
         if (Sprite == null) {
             Sprite = GetComponent<SpriteRenderer>();
         }
-        Sprite.color = ClasicLv._.ClasicColorManager.GetLinkColor(blobColor, stickedTo.BlobReveries.BlobColor);
+        Sprite.color = BlobColorService.GetLinkColor(blobColor, stickedTo.BlobReveries.BlobColor);
     }
 
     public void Unstick()

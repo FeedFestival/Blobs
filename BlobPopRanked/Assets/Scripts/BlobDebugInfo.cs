@@ -1,5 +1,4 @@
-﻿using System.Collections;
-using System.Collections.Generic;
+﻿using Assets.Scripts;
 using UnityEngine;
 
 public class BlobDebugInfo : MonoBehaviour
@@ -17,7 +16,7 @@ public class BlobDebugInfo : MonoBehaviour
     public void FakeKill(BlobColor blobColor, ref SpriteRenderer spriteColor)
     {
         float transparency = 0.15f;
-        Color color = ClasicLv._.ClasicColorManager.GetColorByBlobColor(blobColor);
+        Color color = BlobColorService.GetColorByBlobColor(blobColor);
         color.a = transparency;
         spriteColor.color = color;
         color = HiddenSettings._.White;

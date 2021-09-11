@@ -1,3 +1,4 @@
+using Assets.Scripts;
 using Assets.Scripts.utils;
 using UnityEngine;
 using UnityEngine.UI;
@@ -37,7 +38,7 @@ public class PointsParticles : MonoBehaviour, IPointPool
         _pointsValue = points;
         _textComponent.text = _pointsValue.ToString();
         _currentBlobColor = blobColor;
-        _textComponent.color = ClasicLv._.ClasicColorManager.GetColorByBlobColor(_currentBlobColor);
+        _textComponent.color = BlobColorService.GetColorByBlobColor(_currentBlobColor);
     }
     public void ShowOnScreen(Vector3 ballsCenterPosition, BlobHitStickyInfo blobHitStickyInfo)
     {
@@ -138,7 +139,7 @@ public class PointsParticles : MonoBehaviour, IPointPool
 
     void ShowPointsTrail()
     {
-        Color color = ClasicLv._.ClasicColorManager.GetColorByBlobColor(_currentBlobColor);
+        Color color = BlobColorService.GetColorByBlobColor(_currentBlobColor);
         GradientColorKey colorKey = new GradientColorKey(color, 0.5f);
         GradientAlphaKey[] alphaKeys = new GradientAlphaKey[2];
         alphaKeys[0] = new GradientAlphaKey(0, 0);

@@ -3,6 +3,7 @@ using UnityEngine;
 using Assets.Scripts.utils;
 using System.Collections.Generic;
 using System;
+using Assets.Scripts;
 
 public class DificultyService : MonoBehaviour
 {
@@ -113,7 +114,7 @@ public class DificultyService : MonoBehaviour
                 }
 
                 colorInt = ExtractRandomColor(percentageDistribution);
-                return ReturnBlobColor(colorInt);
+                return BlobColorService.ReturnBlobColor(colorInt);
             }
 
             int countOfNumbers = Colors.Count - countOfZeros;
@@ -133,7 +134,7 @@ public class DificultyService : MonoBehaviour
             percentageDistribution = SetupPercentages(percentages);
 
             colorInt = ExtractRandomColor(percentageDistribution);
-            return ReturnBlobColor(colorInt);
+            return BlobColorService.ReturnBlobColor(colorInt);
         }
 
         int maxValue = Colors.Max();
@@ -172,7 +173,7 @@ public class DificultyService : MonoBehaviour
         }
 
         colorInt = ExtractRandomColor(percentageDistribution);
-        return ReturnBlobColor(colorInt);
+        return BlobColorService.ReturnBlobColor(colorInt);
     }
 
     private List<int> GetWithZeroPercentages(int zerosPercentage, int numbersPercentage)
@@ -230,63 +231,7 @@ public class DificultyService : MonoBehaviour
         }
     }
 
-    public BlobColor ReturnBlobColor(int colorInt)
-    {
-        switch (colorInt)
-        {
-            case 1:
-                return BlobColor.BLUE;
-            case 2:
-                return BlobColor.YELLOW;
-            case 3:
-                return BlobColor.GREEN;
-            case 4:
-                return BlobColor.BROWN;
-            case 5:
-                return BlobColor.PINK;
-            case 6:
-                return BlobColor.WHITE;
-            case 7:
-                return BlobColor.BLACK;
-            case 0:
-            default:
-                return BlobColor.RED;
-        }
-    }
-
-    public int GetBlobColorPoints(BlobColor blobColor)
-    {
-        int multiplier = 1;
-        switch (blobColor)
-        {
-            case BlobColor.BLUE:
-                multiplier = 2;
-                break;
-            case BlobColor.YELLOW:
-                multiplier = 4;
-                break;
-            case BlobColor.GREEN:
-                multiplier = 3;
-                break;
-            case BlobColor.BROWN:
-                multiplier = 0;
-                break;
-            case BlobColor.PINK:
-                multiplier = 5;
-                break;
-            case BlobColor.WHITE:
-                multiplier = 6;
-                break;
-            case BlobColor.BLACK:
-                multiplier = 7;
-                break;
-            case BlobColor.RED:
-            default:
-                multiplier = 1;
-                break;
-        }
-        return multiplier;
-    }
+    
 
     public void CheckIfAddingNewRow()
     {

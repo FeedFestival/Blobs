@@ -45,7 +45,7 @@ public class ClasicLv : MonoBehaviour, ILevel
         DificultyService.Init(this);
     }
 
-    public void StartLevel()
+    void ILevel.StartLevel()
     {
         RetrieveUser();
         Game._.Player.MakeBlob(firstLevel: FirstLevel);

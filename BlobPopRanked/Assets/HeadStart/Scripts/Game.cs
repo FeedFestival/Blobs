@@ -20,6 +20,7 @@ public class Game : MonoBehaviour
     private string LevelToLoad;
     private int _uniqueId;
     public bool GameOver;
+    IEnumerator _waitForLevelLoad;
 
     void Awake()
     {
@@ -34,22 +35,30 @@ public class Game : MonoBehaviour
         LoadUser();
 
         UIController._.Init();
-        LevelController.Init();
 
-        if (LevelController.LevelType == LevelType.MainMenu)
+        Debug.Log("LevelType: " + LevelController.LevelType);
+        switch (LevelController.LevelType)
         {
-            if (User.IsFirstTime)
-            {
-                UIController._.ShowInputNameView();
-            }
-            else
-            {
-                UIController._.InitMainMenu();
-            }
-        }
-        else
-        {
-            UIController._.DestroyMainMenu();
+            case LevelType.MainMenu:
+                if (User.IsFirstTime)
+                {
+                    UIController._.ShowInputNameView();
+                }
+                else
+                {
+                    UIController._.InitMainMenu();
+                }
+                break;
+            case LevelType.TheGame:
+                LevelController.Init();
+                UIController._.DestroyMainMenu();
+                break;
+            case LevelType.Loading:
+            default:
+                _waitForLevelLoad = WaitForLevelLoad();
+                StartCoroutine(_waitForLevelLoad);
+                UIController._.DestroyMainMenu();
+                break;
         }
     }
 
@@ -189,6 +198,18 @@ public class Game : MonoBehaviour
     {
         _uniqueId++;
         return _uniqueId;
+    }
+
+    IEnumerator WaitForLevelLoad()
+    {
+        float loadingWait = _game != null
+            && _game.AfterLoading == AfterLoading.RestartLevel ? 0.5f : 2f;
+        Debug.Log("loadingWait: " + loadingWait);
+        yield return new WaitForSeconds(loadingWait);
+
+        _game.LoadWaitedLevel();
+        StopCoroutine(_waitForLevelLoad);
+        _waitForLevelLoad = null;
     }
 }
 

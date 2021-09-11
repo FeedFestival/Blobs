@@ -26,7 +26,7 @@ namespace Assets.Scripts
                 rest = BlobsIds.Count - 3;
             }
             var points = (3 + (rest * 2));
-            Points = points * ClasicLv._.DificultyService.GetBlobColorPoints(blobColor);
+            Points = points * BlobColorService.GetBlobColorPoints(blobColor);
         }
     }
 }

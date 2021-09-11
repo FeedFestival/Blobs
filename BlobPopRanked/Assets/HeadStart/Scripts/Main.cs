@@ -1,6 +1,5 @@
 ﻿#pragma warning disable 0414 // private field assigned but not used.
 using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 public class Main : MonoBehaviour
@@ -110,30 +109,16 @@ public class Main : MonoBehaviour
 
     IEnumerator AfterCheck()
     {
+        StopCoroutine(_firstCheck);
+        _firstCheck = null;
+
         Debug.Log("Main - Check Completed, starting...");
 
         yield return new WaitForSeconds(0.1f);
 
-        if (_game.LevelController.LevelType == LevelType.Loading)
-        {
-            _waitForLevelLoad = WaitForLevelLoad();
-            StartCoroutine(_waitForLevelLoad);
-        }
-        else
-        {
-            _game.Init();
-        }
-    }
+        _game.Init();
 
-    private IEnumerator WaitForLevelLoad()
-    {
-        float loadingWait = _game != null
-            && _game.AfterLoading == AfterLoading.RestartLevel ? 0.5f : 2f;
-        Debug.Log("loadingWait: " + loadingWait);
-        yield return new WaitForSeconds(loadingWait);
-
-        _game.LoadWaitedLevel();
-        StopCoroutine(_waitForLevelLoad);
-        _waitForLevelLoad = null;
+        StopCoroutine(_afterCheck);
+        _afterCheck = null;
     }
 }

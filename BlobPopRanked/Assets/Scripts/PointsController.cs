@@ -144,7 +144,7 @@ public class PointsController : MonoBehaviour
         {
             LeanTween.cancel(_pointsColorizeTweenId.Value);
         }
-        Color color = ClasicLv._.ClasicColorManager.GetColorByBlobColor(blobColor);
+        Color color = BlobColorService.GetColorByBlobColor(blobColor);
         var pointsRt = UIController._.UiDataController.PointsText.GetComponent<RectTransform>();
         _pointsColorizeTweenId = LeanTween.colorText(pointsRt,
             color,

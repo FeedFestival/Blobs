@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using Assets.Scripts;
 using Assets.Scripts.utils;
 using UnityEngine;
 
@@ -30,11 +31,11 @@ public class BlobReveries : MonoBehaviour
         BlobColor = blobColor;
         if (instant)
         {
-            Sprite.color = ClasicLv._.ClasicColorManager.GetColorByBlobColor(BlobColor);
+            Sprite.color = BlobColorService.GetColorByBlobColor(BlobColor);
             if (TrailRenderer != null)
             {
-                TrailRenderer.startColor = ClasicLv._.ClasicColorManager.GetColorByBlobColor(BlobColor);
-                TrailRenderer.endColor = ClasicLv._.ClasicColorManager.GetColorByBlobColor(BlobColor);
+                TrailRenderer.startColor = BlobColorService.GetColorByBlobColor(BlobColor);
+                TrailRenderer.endColor = BlobColorService.GetColorByBlobColor(BlobColor);
             }
         }
 
@@ -45,12 +46,12 @@ public class BlobReveries : MonoBehaviour
 
         if (TravelSprite != null)
         {
-            TravelSprite.color = ClasicLv._.ClasicColorManager.GetColorByBlobColor(BlobColor);
+            TravelSprite.color = BlobColorService.GetColorByBlobColor(BlobColor);
             TravelSprite.gameObject.SetActive(false);
         }
 
         if (AuraSprite != null) {
-            AuraSprite.color = Game._.Player.PredictionManager.GetPredictionColor(blobColor);
+            AuraSprite.color = BlobColorService.GetBlobAuraColor(blobColor);
             // AuraSprite.color = Game._.Player.PredictionManager.Background_Light;
         }
     }
