@@ -27,6 +27,7 @@ Transform:
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
   m_RootOrder: 0
@@ -47,10 +48,11 @@ MonoBehaviour:
   InstantDebug: 0
   CeilId: 0
   WallStickLimit: 4.44
-  NeighborTestDistance: 0.55
+  NeighborTestDistance: 0.437
   NeighborProximity: 1.3
   MinNeighborCountToDestroy: 2
   GameOverOffsetY: 3.95
+  MaxTimeSeconds: 420
   BlobKillAnimationLength: 0.3
   BlobExplodeAnimationLength: 0.3
   BlobForcePushAnimL: 0.15
@@ -60,6 +62,7 @@ MonoBehaviour:
   StretchSpeedSticky: 2.5
   StartTravelSpeed: 7
   TravelSpeed: 2
+  TowardTotalAnimL: 3
   PrefabBankPrefab: {fileID: 4110335019297747375, guid: ab4ac96b18902cd4290bc37e629eb5aa,
     type: 3}
   TransparentColor: {r: 0, g: 0, b: 0, a: 0}

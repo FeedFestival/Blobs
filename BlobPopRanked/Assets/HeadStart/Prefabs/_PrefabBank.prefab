@@ -27,6 +27,7 @@ Transform:
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
   m_RootOrder: 0
@@ -58,4 +59,6 @@ MonoBehaviour:
   SmallHitParticle: {fileID: 2160214357854624232, guid: a03cc52b8c92ae842bf6134ea1626100,
     type: 3}
   ExplosionParticle: {fileID: 4916094281174691089, guid: 13d69336d4c31cd47be5eeeb893af3e4,
+    type: 3}
+  PointText: {fileID: 4472081050924165608, guid: 25a11c0dc4e6f2741932b95b12b101ba,
     type: 3}

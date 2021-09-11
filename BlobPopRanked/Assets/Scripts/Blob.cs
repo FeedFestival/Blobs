@@ -23,7 +23,12 @@ public class Blob : MonoBehaviour
     {
         if (_radius.HasValue == false)
         {
-            _radius = GetComponent<CircleCollider2D>().radius;
+            var fullSize = transform.localScale.z;
+            var currentSize = transform.localScale.x;
+            // Debug.Log("currentSize: " + currentSize);
+            var perc = percent.What(currentSize, fullSize);
+            var radius = GetComponent<CircleCollider2D>().radius;
+            _radius = percent.Find(perc, radius);
         }
         return _radius.Value;
     }

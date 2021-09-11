@@ -19,6 +19,12 @@ public class BlobHitStickyInfo
         this.blobY = y;
         this.blob = blob;
     }
+    public Vector2 GetReflectPos(Vector2 localPosition)
+    {
+        return localPosition + ((Vector2)ReflectDir.normalized
+            * HiddenSettings._.BallStickyReflectDistanceModifier
+        );
+    }
 }
 
 public class BlobFLight

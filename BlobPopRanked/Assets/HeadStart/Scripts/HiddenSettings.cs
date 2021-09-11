@@ -32,6 +32,7 @@ public class HiddenSettings : MonoBehaviour
     public float NeighborProximity;
     public int MinNeighborCountToDestroy;
     public float GameOverOffsetY;
+    public int MaxTimeSeconds;
 
     [Header("ANIMATIONS")]
     public float BlobKillAnimationLength;
@@ -43,6 +44,7 @@ public class HiddenSettings : MonoBehaviour
     public float StretchSpeedSticky;
     public float StartTravelSpeed;
     public float TravelSpeed;
+    public float TowardTotalAnimL;
     public GameObject PrefabBankPrefab;
 
     [Header("Colors")]

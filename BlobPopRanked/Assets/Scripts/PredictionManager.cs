@@ -25,6 +25,8 @@ public class PredictionManager : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
+        LineRenderer3.widthCurve = LineRenderer2.widthCurve = LineRenderer1.widthCurve;
+        
         Show(false);
     }
 
@@ -51,6 +53,8 @@ public class PredictionManager : MonoBehaviour
             case BlobColor.GREEN:
                 return GreenPrediction;
             case BlobColor.BROWN:
+                return BrownPrediction;
+            case BlobColor.PINK:
                 return BrownPrediction;
             case BlobColor.RED:
             default:

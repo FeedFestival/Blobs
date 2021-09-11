@@ -126,7 +126,7 @@ public class Game : MonoBehaviour
         GameOver = true;
         UIController._.DialogController.ShowDialog(true, GameplayState.Failed);
 
-        int points = Level<ClasicLv>().Points;
+        int points = (int)Math.Ceiling(UIController._.PointsController.Points);
         // For Test
         // points = UnityEngine.Random.Range(100, 1000);
         WeekDetails week = __data.GetWeekDetails();

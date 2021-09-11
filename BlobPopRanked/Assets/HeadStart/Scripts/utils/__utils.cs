@@ -140,5 +140,42 @@ namespace Assets.Scripts.utils
             }
             return q.eulerAngles;
         }
+
+        public static void ShowOnScreen(
+            ref RectTransform rt,
+            Vector3 worldPosition,
+            bool isAtCenter = true)
+        {
+            // then you calculate the position of the UI element
+            // 0,0 for the canvas is at the center of the screen, whereas WorldToViewPortPoint treats the lower left corner as 0,0.
+            // Because of this, you need to subtract the height / width of the canvas * 0.5 to get the correct position.
+
+            var viewportPosition = Camera.main.WorldToViewportPoint(worldPosition);
+            Vector2 worldObjectScreenPosition = new Vector2(
+                ((viewportPosition.x * UIController._.Canvas.sizeDelta.x) - (UIController._.Canvas.sizeDelta.x * 0.5f)),
+                ((viewportPosition.y * UIController._.Canvas.sizeDelta.y) - (UIController._.Canvas.sizeDelta.y * 0.5f))
+            );
+            if (isAtCenter == false)
+            {
+                worldObjectScreenPosition = new Vector2(
+                    ((viewportPosition.x * UIController._.Canvas.sizeDelta.x)),
+                    ((viewportPosition.y * UIController._.Canvas.sizeDelta.y))
+                );
+            }
+
+            //now you can set the position of the ui element
+            rt.anchoredPosition = worldObjectScreenPosition;
+        }
+
+        public static void SetPivot(ref RectTransform rectTransform, Vector2 pivot)
+        {
+            if (rectTransform == null) return;
+
+            Vector2 size = rectTransform.rect.size;
+            Vector2 deltaPivot = rectTransform.pivot - pivot;
+            Vector3 deltaPosition = new Vector3(deltaPivot.x * size.x, deltaPivot.y * size.y);
+            rectTransform.pivot = pivot;
+            rectTransform.localPosition -= deltaPosition;
+        }
     }
 }

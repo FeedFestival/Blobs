@@ -1,6 +1,4 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using Assets.Scripts.utils;
+﻿using Assets.Scripts.utils;
 using UnityEngine;
 
 public class BlobProjectile : MonoBehaviour
@@ -75,7 +73,6 @@ public class BlobProjectile : MonoBehaviour
     {
         BlobHitStickyInfo blobHitStickyInfo = new BlobHitStickyInfo(transform.position.y, GetComponent<Blob>());
         blobHitStickyInfo.otherBlob = otherBlob;
-
         blobHitStickyInfo.ReflectDir = world2d.GetNormalizedDirection(Game._.Player.LastDir, surfaceContact.normal);
 
         Game._.Player.BlobHitSticky(blobHitStickyInfo);

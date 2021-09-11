@@ -67,18 +67,19 @@ public class BlobReveries : MonoBehaviour
         bool hitSomethingElseThenABlob = blobHitStickyInfo.otherBlob == null;
         if (hitSomethingElseThenABlob)
         {
-            _initialPos = new Vector2(transform.localPosition.x, 4.44f - ClasicLv._.BlobsParentT.position.y);
+            _initialPos = new Vector2(transform.localPosition.x, HiddenSettings._.WallStickLimit - ClasicLv._.BlobsParentT.position.y);
         }
         else
         {
             Vector2 dirFromOtherBlobToThisOne = (transform.localPosition - blobHitStickyInfo.otherBlob.transform.localPosition).normalized;
 
             Ray ray = new Ray(blobHitStickyInfo.otherBlob.transform.localPosition, dirFromOtherBlobToThisOne);
-            Vector2 pos = ray.GetPoint(0.5f);
+            Vector2 pos = ray.GetPoint(ClasicLv._.Spacing);
             _initialPos = pos;
         }
 
-        _reflectToPos = (Vector2)transform.localPosition + ((Vector2)blobHitStickyInfo.ReflectDir.normalized * HiddenSettings._.BallStickyReflectDistanceModifier);
+        _reflectToPos = blobHitStickyInfo.GetReflectPos((Vector2)transform.localPosition);
+        // _reflectToPos = (Vector2)transform.localPosition + ((Vector2)blobHitStickyInfo.ReflectDir.normalized * HiddenSettings._.BallStickyReflectDistanceModifier);
         _reflectTweenId = LeanTween.moveLocal(gameObject,
             _reflectToPos,
             HiddenSettings._.BlobForcePushAnimL

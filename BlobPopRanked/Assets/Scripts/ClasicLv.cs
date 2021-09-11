@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using Assets.Scripts.LevelService;
 using Assets.Scripts.utils;
+using Assets.Scripts;
 
 public class ClasicLv : MonoBehaviour, ILevel
 {
@@ -25,16 +26,16 @@ public class ClasicLv : MonoBehaviour, ILevel
     private List<int> _checked;
     [HideInInspector]
     public DificultyService DificultyService;
-    public int Points;
     public Transform BlobsParentT;
     public ClasicColorManager ClasicColorManager;
-
+    private Dictionary<int, BlobPointInfo> _blobsByColor;
     private int? _descendTweenId;
     public Collider2D LeftWall;
     public Collider2D RightWall;
     public PolygonCollider2D EndGameCollider;
 
-    void Awake() {
+    void Awake()
+    {
         _clasicLv = this;
     }
 
@@ -46,17 +47,19 @@ public class ClasicLv : MonoBehaviour, ILevel
 
     public void StartLevel()
     {
-        if (Game._.PlayingUser == null) {
+        RetrieveUser();
+        Game._.Player.MakeBlob(firstLevel: FirstLevel);
+        GenerateBlobLevel();
+        ActivateEndGame(false);
+    }
+
+    private void RetrieveUser()
+    {
+        if (Game._.PlayingUser == null)
+        {
             Game._.PlayingUser = Game._.User;
         }
         Debug.Log("Starting Level.... [" + Game._.PlayingUser.Name + "]");
-
-        Game._.Player.MakeBlob(firstLevel: FirstLevel);
-
-        if (__debug__._blobGen == false)
-        {
-            GenerateBlobLevel();
-        }
     }
 
     public void DescendBlobs()
@@ -95,8 +98,7 @@ public class ClasicLv : MonoBehaviour, ILevel
 
     public void AddAnotherBlobLevel()
     {
-        DificultyService.CalculateDificulty();
-        DificultyService.CalculateDificultySeed();
+        CalculateDificulty();
 
         if (__debug__._blobGen)
         {
@@ -110,19 +112,27 @@ public class ClasicLv : MonoBehaviour, ILevel
 
     public void GenerateBlobLevel(bool alreadyCalculateDificulty = false)
     {
+        if (__debug__._blobGen) { return; }
+
+        CalculateDificulty(alreadyCalculateDificulty);
+        MakeBlobLevel();
+        OnFinishedMakingBlobLevel();
+    }
+
+    private void CalculateDificulty(bool alreadyCalculateDificulty = false)
+    {
         if (alreadyCalculateDificulty == false)
         {
             DificultyService.CalculateDificulty();
             DificultyService.CalculateDificultySeed();
         }
+    }
 
-        if (__debug__._blobGen == false)
+    private void MakeBlobLevel()
+    {
+        for (var i = 0; i < BlobsPerRow; i++)
         {
-            for (var i = 0; i < BlobsPerRow; i++)
-            {
-                MakeABlob(i);
-            }
-            OnFinishedMakingBlobLevel();
+            MakeABlob(i);
         }
     }
 
@@ -136,6 +146,7 @@ public class ClasicLv : MonoBehaviour, ILevel
         if (FirstLevel == false)
         {
             DescendBlobs();
+            ActivateEndGame();
         }
     }
 
@@ -236,8 +247,15 @@ public class ClasicLv : MonoBehaviour, ILevel
         Affected = new List<int>();
         FindNeighborsToDestroy(blob);
 
+        if (_blobsByColor == null)
+        {
+            _blobsByColor = new Dictionary<int, BlobPointInfo>();
+        }
+
         DestroyBlobs();
         CheckAffected();
+
+        CalculatePoints();
 
         AfterDestroy();
     }
@@ -273,22 +291,27 @@ public class ClasicLv : MonoBehaviour, ILevel
             return;
         }
 
-        foreach (int id in _toDestroy)
-        {
-            Blob oneBlobFromToDestroy = Blobs.Find(b => b.Id == id);
-            int colorIndex = (int)oneBlobFromToDestroy.BlobReveries.BlobColor;
-            DificultyService.ChangeColorNumbers(colorIndex, false);
-        }
-
-        int points = CalculatePoints(_toDestroy.Count);
-        // Debug.Log("points: " + points + "");
-        Points += points;
-        UIController._.UiDataController.UpdateText(Points, UiDataType.Point);
-
         _toDestroy.Reverse();
         foreach (int bId in _toDestroy)
         {
             int index = Blobs.FindIndex(b => b.Id == bId);
+            int colorIndex = (int)Blobs[index].BlobReveries.BlobColor;
+
+            if (_blobsByColor.ContainsKey(colorIndex) == false)
+            {
+                BlobPointInfo blobPointInfo = new BlobPointInfo();
+                blobPointInfo.BlobsIds = new List<int> { Blobs[index].Id };
+                blobPointInfo.BlobsPositions = new List<Vector2> { Blobs[index].transform.position };
+
+                _blobsByColor.Add(colorIndex, blobPointInfo);
+            }
+            else
+            {
+                _blobsByColor[colorIndex].BlobsIds.Add(Blobs[index].Id);
+                _blobsByColor[colorIndex].BlobsPositions.Add(Blobs[index].transform.position);
+            }
+
+            DificultyService.ChangeColorNumbers(colorIndex, false);
             Blobs[index].Kill();
             if (__debug__._blobKilling)
             {
@@ -308,18 +331,25 @@ public class ClasicLv : MonoBehaviour, ILevel
         }
     }
 
-    private int CalculatePoints(int count)
+    private void CalculatePoints()
     {
-        if (count <= 3)
+        foreach (KeyValuePair<int, BlobPointInfo> kvp in _blobsByColor)
         {
-            return count;
+            BlobColor blobColor = (BlobColor)kvp.Key;
+            if (blobColor == BlobColor.BROWN) {
+                continue;
+            }
+            
+            BlobPointInfo blobPointInfo = kvp.Value;
+            blobPointInfo.CalculateColorPoints(blobColor);
+            // Debug.Log(
+            //     "Color: " + blobColor.ToString()
+            //     + " (count: " + kvp.Value.BlobsIds.Count
+            //     + ") -> points: " + blobPointInfo.Points
+            // );
+            UIController._.PointsController.ShowPoints(blobColor, blobPointInfo);
         }
-        int rest = 0;
-        if (count > 3)
-        {
-            rest = count - 3;
-        }
-        return (3 + (rest * 2));
+        _blobsByColor.Clear();
     }
 
     public void CheckAffected()
@@ -480,6 +510,19 @@ public class ClasicLv : MonoBehaviour, ILevel
         }
         // Debug.Log(LeftWall.gameObject.name + " - " + LeftWall.enabled);
         // Debug.Log(RightWall.gameObject.name + " - " + RightWall.enabled);
+    }
+
+    public void ActivateEndGame(bool activate = true)
+    {
+        if (activate == false)
+        {
+            EndGameCollider.gameObject.SetActive(activate);
+            return;
+        }
+        Timer._.InternalWait(() =>
+        {
+            EndGameCollider.gameObject.SetActive(activate);
+        }, HiddenSettings._.BlobForcePushAnimL + HiddenSettings._.BlobElasticBackAnimL + 1f);
     }
 }
 

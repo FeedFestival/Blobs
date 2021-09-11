@@ -32,6 +32,7 @@ public class LevelController : MonoBehaviour
     {
         Debug.Log("Level - Pre Start Game");
         EffectsPool.GenerateParticleControllers();
+        UIController._.PointsController.GeneratePoints();
     }
 
     public void StartGame()

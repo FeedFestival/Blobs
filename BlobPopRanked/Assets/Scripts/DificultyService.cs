@@ -2,11 +2,26 @@
 using UnityEngine;
 using Assets.Scripts.utils;
 using System.Collections.Generic;
+using System;
 
 public class DificultyService : MonoBehaviour
 {
     [Range(0.0f, 100.0f)]
     public float PercentIncrease = 0f;
+    private float _dificultyPercentIncrease
+    {
+        get
+        {
+            CalculatePlayTime();
+
+            PercentIncrease = percent.What(_is: SecondsPlayed, _of: HiddenSettings._.MaxTimeSeconds);
+            PercentIncrease = PercentIncrease < 100 ? PercentIncrease : 100;
+            return 100 - PercentIncrease;
+        }
+    }
+    [Range(0.0f, 100.0f)]
+    [SerializeField]
+    private float _healthPercent;
     public int AdditionalRows = 0;
     public int Dificulty = 2;
     public int DificultySeed;
@@ -17,6 +32,9 @@ public class DificultyService : MonoBehaviour
     private ClasicLv _clasicLv;
     public List<int> Colors;
     public List<int> LevelIncreseThreshhold;
+    private DateTime PlayStartedTime;
+    [SerializeField]
+    private int SecondsPlayed;
 
     public void Init(ClasicLv levelRandomRanked)
     {
@@ -25,6 +43,8 @@ public class DificultyService : MonoBehaviour
         Colors = new List<int>();
         Colors.Add(0);
         Colors.Add(0);
+
+        SecondsPlayed = 0;
     }
 
     public void CalculateDificultySeed()
@@ -222,10 +242,50 @@ public class DificultyService : MonoBehaviour
                 return BlobColor.GREEN;
             case 4:
                 return BlobColor.BROWN;
+            case 5:
+                return BlobColor.PINK;
+            case 6:
+                return BlobColor.WHITE;
+            case 7:
+                return BlobColor.BLACK;
             case 0:
             default:
                 return BlobColor.RED;
         }
+    }
+
+    public int GetBlobColorPoints(BlobColor blobColor)
+    {
+        int multiplier = 1;
+        switch (blobColor)
+        {
+            case BlobColor.BLUE:
+                multiplier = 2;
+                break;
+            case BlobColor.YELLOW:
+                multiplier = 4;
+                break;
+            case BlobColor.GREEN:
+                multiplier = 3;
+                break;
+            case BlobColor.BROWN:
+                multiplier = 0;
+                break;
+            case BlobColor.PINK:
+                multiplier = 5;
+                break;
+            case BlobColor.WHITE:
+                multiplier = 6;
+                break;
+            case BlobColor.BLACK:
+                multiplier = 7;
+                break;
+            case BlobColor.RED:
+            default:
+                multiplier = 1;
+                break;
+        }
+        return multiplier;
     }
 
     public void CheckIfAddingNewRow()
@@ -245,24 +305,27 @@ public class DificultyService : MonoBehaviour
         {
             float blobY = _clasicLv.Blobs.Min(b => b.transform.position.y);
 
-            // Debug.Log("blobY: " + blobY);
-            float overZero = 4.44f;
             float dashedLine = -4.23f;
-            float newDashedLine = dashedLine - overZero;
-            float newBlobY = blobY - overZero;
+            float newDashedLine = dashedLine - HiddenSettings._.WallStickLimit;
+            float newBlobY = blobY - HiddenSettings._.WallStickLimit;
 
-            // Debug.Log("newDashedLine: " + newDashedLine);
-            // Debug.Log("newBlobY: " + newBlobY);
+            int minHealthPercent = 25;
+            _healthPercent = Mathf.CeilToInt(percent.What(_is: newBlobY, _of: newDashedLine));
+            _healthPercent = _healthPercent > minHealthPercent ? _healthPercent : minHealthPercent;
+            // Debug.Log("healthPercent: " + _healthPercent);
 
-            float healthPercent = percent.What(_is: newBlobY, _of: newDashedLine);
-            // Debug.Log("healthPercent: " + healthPercent);
 
-            float maxHits = percent.Find(PercentIncrease, MaxHits) + MaxHits;
-            float minHits = percent.Find(PercentIncrease, MinHits) + MinHits;
-            HitsToReset = (int)Mathf.Ceil(percent.Find(healthPercent, _of: maxHits));
+            int minHits = Mathf.CeilToInt(percent.Find(_dificultyPercentIncrease, MinHits));
+            if (minHits <= 0)
+            {
+                minHits = 1;
+            }
+            // Debug.Log("minHits: " + minHits);
+            int maxHits = Mathf.CeilToInt(percent.Find(_dificultyPercentIncrease, MaxHits));
+            maxHits = maxHits > MinHits ? maxHits : MinHits;
+            // Debug.Log("maxHits: " + maxHits);
 
-            // HitsToReset = HitsToReset + (int)Mathf.Floor(percent.Find(healthPercent, Dificulty));
-            // Debug.Log("HitsToReset: " + HitsToReset);
+            HitsToReset = Mathf.CeilToInt(percent.Find(_healthPercent, maxHits));
 
             if (HitsToReset < minHits)
             {
@@ -272,7 +335,6 @@ public class DificultyService : MonoBehaviour
             {
                 HitsToReset = (int)Mathf.Ceil(maxHits);
             }
-            // Debug.Log("HitsToReset: " + HitsToReset);
 
             Hits++;
             if (Hits >= HitsToReset)
@@ -280,10 +342,27 @@ public class DificultyService : MonoBehaviour
                 Hits = 0;
                 _clasicLv.AddAnotherBlobLevel();
             }
+            else if (_healthPercent > 80)
+            {
+                _clasicLv.ActivateEndGame();
+            }
         }
         else
         {
             _clasicLv.AddAnotherBlobLevel();
         }
+    }
+
+    public void CalculatePlayTime(bool start = false)
+    {
+        if (start)
+        {
+            PlayStartedTime = DateTime.Now;
+            return;
+        }
+
+        var timeNow = DateTime.Now;
+        TimeSpan ts = PlayStartedTime - timeNow;
+        SecondsPlayed += Mathf.Abs(Mathf.CeilToInt(Convert.ToInt32(ts.TotalSeconds)));
     }
 }

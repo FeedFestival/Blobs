@@ -33,6 +33,7 @@ public class Player : MonoBehaviour
     private int _lastBlobFlightBlobId;
     public Vector2 LastDir;
     private int _layerMask;
+    private BlobHitStickyInfo _blobHitStickyInfo;
 
     void Start()
     {
@@ -150,6 +151,8 @@ public class Player : MonoBehaviour
         ShootAnimated();
 
         BlobInMotion = true;
+        ClasicLv._.DificultyService.CalculatePlayTime(start: true);
+        ClasicLv._.ActivateEndGame(false);
     }
 
     public void ShootAnimated()
@@ -300,22 +303,29 @@ public class Player : MonoBehaviour
             return;
         }
 
-        blobHitStickyInfo.blob.transform.SetParent(ClasicLv._.BlobsParentT);
+        _blobHitStickyInfo = blobHitStickyInfo;
 
-        blobHitStickyInfo.blob.SetPosition(blobHitStickyInfo.blob.transform.position, createdInRow: false);
+        _blobHitStickyInfo.blob.transform.SetParent(ClasicLv._.BlobsParentT);
 
-        blobHitStickyInfo.blob.BlobReveries.AnimateElasticSettle(blobHitStickyInfo);
+        _blobHitStickyInfo.blob.SetPosition(blobHitStickyInfo.blob.transform.position, createdInRow: false);
 
-        blobHitStickyInfo.blob.CheckSurroundings(blobHitStickyInfo.otherBlob);
+        _blobHitStickyInfo.blob.BlobReveries.AnimateElasticSettle(blobHitStickyInfo);
 
-        ClasicLv._.Blobs.Add(blobHitStickyInfo.blob);
+        _blobHitStickyInfo.blob.CheckSurroundings(blobHitStickyInfo.otherBlob);
+
+        ClasicLv._.Blobs.Add(_blobHitStickyInfo.blob);
         // ! important to try to destroy AFTER adding
-        ClasicLv._.TryDestroyNeighbors(blobHitStickyInfo.blob);
+        ClasicLv._.TryDestroyNeighbors(_blobHitStickyInfo.blob);
 
         FirstProjectile = null;
         MakeBlob();
         MakingBlob = true;
         BlobInMotion = false;
+    }
+
+    public BlobHitStickyInfo GetBlobHitStickyInfo()
+    {
+        return _blobHitStickyInfo;
     }
 
     private GameObject GetRandomBlob()
