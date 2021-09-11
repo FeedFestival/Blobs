@@ -3,7 +3,7 @@ using Assets.Scripts.utils;
 using UnityEngine;
 using UnityEngine.UI;
 
-public class PointTextParticle : MonoBehaviour, IPointPool
+public class PointTextParticle : MonoBehaviour, IPoolObject, IPointText
 {
     private int _id;
     private bool _isUsed;
@@ -18,23 +18,23 @@ public class PointTextParticle : MonoBehaviour, IPointPool
     private BlobColor _currentBlobColor;
     public TrailRenderer Trail;
 
-    int IPointPool.Id
+    int IPoolObject.Id
     {
         get => _id;
     }
-    bool IPointPool.IsUsed
+    bool IPoolObject.IsUsed
     {
         get => _isUsed;
     }
-    void IPointPool.Init(int id, Text text)
+    void IPointText.Init(int id, Text text)
     {
         _id = id;
         _textComponent = text;
         _rt = this.gameObject.GetComponent<RectTransform>();
     }
-    void IPointPool.Show() => InternalShow(true);
-    void IPointPool.Hide() => InternalShow(false);
-    public void ChangeValue(int points, BlobColor blobColor)
+    void IPoolObject.Show() => InternalShow(true);
+    void IPoolObject.Hide() => InternalShow(false);
+    void IPointText.ChangeValue(int points, BlobColor blobColor)
     {
         _pointsValue = points;
         _textComponent.text = _pointsValue.ToString();

@@ -1,13 +1,14 @@
 using System.Collections;
 using System.Collections.Generic;
 using Assets.Scripts;
+using Assets.Scripts.utils;
 using UnityEngine;
 using UnityEngine.UI;
 
 public class PointsController : MonoBehaviour
 {
     public Transform HolderT;
-    List<IPointPool> _pointTexts;
+    List<IPoolObject> _pointTexts;
     int _startPointsLength = 2;
     public float Points;
     int? _pointsEnlargeTweenId;
@@ -36,7 +37,7 @@ public class PointsController : MonoBehaviour
     {
         if (_pointTexts == null)
         {
-            _pointTexts = new List<IPointPool>();
+            _pointTexts = new List<IPoolObject>();
         }
         for (var i = 0; i < _startPointsLength; i++)
         {
@@ -46,16 +47,13 @@ public class PointsController : MonoBehaviour
 
     public void ShowPoints(BlobColor blobColor, BlobPointInfo blobPointInfo)
     {
-        var pointText = GetAvailablePointText();
-        (pointText as PointTextParticle).ChangeValue(blobPointInfo.Points, blobColor);
+        var pointText = GetAvailablePointText() as IPointText;
+        pointText.ChangeValue(blobPointInfo.Points, blobColor);
         pointText.Show();
 
-        // TODO: get a start position for the particle
-        var ballsCenterPos = blobPointInfo.BlobsPositions[0];
-        Debug.Log("ballsCenterPos: " + ballsCenterPos);
-
+        Vector2 ballsCenterPos = world2d.GetCenterPosition(blobPointInfo.BlobsPositions);
         var blobHitStickyInfo = Game._.Player.GetBlobHitStickyInfo();
-        (pointText as PointTextParticle).ShowOnScreen(ballsCenterPos, blobHitStickyInfo);
+        pointText.ShowOnScreen(ballsCenterPos, blobHitStickyInfo);
     }
 
     public void UpdatePoints(int toAdd, BlobColor blobColor)
@@ -66,7 +64,8 @@ public class PointsController : MonoBehaviour
         ColorizePoints(blobColor);
     }
 
-    void SetupTweenVariables(int toAdd) {
+    void SetupTweenVariables(int toAdd)
+    {
         if (__setTimedPoints != null)
         {
             StopCoroutine(__setTimedPoints);
@@ -138,7 +137,7 @@ public class PointsController : MonoBehaviour
         LeanTween.descr(_pointsEnlargeTweenId.Value).setEase(LeanTweenType.linear);
     }
 
-    private void ColorizePoints(BlobColor blobColor)
+    void ColorizePoints(BlobColor blobColor)
     {
         if (_pointsColorizeTweenId.HasValue)
         {
@@ -153,7 +152,7 @@ public class PointsController : MonoBehaviour
         LeanTween.descr(_pointsColorizeTweenId.Value).setEase(LeanTweenType.linear);
     }
 
-    IPointPool GetAvailablePointText()
+    IPoolObject GetAvailablePointText()
     {
         var pointText = _pointTexts.Find(pT => pT.IsUsed == false);
         if (pointText == null)
@@ -163,7 +162,7 @@ public class PointsController : MonoBehaviour
         return pointText;
     }
 
-    IPointPool GenerateNewPoint(int? index = null)
+    IPoolObject GenerateNewPoint(int? index = null)
     {
         var pointText = GetNewText(index);
         pointText.Hide();
@@ -171,7 +170,7 @@ public class PointsController : MonoBehaviour
         return pointText;
     }
 
-    IPointPool GetNewText(int? index)
+    IPoolObject GetNewText(int? index)
     {
         if (index.HasValue == false)
         {
@@ -182,7 +181,7 @@ public class PointsController : MonoBehaviour
         var rect = go.GetComponent<RectTransform>();
         rect.localScale = Vector3.one;
         var textComponent = go.GetComponent<Text>();
-        var pointParticle = go.GetComponent<PointTextParticle>() as IPointPool;
+        var pointParticle = go.GetComponent<PointTextParticle>() as IPointText;
         pointParticle.Init(index.Value, textComponent);
         return pointParticle;
     }
