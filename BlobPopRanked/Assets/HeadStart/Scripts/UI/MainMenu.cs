@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using Assets.Scripts;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -24,7 +25,7 @@ public class MainMenu : MonoBehaviour
 
     public void Init(bool showMenu = true, string overrideView = VIEW.Main)
     {
-        MusicManager._.PlayBackgroundMusic("MainMenuMusic");
+        MusicManager._.PlayBackgroundMusic(new MusicOpts("MainMenuMusic"));
         gameObject.SetActive(showMenu);
         SwitchView(overrideView);
     }

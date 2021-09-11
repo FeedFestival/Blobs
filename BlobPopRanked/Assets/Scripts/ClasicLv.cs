@@ -47,6 +47,9 @@ public class ClasicLv : MonoBehaviour, ILevel
 
     void ILevel.StartLevel()
     {
+        MusicOpts mOpts = new MusicOpts("GameMusic1", 0.09f);
+        mOpts.FadeInSeconds = 30f;
+        MusicManager._.PlayBackgroundMusic(mOpts);
         RetrieveUser();
         Game._.Player.MakeBlob(firstLevel: FirstLevel);
         GenerateBlobLevel();

@@ -75,6 +75,8 @@ public class BlobProjectile : MonoBehaviour
         blobHitStickyInfo.otherBlob = otherBlob;
         blobHitStickyInfo.ReflectDir = world2d.GetNormalizedDirection(Game._.Player.LastDir, surfaceContact.normal);
 
+        BlobReveries.PlayHitEffect(Game._.Player.GetLastBlobFlight().hitPoint);
+
         Game._.Player.BlobHitSticky(blobHitStickyInfo);
 
         BlobReveries.StretchOnCollision(blobHitStickyInfo.ReflectDir, null, hitSticky: true);

@@ -25,6 +25,7 @@ public class BlobReveries : MonoBehaviour
     private Vector2 _reflectToPos;
     private AfterAnim _afterAnimCallback;
     private IEnumerator _playEID;
+    private MusicOpts _blobHitSound;
 
     internal void SetColor(BlobColor blobColor, bool instant = true)
     {
@@ -224,6 +225,10 @@ public class BlobReveries : MonoBehaviour
 
     public void PlayHitEffect(Vector2 point)
     {
+        if (_blobHitSound == null) {
+            _blobHitSound = new MusicOpts("BlobHit", 0.4f, false);
+        }
+        MusicManager._.PlaySound(_blobHitSound);
         ParticleController pc = Game._.LevelController.EffectsPool.GetParticle();
         pc.Play(point);
     }

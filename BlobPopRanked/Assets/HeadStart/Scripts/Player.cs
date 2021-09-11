@@ -428,6 +428,13 @@ public class Player : MonoBehaviour
             CenteroidBlob.position = newOrigin;
         }
         Blob blob = hit.transform.GetComponent<Blob>();
-        BlobFlightPositions.Add(new BlobFLight(newOrigin, blob));
+        BlobFLight blobFLight = new BlobFLight(newOrigin, blob);
+        blobFLight.hitPoint = hit.point;
+        BlobFlightPositions.Add(blobFLight);
+    }
+
+    public BlobFLight GetLastBlobFlight()
+    {
+        return _lastBlobFlight;
     }
 }

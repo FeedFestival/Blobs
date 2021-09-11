@@ -1,12 +1,13 @@
 ﻿#pragma warning disable 0414 // private field assigned but not used.
 using System.Collections;
 using System.Collections.Generic;
+using Assets.Scripts;
 using Hellmade.Sound;
 using UnityEngine;
 
 public class MusicManager : MonoBehaviour
 {
-    public static readonly  string _version = "1.0.1";
+    public static readonly string _version = "1.0.1";
     private static MusicManager _instance;
     public static MusicManager _ { get { return _instance; } }
 
@@ -19,14 +20,19 @@ public class MusicManager : MonoBehaviour
     private Dictionary<string, MAudio> Sounds;
     public AudioClip MainMenuMusic;
     public AudioClip ClickSound;
+    [Header("GameMusic")]
+    public AudioClip GameMusic1;
+    [Header("Gameplay Sounds")]
+    public AudioClip BlobHit;
 
     public void Init()
     {
         Sounds = new Dictionary<string, MAudio>()
         {
             { "MainMenuMusic", new MAudio() { AudioClip = MainMenuMusic } },
-            { "Click", new MAudio() { AudioClip = ClickSound }
-            }
+            { "Click", new MAudio() { AudioClip = ClickSound } },
+            { "GameMusic1", new MAudio() { AudioClip = GameMusic1 } },
+            { "BlobHit", new MAudio() { AudioClip = BlobHit } }
         };
     }
 
@@ -38,25 +44,27 @@ public class MusicManager : MonoBehaviour
     private int? _soundId;
     private string _sound;
 
-    public void PlayBackgroundMusic(string musicName, bool loop = true, float? time = null)
+    public void PlayBackgroundMusic(MusicOpts opts)
     {
         Audio audio;
         if (_backgroundMusicId.HasValue)
         {
             audio = EazySoundManager.GetAudio(_backgroundMusicId.Value);
-            if (audio == null) {
+            if (audio == null)
+            {
                 Debug.LogError("audio has a problem");
                 return;
             }
             audio.Stop();
         }
-        _backgroundMusicId = EazySoundManager.PrepareMusic(Sounds[musicName].AudioClip, 0.7f, loop, false);
-        _backgroundMusic = musicName;
+        _backgroundMusicId = EazySoundManager
+            .PrepareMusic(Sounds[opts.MusicName].AudioClip, opts.Volume, opts.Loop, false, opts.FadeInSeconds, opts.FadeOutSeconds);
+        _backgroundMusic = opts.MusicName;
         audio = EazySoundManager.GetAudio(_backgroundMusicId.Value);
         audio.Play();
-        if (time.HasValue)
+        if (opts.Time.HasValue)
         {
-            audio.AudioSource.time = time.Value;
+            audio.AudioSource.time = opts.Time.Value;
         }
     }
 
@@ -66,7 +74,7 @@ public class MusicManager : MonoBehaviour
         _ambientMusic = musicName;
         if (Sounds[_ambientMusic].AudioClip != null)
         {
-            PlayAmbientAudio(Sounds[musicName], loop);
+            PlayAmbientAudio(Sounds[musicName], loop: loop);
         }
         else
         {
@@ -80,7 +88,8 @@ public class MusicManager : MonoBehaviour
         {
             Audio audio = null;
             audio = EazySoundManager.GetAudio(_ambientMusicId.Value);
-            if (audio == null) {
+            if (audio == null)
+            {
                 Debug.LogError("audio has a problem");
                 return;
             }
@@ -89,12 +98,12 @@ public class MusicManager : MonoBehaviour
         }
     }
 
-    private Audio PlayAmbientAudio(MAudio mAudio, bool loop, bool loadMany = false)
+    private Audio PlayAmbientAudio(MAudio mAudio, float volume = 0.2f, bool loop = false, bool loadMany = false)
     {
         ClearAmbientQueue();
         _ambientMusicId = EazySoundManager.PrepareMusic(
             loadMany ? mAudio.AudioClips[mAudio.GetRandomIndex()] : mAudio.AudioClip,
-            0.2f,
+            volume,
             loop,
             false
             );
@@ -105,7 +114,7 @@ public class MusicManager : MonoBehaviour
 
     private IEnumerator PlayAllAmbientAudio(MAudio mAudio, bool loop)
     {
-        var audio = PlayAmbientAudio(mAudio, loop, true);
+        var audio = PlayAmbientAudio(mAudio, loop: loop, loadMany: true);
         var time = audio.AudioSource.clip.length;
 
         yield return new WaitForSeconds(time);
@@ -120,7 +129,8 @@ public class MusicManager : MonoBehaviour
             return;
         }
 
-        PlayBackgroundMusic(musicName, loop, time);
+        MusicOpts opts = new MusicOpts(musicName, loop: loop, time: time);
+        PlayBackgroundMusic(opts);
     }
 
     public void PlayRequiredAmbient(string musicName, bool loop = false)
@@ -138,7 +148,16 @@ public class MusicManager : MonoBehaviour
         _sound = soundName;
         if (Sounds[_sound].AudioClip != null)
         {
-            PlayAmbientAudio(Sounds[soundName], loop);
+            PlayAmbientAudio(Sounds[soundName], loop: loop);
+        }
+    }
+
+    public void PlaySound(MusicOpts opts)
+    {
+        _sound = opts.MusicName;
+        if (Sounds[_sound].AudioClip != null)
+        {
+            PlayAmbientAudio(Sounds[_sound], volume: opts.Volume, loop: opts.Loop);
         }
     }
 

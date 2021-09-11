@@ -64,8 +64,8 @@ public class Main : MonoBehaviour
         if (FindObjectOfType<MusicManager>() == null)
         {
             go = Instantiate(prefabBank.MusicManagerPrefab, new Vector3(0, 0, 0), Quaternion.identity);
-            MusicManager._.Init();
         }
+        MusicManager._.Init();
 
         if (FindObjectOfType<ColorBank>() == null)
         {
