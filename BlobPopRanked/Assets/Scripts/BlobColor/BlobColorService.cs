@@ -104,7 +104,7 @@ namespace Assets.Scripts
                 case BlobColor.GREEN:
                     return ColorBank._.GetColor("#3E6550".ToLower());
                 case BlobColor.BROWN:
-                    return ColorBank._.GetColor("#38374D".ToLower());
+                    return ColorBank._.GetColor("#383E6F".ToLower());
                 case BlobColor.RED:
                 default:
                     return ColorBank._.GetColor("#BF3373".ToLower());

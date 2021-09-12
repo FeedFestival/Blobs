@@ -79,7 +79,6 @@ public class DificultyService : MonoBehaviour
 
         if (BrownIsWall && Colors.Count > (int)BlobColor.BROWN) {
             int allOtherCombined = 0;
-            Debug.Log("allOtherCombined: " + allOtherCombined);
             for (var i = 0; i < Colors.Count; i++) {
                 if (i != (int)BlobColor.BROWN) {
                     allOtherCombined += Colors[i];

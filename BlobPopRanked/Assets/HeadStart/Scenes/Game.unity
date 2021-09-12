@@ -1785,6 +1785,7 @@ MonoBehaviour:
   MainMenu: {fileID: 0}
   PointsController: {fileID: 1094454099}
   Canvas: {fileID: 356593654}
+  UiPointerArea: {fileID: 1477216282}
 --- !u!20 &519420031
 Camera:
   m_ObjectHideFlags: 0
@@ -2212,7 +2213,7 @@ MonoBehaviour:
   LevelDebugState: 0
   TextHelper: {fileID: 1547149046}
   _dificulty: 0
-  _colorDistribution: 1
+  _colorDistribution: 0
   _shooting: 0
   _stickingProcess: 0
   _proximity: 0
@@ -3658,7 +3659,7 @@ GameObject:
   - component: {fileID: 1477216285}
   - component: {fileID: 1477216286}
   m_Layer: 5
-  m_Name: _PointerArea
+  m_Name: _UiPointerArea
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -4113,7 +4114,7 @@ MonoBehaviour:
   m_PreferredWidth: -1
   m_PreferredHeight: -1
   m_FlexibleWidth: -1
-  m_FlexibleHeight: 20
+  m_FlexibleHeight: 34
   m_LayoutPriority: 1
 --- !u!222 &1598946333
 CanvasRenderer:
@@ -4166,38 +4167,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_Delegates:
-  - eventID: 0
-    callback:
-      m_PersistentCalls:
-        m_Calls:
-        - m_Target: {fileID: 1555944960}
-          m_TargetAssemblyTypeName: 
-          m_MethodName: SetIsInPointArea
-          m_Mode: 6
-          m_Arguments:
-            m_ObjectArgument: {fileID: 0}
-            m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-            m_IntArgument: 0
-            m_FloatArgument: 0
-            m_StringArgument: 
-            m_BoolArgument: 1
-          m_CallState: 2
-  - eventID: 1
-    callback:
-      m_PersistentCalls:
-        m_Calls:
-        - m_Target: {fileID: 1555944960}
-          m_TargetAssemblyTypeName: 
-          m_MethodName: SetIsInPointArea
-          m_Mode: 6
-          m_Arguments:
-            m_ObjectArgument: {fileID: 0}
-            m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-            m_IntArgument: 0
-            m_FloatArgument: 0
-            m_StringArgument: 
-            m_BoolArgument: 0
-          m_CallState: 2
   - eventID: 3
     callback:
       m_PersistentCalls:
@@ -4784,7 +4753,7 @@ MonoBehaviour:
   HitsToReset: 1
   Hits: 0
   Colors: 
-  LevelIncreseThreshhold: 04000000070000000b0000000d0000000e0000000f0000001200000015000000
+  LevelIncreseThreshhold: 01000000020000000200000002000000030000000a0000000a0000000a000000
   SecondsPlayed: 0
   BrownIsWall: 1
 --- !u!1 &1881322699

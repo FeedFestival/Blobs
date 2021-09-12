@@ -16,6 +16,7 @@ public class UIController : MonoBehaviour
     public MainMenu MainMenu;
     public PointsController PointsController;
     public RectTransform Canvas;
+    public GameObject UiPointerArea;
 
     public void Init()
     {

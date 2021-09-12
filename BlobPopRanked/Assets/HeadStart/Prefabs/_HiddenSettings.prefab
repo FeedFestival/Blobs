@@ -52,7 +52,7 @@ MonoBehaviour:
   NeighborProximity: 1.3
   MinNeighborCountToDestroy: 2
   GameOverOffsetY: 3.95
-  MaxTimeSeconds: 420
+  MaxTimeSeconds: 600
   BlobKillAnimationLength: 0.3
   BlobExplodeAnimationLength: 0.3
   BlobForcePushAnimL: 0.15

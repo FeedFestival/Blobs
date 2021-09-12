@@ -1,12 +1,11 @@
-﻿using System;
-using System.Collections;
+﻿using System.Collections;
 using System.Collections.Generic;
-using Assets.Scripts;
 using UnityEngine;
-using UnityEngine.UI;
 using UnityEngine.EventSystems;
 using Assets.Scripts.utils;
 using System.Linq;
+using UniRx;
+using System;
 
 public class Player : MonoBehaviour
 {
@@ -34,19 +33,33 @@ public class Player : MonoBehaviour
     public Vector2 LastDir;
     private int _layerMask;
     private BlobHitStickyInfo _blobHitStickyInfo;
+    IObserver<int> _pointerUpObserver;
 
     void Start()
     {
         _layerMask = __utils.CreateLayerMask(aExclude: true, LayerMask.NameToLayer(LAYER.BlobProjectile), LayerMask.NameToLayer(LAYER.EndGame));
+        var pointerUpDebounced = Observable.Create<int>(observer =>
+        {
+            _pointerUpObserver = observer;
+            return Disposable.Empty;
+        });
+
+        pointerUpDebounced
+            .Throttle(TimeSpan.FromSeconds(0.03f))
+            .Subscribe((int n) =>
+            {
+                TryShooting();
+            });
     }
 
     public void PointerDrag(BaseEventData baseEventData)
     {
-        IsDragging = true;
         if (BlobInMotion || FirstProjectile == null)
         {
+            IsDragging = false;
             return;
         }
+        IsDragging = true;
 
         FirstProjectile.GetComponent<CircleCollider2D>().enabled = false;
         SecondProjectile.GetComponent<CircleCollider2D>().enabled = false;
@@ -70,7 +83,17 @@ public class Player : MonoBehaviour
 
     public void PointerUp(BaseEventData baseEventData)
     {
-        IsDragging = false;
+        if (IsDragging) {
+            _pointerUpObserver.OnNext(1);
+        }
+    }
+
+    void TryShooting()
+    {
+        if (IsDragging)
+        {
+            IsDragging = false;
+        }
         PredictionManager.Reset();
 
         if (ClasicLv._.__debug__._noFiring)
@@ -82,6 +105,8 @@ public class Player : MonoBehaviour
         {
             return;
         }
+
+        UIController._.UiPointerArea.SetActive(false);
 
         Shoot();
     }
@@ -313,6 +338,7 @@ public class Player : MonoBehaviour
         MakeBlob();
         MakingBlob = true;
         BlobInMotion = false;
+        UIController._.UiPointerArea.SetActive(true);
     }
 
     public BlobHitStickyInfo GetBlobHitStickyInfo()

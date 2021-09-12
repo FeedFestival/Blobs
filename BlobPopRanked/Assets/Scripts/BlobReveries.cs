@@ -63,7 +63,7 @@ public class BlobReveries : MonoBehaviour
             TravelSprite.gameObject.SetActive(false);
         }
 
-        if (AuraSprite != null && isWall == false) {
+        if (AuraSprite != null) {
             AuraSprite.color = BlobColorService.GetBlobAuraColor(blobColor);
         }
     }
