@@ -127,7 +127,6 @@ public class ClasicLv : MonoBehaviour, ILevel
         if (alreadyCalculateDificulty == false)
         {
             DificultyService.CalculateDificulty();
-            DificultyService.CalculateDificultySeed();
         }
     }
 

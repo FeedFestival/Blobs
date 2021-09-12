@@ -404,7 +404,7 @@ public class ColorBank : MonoBehaviour
 
         // Non Colors
         AddHex("Black_Rangoon_Green", "181810");
-        AddHex("Black_Cod_Gray", "1b1b1b");
+        AddHex("Black_Cod_Gray", "2c2b2b"); // 2C2B2B 1b1b1b
 
         AddHex("White_Orange", "FEFBF0");
         AddHex("White_Tana", "ded4c0");

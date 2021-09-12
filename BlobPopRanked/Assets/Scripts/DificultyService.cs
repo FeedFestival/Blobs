@@ -25,7 +25,6 @@ public class DificultyService : MonoBehaviour
     private float _healthPercent;
     public int AdditionalRows = 0;
     public int Dificulty = 2;
-    public int DificultySeed;
     public int MinHits;
     public int MaxHits;
     public int HitsToReset;
@@ -36,6 +35,7 @@ public class DificultyService : MonoBehaviour
     private DateTime PlayStartedTime;
     [SerializeField]
     private int SecondsPlayed;
+    public bool BrownIsWall;
 
     public void Init(ClasicLv levelRandomRanked)
     {
@@ -46,20 +46,6 @@ public class DificultyService : MonoBehaviour
         Colors.Add(0);
 
         SecondsPlayed = 0;
-    }
-
-    public void CalculateDificultySeed()
-    {
-        string zeros = "0";
-        for (var i = 0; i < Dificulty - 1; i++)
-        {
-            zeros += "0";
-        }
-        DificultySeed = System.Convert.ToInt32("1" + zeros);
-        if (_clasicLv.__debug__._dificulty)
-        {
-            Debug.Log("DificultySeed: " + DificultySeed);
-        }
     }
 
     public void CalculateDificulty()
@@ -74,9 +60,9 @@ public class DificultyService : MonoBehaviour
         }
     }
 
-    public BlobColor GetColorByDificulty()
+    public BlobColor GetColorByDificulty(bool newBlob = false)
     {
-        if (Colors.Count < Dificulty)
+        if (Colors.Count < Dificulty && LevelIncreseThreshhold.Count > Colors.Count)
         {
             Colors.Add(0);
         }
@@ -90,6 +76,17 @@ public class DificultyService : MonoBehaviour
         int splitPercentage;
         List<int> percentages;
         List<int> percentageDistribution;
+
+        if (BrownIsWall && Colors.Count > (int)BlobColor.BROWN) {
+            int allOtherCombined = 0;
+            Debug.Log("allOtherCombined: " + allOtherCombined);
+            for (var i = 0; i < Colors.Count; i++) {
+                if (i != (int)BlobColor.BROWN) {
+                    allOtherCombined += Colors[i];
+                }
+            }
+            Colors[(int)BlobColor.BROWN] = (int)percent.Find(_healthPercent, allOtherCombined);
+        }
 
         if (Colors.Any(c => c == 0))
         {
@@ -113,7 +110,7 @@ public class DificultyService : MonoBehaviour
                     Debug.Log(__debug.DebugList<int>(percentageDistribution, "percentageDistribution"));
                 }
 
-                colorInt = ExtractRandomColor(percentageDistribution);
+                colorInt = ExtractRandomColor(percentageDistribution, newBlob);
                 return BlobColorService.ReturnBlobColor(colorInt);
             }
 
@@ -133,10 +130,9 @@ public class DificultyService : MonoBehaviour
             percentages = GetWithZeroPercentages(zerosPercentage, numbersPercentage);
             percentageDistribution = SetupPercentages(percentages);
 
-            colorInt = ExtractRandomColor(percentageDistribution);
+            colorInt = ExtractRandomColor(percentageDistribution, newBlob);
             return BlobColorService.ReturnBlobColor(colorInt);
         }
-
         int maxValue = Colors.Max();
 
         List<float> coeficientColors = new List<float>();
@@ -172,7 +168,7 @@ public class DificultyService : MonoBehaviour
             Debug.Log(__debug.DebugList<int>(percentageDistribution, "percentageDistribution"));
         }
 
-        colorInt = ExtractRandomColor(percentageDistribution);
+        colorInt = ExtractRandomColor(percentageDistribution, newBlob);
         return BlobColorService.ReturnBlobColor(colorInt);
     }
 
@@ -202,7 +198,7 @@ public class DificultyService : MonoBehaviour
         return percentages;
     }
 
-    private int ExtractRandomColor(List<int> percentages)
+    private int ExtractRandomColor(List<int> percentages, bool newBlob)
     {
         int randomNumber = UnityEngine.Random.Range(0, 100);
         int index = percentages.FindIndex(p => randomNumber < p);
@@ -211,6 +207,24 @@ public class DificultyService : MonoBehaviour
         {
             Debug.Log("randomNumber: " + randomNumber + ", indexIn_colors: " + index);
         }
+
+        // When making a new Blob and BROWN is Wall
+        //  - we dont want to shoot brown so we pick the lowest color
+        int brownIndex = (int)BlobColor.BROWN;
+        if (BrownIsWall && newBlob && index == brownIndex) {
+            int minValue = Colors.Max();
+            for(var i = 0; i < Colors.Count; i++) {
+                if (i == brownIndex) {
+                    continue;
+                }
+                if (Colors[i] < minValue) {
+                    minValue = Colors[i];
+                }
+            }
+            int minIndex = Colors.FindIndex(c => c == minValue);
+            index = minIndex;
+        }
+
         ChangeColorNumbers(index);
         return index;
     }
@@ -236,7 +250,7 @@ public class DificultyService : MonoBehaviour
     public void CheckIfAddingNewRow()
     {
         bool isAtLeastOnBlobConnectedToCeil = (_clasicLv.Blobs == null || _clasicLv.Blobs.Count == 0) == false;
-        // Debug.Log("_clasicLv.Blobs.Count: " + _clasicLv.Blobs.Count);
+
         if (isAtLeastOnBlobConnectedToCeil == false)
         {
             isAtLeastOnBlobConnectedToCeil = _clasicLv.Blobs.Exists(b =>
@@ -257,7 +271,6 @@ public class DificultyService : MonoBehaviour
             int minHealthPercent = 25;
             _healthPercent = Mathf.CeilToInt(percent.What(_is: newBlobY, _of: newDashedLine));
             _healthPercent = _healthPercent > minHealthPercent ? _healthPercent : minHealthPercent;
-            // Debug.Log("healthPercent: " + _healthPercent);
 
 
             int minHits = Mathf.CeilToInt(percent.Find(_dificultyPercentIncrease, MinHits));
@@ -265,10 +278,8 @@ public class DificultyService : MonoBehaviour
             {
                 minHits = 1;
             }
-            // Debug.Log("minHits: " + minHits);
             int maxHits = Mathf.CeilToInt(percent.Find(_dificultyPercentIncrease, MaxHits));
             maxHits = maxHits > MinHits ? maxHits : MinHits;
-            // Debug.Log("maxHits: " + maxHits);
 
             HitsToReset = Mathf.CeilToInt(percent.Find(_healthPercent, maxHits));
 

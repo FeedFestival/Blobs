@@ -68,10 +68,10 @@ namespace Assets.Scripts
                     multiplier = 2;
                     break;
                 case BlobColor.YELLOW:
-                    multiplier = 4;
+                    multiplier = 3;
                     break;
                 case BlobColor.GREEN:
-                    multiplier = 3;
+                    multiplier = 4;
                     break;
                 case BlobColor.BROWN:
                     multiplier = 0;

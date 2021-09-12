@@ -16,6 +16,7 @@ public class BlobReveries : MonoBehaviour
     public Animator TravelAnimator;
     public Transform TravelPivot;
     public TrailRenderer TrailRenderer;
+    public GameObject WallBlob;
     [Header("Animations")]
     public AnimationClip StretchClip;
     public AnimationClip StartTravelClip;
@@ -30,9 +31,20 @@ public class BlobReveries : MonoBehaviour
     internal void SetColor(BlobColor blobColor, bool instant = true)
     {
         BlobColor = blobColor;
+        bool isWall = ClasicLv._.DificultyService.BrownIsWall
+            && BlobColor == BlobColor.BROWN;
+
         if (instant)
         {
             Sprite.color = BlobColorService.GetColorByBlobColor(BlobColor);
+            if (WallBlob != null) {
+                if (isWall) {
+                    WallBlob.SetActive(true);
+                } else {
+                    WallBlob.SetActive(false);
+                }
+            }
+            
             if (TrailRenderer != null)
             {
                 TrailRenderer.startColor = BlobColorService.GetColorByBlobColor(BlobColor);
@@ -51,9 +63,8 @@ public class BlobReveries : MonoBehaviour
             TravelSprite.gameObject.SetActive(false);
         }
 
-        if (AuraSprite != null) {
+        if (AuraSprite != null && isWall == false) {
             AuraSprite.color = BlobColorService.GetBlobAuraColor(blobColor);
-            // AuraSprite.color = Game._.Player.PredictionManager.Background_Light;
         }
     }
 
@@ -81,7 +92,7 @@ public class BlobReveries : MonoBehaviour
         }
 
         _reflectToPos = blobHitStickyInfo.GetReflectPos((Vector2)transform.localPosition);
-        // _reflectToPos = (Vector2)transform.localPosition + ((Vector2)blobHitStickyInfo.ReflectDir.normalized * HiddenSettings._.BallStickyReflectDistanceModifier);
+
         _reflectTweenId = LeanTween.moveLocal(gameObject,
             _reflectToPos,
             HiddenSettings._.BlobForcePushAnimL
@@ -181,6 +192,12 @@ public class BlobReveries : MonoBehaviour
                         new Vector2(proxiBlob.transform.position.x, proxiBlob.transform.position.y)
                     );
             Vector2 dir = ((proxiBlob.transform.position - transform.position).normalized * ((1 - distance) + 0.1f)) * 0.2f;
+
+            if (ClasicLv._.DificultyService.BrownIsWall
+                && proxiBlob.BlobReveries.BlobColor == BlobColor.BROWN) {
+                dir = dir * 0.2f;
+            }
+
             proxiBlob.BlobReveries.ForcePush(dir);
         }
     }

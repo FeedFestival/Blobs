@@ -1240,11 +1240,6 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
-    - target: {fileID: 3900219681629069350, guid: bddde7f7c1b9bcc488c7ae22b16ed2f0,
-        type: 3}
-      propertyPath: BlobHit
-      value: 
-      objectReference: {fileID: 8300000, guid: 3d3525ee314d4eb48b0da2379e739ea4, type: 3}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: bddde7f7c1b9bcc488c7ae22b16ed2f0, type: 3}
 --- !u!1 &336907168
@@ -2217,7 +2212,7 @@ MonoBehaviour:
   LevelDebugState: 0
   TextHelper: {fileID: 1547149046}
   _dificulty: 0
-  _colorDistribution: 0
+  _colorDistribution: 1
   _shooting: 0
   _stickingProcess: 0
   _proximity: 0
@@ -3256,11 +3251,6 @@ PrefabInstance:
         type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 6781357454992910087, guid: 463f6a49383fa784c8132683a8946964,
-        type: 3}
-      propertyPath: TowardTotalAnimL
-      value: 1
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 463f6a49383fa784c8132683a8946964, type: 3}
@@ -4789,14 +4779,14 @@ MonoBehaviour:
   _healthPercent: 0
   AdditionalRows: 0
   Dificulty: 2
-  DificultySeed: 0
   MinHits: 3
   MaxHits: 13
   HitsToReset: 1
   Hits: 0
   Colors: 
-  LevelIncreseThreshhold: 020000000300000005000000080000000b0000001500000016000000
+  LevelIncreseThreshhold: 04000000070000000b0000000d0000000e0000000f0000001200000015000000
   SecondsPlayed: 0
+  BrownIsWall: 1
 --- !u!1 &1881322699
 GameObject:
   m_ObjectHideFlags: 0

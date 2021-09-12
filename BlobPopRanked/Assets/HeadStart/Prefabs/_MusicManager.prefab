@@ -47,3 +47,4 @@ MonoBehaviour:
   MainMenuMusic: {fileID: 8300000, guid: 193969cbac8eb7c468b5e6df0609e2df, type: 3}
   ClickSound: {fileID: 8300000, guid: f2951050e3c06314ba3e3f82cdb1e6a3, type: 3}
   GameMusic1: {fileID: 8300000, guid: cd0fc71065b0bb64ebbaa56f8c8bad0a, type: 3}
+  BlobHit: {fileID: 8300000, guid: 3d3525ee314d4eb48b0da2379e739ea4, type: 3}

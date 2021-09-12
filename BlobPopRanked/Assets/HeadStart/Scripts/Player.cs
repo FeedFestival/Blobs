@@ -40,14 +40,6 @@ public class Player : MonoBehaviour
         _layerMask = __utils.CreateLayerMask(aExclude: true, LayerMask.NameToLayer(LAYER.BlobProjectile), LayerMask.NameToLayer(LAYER.EndGame));
     }
 
-    void Update()
-    {
-        if (Input.GetKeyUp(KeyCode.Return))
-        {
-            Shoot();
-        }
-    }
-
     public void PointerDrag(BaseEventData baseEventData)
     {
         IsDragging = true;
@@ -331,7 +323,8 @@ public class Player : MonoBehaviour
     private GameObject GetRandomBlob()
     {
         var go = HiddenSettings._.GetAnInstantiated(PrefabBank._.NewBlob);
-        go.GetComponent<Blob>().BlobReveries.SetColor(ClasicLv._.DificultyService.GetColorByDificulty());
+        BlobColor blobColor = ClasicLv._.DificultyService.GetColorByDificulty(newBlob: true);
+        go.GetComponent<Blob>().BlobReveries.SetColor(blobColor);
         return go;
     }
 

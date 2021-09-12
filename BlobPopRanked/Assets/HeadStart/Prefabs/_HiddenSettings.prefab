@@ -62,7 +62,7 @@ MonoBehaviour:
   StretchSpeedSticky: 2.5
   StartTravelSpeed: 7
   TravelSpeed: 2
-  TowardTotalAnimL: 3
+  TowardTotalAnimL: 1
   PrefabBankPrefab: {fileID: 4110335019297747375, guid: ab4ac96b18902cd4290bc37e629eb5aa,
     type: 3}
   TransparentColor: {r: 0, g: 0, b: 0, a: 0}
