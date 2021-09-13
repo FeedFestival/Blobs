@@ -29,7 +29,7 @@ namespace Assets.Scripts
                     bool inProximity = BlobService.AreClose(blob.transform, b.transform, ref distance, proximity: true);
                     if (ClasicLv._.__debug__._proximity)
                     {
-                        Debug.Log("blob" + blob.Id + " and proximityBlob" + b.Id + " distance: " + distance +
+                        Debug.Log("blob" + blob.Bid + " and proximityBlob" + b.Bid + " distance: " + distance +
                             "(min: " + HiddenSettings._.NeighborProximity + ") inProximity: " + inProximity);
                     }
                     return inProximity;

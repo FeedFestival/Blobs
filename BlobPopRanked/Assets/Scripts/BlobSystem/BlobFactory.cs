@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using Assets.Scripts.utils;
 using UnityEngine;
 
 public class BlobFactory : MonoBehaviour
@@ -10,7 +11,7 @@ public class BlobFactory : MonoBehaviour
         _blobFactory = this;
     }
     public int InitialBlobsCount;
-    List<IPoolObject> _allBlobs;
+    public List<IPoolObject> _allBlobs;
 
     public void Init()
     {
@@ -29,6 +30,9 @@ public class BlobFactory : MonoBehaviour
     public IPoolObject GetAvailableBlob()
     {
         var poolBlob = _allBlobs.Find(pT => pT.IsUsed == false);
+        // Debug.Log(__debug.DebugList<IPoolObject>(_allBlobs, "_allBlobs", (IPoolObject blob) => {
+        //     return ", " + (blob as Blob).Bid + "" + (blob.IsUsed ? "[u] " : " ");
+        // }));
         if (poolBlob == null)
         {
             poolBlob = CreateNewPoolBlob();
@@ -41,7 +45,7 @@ public class BlobFactory : MonoBehaviour
         var poolBlob = CreateBlob(index);
         poolBlob.Hide();
         _allBlobs.Add(poolBlob);
-        return poolBlob;
+        return _allBlobs[_allBlobs.Count - 1];
     }
 
     IPoolObject CreateBlob(int? index)
@@ -52,15 +56,14 @@ public class BlobFactory : MonoBehaviour
         }
         GameObject go = HiddenSettings._.GetAnInstantiated(PrefabBank._.Blob);
         go.transform.SetParent(this.transform);
+        go.name = "Blob";
         var blob = go.GetComponent<Blob>();
         return blob;
-        // var go = HiddenSettings._.GetAnInstantiated(PrefabBank._.PointText);
-        // go.transform.SetParent(HolderT);
-        // var rect = go.GetComponent<RectTransform>();
-        // rect.localScale = Vector3.one;
-        // var textComponent = go.GetComponent<Text>();
-        // var pointParticle = go.GetComponent<PointTextParticle>() as IPointText;
-        // pointParticle.Init(index.Value, textComponent);
-        // return pointParticle;
+    }
+
+    public void AddNewBlobToPool(Blob newBlob)
+    {   
+        newBlob.transform.SetParent(this.transform);
+        _allBlobs.Add(newBlob as IPoolObject);
     }
 }

@@ -2140,7 +2140,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7fa04a2662a55f544a1f76c4aa670edb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  ClasicLv: {fileID: 0}
+  ClasicLv: {fileID: 1814022078}
   LevelDebugState: 0
   TextHelper: {fileID: 1547149046}
   _dificulty: 0

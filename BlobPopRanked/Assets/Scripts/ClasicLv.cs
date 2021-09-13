@@ -107,6 +107,7 @@ public class ClasicLv : MonoBehaviour, ILevel
 
     public void AddAnotherBlobLevel()
     {
+        Debug.Log("---------------------------------------------");
         CalculateDificulty();
 
         if (__debug__._blobGen)
@@ -227,9 +228,15 @@ public class ClasicLv : MonoBehaviour, ILevel
                 Blobs[Blobs.Count - 1].Pos.x + Spacing,
                 StartPos.y, 0);
         }
-        blob.SetPosition(pos, true);
-
+        blob.transform.position = pos;
         (blob as IPoolObject).Show();
+
+        blob.SetId();
+        blob.Init();
+        blob.SetPosition(pos);
+        blob.StickedTo.Add(HiddenSettings._.CeilId);
+
+        // (blob as IPoolObject).Show();
 
         blob.BlobReveries.SetColor(DificultyService.GetColorByDificulty());
         blob.CalculateNeighbors(Blobs);
@@ -239,7 +246,7 @@ public class ClasicLv : MonoBehaviour, ILevel
 
     internal Blob GetBlobById(int bId)
     {
-        return Blobs[Blobs.FindIndex(b => b.Id == bId)];
+        return Blobs[Blobs.FindIndex(b => b.Bid == bId)];
     }
 
     public void TryDestroyNeighbors(Blob blob)
@@ -289,7 +296,7 @@ public class ClasicLv : MonoBehaviour, ILevel
 
     public void FindNeighborsToDestroy(Blob blob)
     {
-        _toDestroy.Add(blob.Id);
+        _toDestroy.Add(blob.Bid);
         foreach (int bId in blob.Neighbors)
         {
             if (_toDestroy.Contains(bId))
@@ -310,20 +317,20 @@ public class ClasicLv : MonoBehaviour, ILevel
         _toDestroy.Reverse();
         foreach (int bId in _toDestroy)
         {
-            int index = Blobs.FindIndex(b => b.Id == bId);
+            int index = Blobs.FindIndex(b => b.Bid == bId);
             int colorIndex = (int)Blobs[index].BlobReveries.BlobColor;
 
             if (_blobsByColor.ContainsKey(colorIndex) == false)
             {
                 BlobPointInfo blobPointInfo = new BlobPointInfo();
-                blobPointInfo.BlobsIds = new List<int> { Blobs[index].Id };
+                blobPointInfo.BlobsIds = new List<int> { Blobs[index].Bid };
                 blobPointInfo.BlobsPositions = new List<Vector2> { Blobs[index].transform.position };
 
                 _blobsByColor.Add(colorIndex, blobPointInfo);
             }
             else
             {
-                _blobsByColor[colorIndex].BlobsIds.Add(Blobs[index].Id);
+                _blobsByColor[colorIndex].BlobsIds.Add(Blobs[index].Bid);
                 _blobsByColor[colorIndex].BlobsPositions.Add(Blobs[index].transform.position);
             }
 
@@ -398,26 +405,26 @@ public class ClasicLv : MonoBehaviour, ILevel
 
         foreach (int id in Affected)
         {
-            var index = Blobs.FindIndex(b => b.Id == id);
+            var index = Blobs.FindIndex(b => b.Bid == id);
             var blob = Blobs[index];
             if (blob.StickedTo.Count == 0)
             {
                 if (__debug__._destroyProcess)
                 {
-                    Debug.Log("blob" + blob.Id + " is isolated so it get's destroyed.");
+                    Debug.Log("blob" + blob.Bid + " is isolated so it get's destroyed.");
                 }
-                _toDestroy.Add(blob.Id);
+                _toDestroy.Add(blob.Bid);
             }
             else
             {
                 if (__debug__._destroyProcess)
                 {
-                    Debug.Log("blob" + blob.Id + " - checking To See If is touching ceil");
+                    Debug.Log("blob" + blob.Bid + " - checking To See If is touching ceil");
                 }
                 _checked = new List<int>();
                 if (isTouchingCeil(blob) == false)
                 {
-                    __utils.AddIfNone(blob.Id, ref _toDestroy);
+                    __utils.AddIfNone(blob.Bid, ref _toDestroy);
                 }
             }
         }
@@ -428,21 +435,21 @@ public class ClasicLv : MonoBehaviour, ILevel
 
     private bool isTouchingCeil(Blob blob)
     {
-        __utils.AddIfNone(blob.Id, ref _checked,
-            debugAdd: __debug__._destroyProcess ? "------------- blob" + blob.Id + " added to " + __debug.DebugList(_checked, "_checked") : null);
+        __utils.AddIfNone(blob.Bid, ref _checked,
+            debugAdd: __debug__._destroyProcess ? "------------- blob" + blob.Bid + " added to " + __debug.DebugList(_checked, "_checked") : null);
         if (blob.StickedTo.Contains(HiddenSettings._.CeilId))
         {
             if (__debug__._destroyProcess)
             {
-                Debug.Log("------------- blob" + blob.Id + " touches ceiling.");
+                Debug.Log("------------- blob" + blob.Bid + " touches ceiling.");
             }
-            __utils.AddIfNone(blob.Id, ref _verified,
-                debugAdd: __debug__._destroyProcess ? "------------- blob" + blob.Id + " added to _verified." : null);
+            __utils.AddIfNone(blob.Bid, ref _verified,
+                debugAdd: __debug__._destroyProcess ? "------------- blob" + blob.Bid + " added to _verified." : null);
             return true;
         }
         if (__debug__._destroyProcess)
         {
-            Debug.Log("------------- " + __debug.DebugList(blob.StickedTo, "blob" + blob.Id + ".StickedTo"));
+            Debug.Log("------------- " + __debug.DebugList(blob.StickedTo, "blob" + blob.Bid + ".StickedTo"));
         }
         foreach (var blobId in blob.StickedTo)
         {
@@ -466,23 +473,23 @@ public class ClasicLv : MonoBehaviour, ILevel
             var stickedBlob = GetBlobById(blobId);
             if (__debug__._destroyProcess)
             {
-                Debug.Log("------------- blob" + stickedBlob.Id + " - checking To See If is touching ceil");
+                Debug.Log("------------- blob" + stickedBlob.Bid + " - checking To See If is touching ceil");
             }
             bool isTouching = isTouchingCeil(stickedBlob);
             if (isTouching)
             {
                 if (__debug__._destroyProcess)
                 {
-                    Debug.Log("------------- one of it's sticking blobs(" + stickedBlob.Id + ") touches ceil");
+                    Debug.Log("------------- one of it's sticking blobs(" + stickedBlob.Bid + ") touches ceil");
                 }
-                __utils.AddIfNone(blob.Id, ref _verified,
-                    debugAdd: __debug__._destroyProcess ? "------------- blob" + blob.Id + " added to _verified." : null);
+                __utils.AddIfNone(blob.Bid, ref _verified,
+                    debugAdd: __debug__._destroyProcess ? "------------- blob" + blob.Bid + " added to _verified." : null);
                 return true;
             }
         }
         if (__debug__._destroyProcess)
         {
-            Debug.Log("------------- blob" + blob.Id + " doesn't touch ceiling.");
+            Debug.Log("------------- blob" + blob.Bid + " doesn't touch ceiling.");
         }
         return false;
     }

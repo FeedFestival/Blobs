@@ -8,7 +8,7 @@ public class StickingGlue : MonoBehaviour
 
     public void SetStickedTo(Blob stickedTo, BlobColor blobColor)
     {
-        StickedTo = stickedTo.Id;
+        StickedTo = stickedTo.Bid;
         gameObject.SetActive(true);
 
         Vector3 difference = stickedTo.Pos - transform.position;

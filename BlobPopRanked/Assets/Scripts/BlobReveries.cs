@@ -37,12 +37,10 @@ public class BlobReveries : MonoBehaviour
         if (instant)
         {
             Sprite.color = BlobColorService.GetColorByBlobColor(BlobColor);
-            if (WallBlob != null) {
-                if (isWall) {
-                    WallBlob.SetActive(true);
-                } else {
-                    WallBlob.SetActive(false);
-                }
+            if (isWall) {
+                WallBlob.SetActive(true);
+            } else {
+                WallBlob.SetActive(false);
             }
             
             if (TrailRenderer != null)

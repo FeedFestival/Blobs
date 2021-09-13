@@ -21,7 +21,7 @@ public class TriggerCallback : MonoBehaviour
         if (collider.tag == TAG.Blob)
         {
             Debug.Log(collider.name);
-            _onTriggered(collider.GetComponent<Blob>().Id);
+            _onTriggered(collider.GetComponent<Blob>().Bid);
         }
     }
 }

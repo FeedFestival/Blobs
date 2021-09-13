@@ -130,7 +130,7 @@ public class Player : MonoBehaviour
             Blob currentBlob = FirstProjectile.GetComponent<Blob>();
             PredictionManager.ChangeColor(currentBlob.BlobReveries.BlobColor);
             currentBlob.SetId();
-            _lastBlobFlightBlobId = currentBlob.Id;
+            _lastBlobFlightBlobId = currentBlob.Bid;
 
             SecondProjectile.transform.position = SecondBlobPos;
             MakingBlob = false;
@@ -255,9 +255,9 @@ public class Player : MonoBehaviour
                 if (hit.transform.tag == TAG.Blob)
                 {
                     Blob newHitBlob = hit.transform.GetComponent<Blob>();
-                    if (newHitBlob.Id != blobFlight.Blob.Id)
+                    if (newHitBlob.Bid != blobFlight.Blob.Bid)
                     {
-                        Debug.Log("Need another <b>ROUTE</b>: newHitBlob[" + newHitBlob.Id + "] was found where we expected blobFlight.blob[" + blobFlight.Blob.Id + "]");
+                        Debug.Log("Need another <b>ROUTE</b>: newHitBlob[" + newHitBlob.Bid + "] was found where we expected blobFlight.blob[" + blobFlight.Blob.Bid + "]");
                         FakeHitBlob(hit);
                     }
                     else
@@ -271,7 +271,7 @@ public class Player : MonoBehaviour
                 }
                 else
                 {
-                    Debug.Log("Need another <b>ROUTE</b>: " + hit.transform.gameObject.name + " was found where we expected blobFlight.blob[" + blobFlight.Blob.Id + "]");
+                    Debug.Log("Need another <b>ROUTE</b>: " + hit.transform.gameObject.name + " was found where we expected blobFlight.blob[" + blobFlight.Blob.Bid + "]");
                     OnHitSomething(hit, origin);
                 }
             }
@@ -321,10 +321,10 @@ public class Player : MonoBehaviour
         }
 
         _blobHitStickyInfo = blobHitStickyInfo;
-
-        _blobHitStickyInfo.blob.transform.SetParent(BlobFactory._.BlobsParent());
-
-        _blobHitStickyInfo.blob.SetPosition(blobHitStickyInfo.blob.transform.position, createdInRow: false);
+        
+        BlobFactory._.AddNewBlobToPool(_blobHitStickyInfo.blob);
+        _blobHitStickyInfo.blob.NewBlobBecomesBlob();
+        _blobHitStickyInfo.blob.SetPosition(blobHitStickyInfo.blob.transform.position);
 
         _blobHitStickyInfo.blob.BlobReveries.AnimateElasticSettle(blobHitStickyInfo);
 
@@ -349,6 +349,7 @@ public class Player : MonoBehaviour
     private BlobProjectile GetRandomBlob()
     {
         var go = HiddenSettings._.GetAnInstantiated(PrefabBank._.NewBlob);
+        go.name = "Nblob";
         BlobColor blobColor = ClasicLv._.DificultyService.GetColorByDificulty(newBlob: true);
         go.GetComponent<Blob>().BlobReveries.SetColor(blobColor);
         return go.GetComponent<BlobProjectile>();
