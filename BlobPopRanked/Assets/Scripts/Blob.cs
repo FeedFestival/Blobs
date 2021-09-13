@@ -4,20 +4,45 @@ using UnityEngine;
 using System.Linq;
 using Assets.Scripts.utils;
 
-public class Blob : MonoBehaviour
+public class Blob : MonoBehaviour, IPoolObject
 {
     public int Id;
+    bool _isUsed;
     public Vector3 Pos;
     [SerializeField]
     public BlobReveries BlobReveries;
-    private BlobDebugInfo _blobDebugInfo;
+    BlobDebugInfo _blobDebugInfo;
     [Header("Game Props")]
     public List<int> Neighbors;
     public List<int> StickedTo;
-    private float? _radius;
+    float? _radius;
     public bool HasAnyNeighbors;
     public bool CanDestroyNeighbors;
     List<int> _linkedNeighbors;
+
+    int IPoolObject.Id => Id;
+    bool IPoolObject.IsUsed => _isUsed;
+    void IPoolObject.Show() => this.InternalShow(true);
+    void IPoolObject.Hide() => this.InternalShow(false);
+    void InternalShow(bool show = true)
+    {
+        _isUsed = show;
+        if (_isUsed)
+        {
+            Init();
+        }
+        else
+        {
+            Reset();
+        }
+        gameObject.SetActive(show);
+    }
+
+    void Init()
+    {
+        gameObject.name += " [U] ";
+        GetComponent<CircleCollider2D>().enabled = true;
+    }
 
     internal float GetRadius()
     {
@@ -25,7 +50,6 @@ public class Blob : MonoBehaviour
         {
             var fullSize = transform.localScale.z;
             var currentSize = transform.localScale.x;
-            // Debug.Log("currentSize: " + currentSize);
             var perc = percent.What(currentSize, fullSize);
             var radius = GetComponent<CircleCollider2D>().radius;
             _radius = percent.Find(perc, radius);
@@ -74,7 +98,7 @@ public class Blob : MonoBehaviour
         }
     }
 
-    private void SetWorldPosition(Vector3 pos)
+    void SetWorldPosition(Vector3 pos)
     {
         Pos = pos;
     }
@@ -146,12 +170,14 @@ public class Blob : MonoBehaviour
         }
         else
         {
-            gameObject.SetActive(false);
+            InternalShow(false);
+            // gameObject.SetActive(false);
         }
     }
 
     internal void CalculateNeighbors(List<Blob> allBlobs)
     {
+        // Debug.Log("allBlobs: " + allBlobs.Count);
         foreach (var otherBlob in allBlobs)
         {
             IfNeighborAdd(otherBlob);
@@ -220,7 +246,7 @@ public class Blob : MonoBehaviour
         StickedTo = StickedTo.OrderByDescending(s => s).ToList();
     }
 
-    private void RemoveSticked(int id)
+    void RemoveSticked(int id)
     {
         int index = StickedTo.FindIndex(s => s == id);
         if (index >= 0)
@@ -255,7 +281,7 @@ public class Blob : MonoBehaviour
         CanDestroyNeighbors = MeetsRequirementsToDestroy();
     }
 
-    private void SetupNeighbors(List<Blob> proximityBlobs, Blob otherBlob)
+    void SetupNeighbors(List<Blob> proximityBlobs, Blob otherBlob)
     {
         HasAnyNeighbors = otherBlob == null ? false
             : IfNeighborAdd(otherBlob: otherBlob);
@@ -277,7 +303,7 @@ public class Blob : MonoBehaviour
         }
     }
 
-    private bool MeetsRequirementsToDestroy()
+    bool MeetsRequirementsToDestroy()
     {
         if (HasAnyNeighbors)
         {
@@ -303,7 +329,7 @@ public class Blob : MonoBehaviour
         return false;
     }
 
-    private void FindLinkedNeighbors(Blob blob)
+    void FindLinkedNeighbors(Blob blob)
     {
         foreach (int neighborId in blob.Neighbors)
         {
@@ -321,6 +347,24 @@ public class Blob : MonoBehaviour
             }
 
             FindLinkedNeighbors(foundNeighbor);
+        }
+    }
+
+    void Reset()
+    {
+        Id = 0;
+        string name = gameObject.name.Replace(" [U] ", "");
+        Debug.Log("Reseting " + name);
+        gameObject.name = name;
+        Debug.Log("Neighbors: " + Neighbors.Count);
+        __debug.DebugList(Neighbors);
+        Neighbors = new List<int>();
+        Debug.Log("StickedTo: " + StickedTo.Count);
+        __debug.DebugList(StickedTo);
+        StickedTo = new List<int>();
+        foreach (StickingGlue sg in BlobReveries.StickingGlues)
+        {
+            sg.Unstick();
         }
     }
 }

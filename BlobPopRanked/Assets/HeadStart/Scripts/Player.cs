@@ -117,13 +117,13 @@ public class Player : MonoBehaviour
         {
             if (firstLevel)
             {
-                FirstProjectile = GetRandomBlob().GetComponent<BlobProjectile>();
-                SecondProjectile = GetRandomBlob().GetComponent<BlobProjectile>();
+                FirstProjectile = GetRandomBlob();
+                SecondProjectile = GetRandomBlob();
             }
             else
             {
                 FirstProjectile = SecondProjectile;
-                SecondProjectile = GetRandomBlob().GetComponent<BlobProjectile>();
+                SecondProjectile = GetRandomBlob();
             }
 
             FirstProjectile.transform.position = StartPos;
@@ -322,7 +322,7 @@ public class Player : MonoBehaviour
 
         _blobHitStickyInfo = blobHitStickyInfo;
 
-        _blobHitStickyInfo.blob.transform.SetParent(ClasicLv._.BlobsParentT);
+        _blobHitStickyInfo.blob.transform.SetParent(BlobFactory._.BlobsParent());
 
         _blobHitStickyInfo.blob.SetPosition(blobHitStickyInfo.blob.transform.position, createdInRow: false);
 
@@ -346,12 +346,12 @@ public class Player : MonoBehaviour
         return _blobHitStickyInfo;
     }
 
-    private GameObject GetRandomBlob()
+    private BlobProjectile GetRandomBlob()
     {
         var go = HiddenSettings._.GetAnInstantiated(PrefabBank._.NewBlob);
         BlobColor blobColor = ClasicLv._.DificultyService.GetColorByDificulty(newBlob: true);
         go.GetComponent<Blob>().BlobReveries.SetColor(blobColor);
-        return go;
+        return go.GetComponent<BlobProjectile>();
     }
 
     private void PrepShot(Vector2 origin, Vector2 targetPos)

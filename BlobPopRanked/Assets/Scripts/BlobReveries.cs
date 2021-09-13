@@ -80,7 +80,7 @@ public class BlobReveries : MonoBehaviour
         bool hitSomethingElseThenABlob = blobHitStickyInfo.otherBlob == null;
         if (hitSomethingElseThenABlob)
         {
-            _initialPos = new Vector2(transform.localPosition.x, HiddenSettings._.WallStickLimit - ClasicLv._.BlobsParentT.position.y);
+            _initialPos = new Vector2(transform.localPosition.x, HiddenSettings._.WallStickLimit - BlobFactory._.BlobsParent().position.y);
         }
         else
         {

@@ -26,7 +26,6 @@ public class ClasicLv : MonoBehaviour, ILevel
     private List<int> _checked;
     [HideInInspector]
     public DificultyService DificultyService;
-    public Transform BlobsParentT;
     public ClasicColorManager ClasicColorManager;
     private Dictionary<int, BlobPointInfo> _blobsByColor;
     private int? _descendTweenId;
@@ -42,18 +41,24 @@ public class ClasicLv : MonoBehaviour, ILevel
     void Start()
     {
         DificultyService = GetComponent<DificultyService>();
-        DificultyService.Init(this);
     }
 
     void ILevel.StartLevel()
     {
-        MusicOpts mOpts = new MusicOpts("GameMusic1", 0.09f);
-        mOpts.FadeInSeconds = 30f;
-        MusicManager._.PlayBackgroundMusic(mOpts);
+        DificultyService.Init(this);
         RetrieveUser();
+        PlayBackgroundMusic();
+        BlobFactory._.Init();
         Game._.Player.MakeBlob(firstLevel: FirstLevel);
         GenerateBlobLevel();
         ActivateEndGame(false);
+    }
+
+    void PlayBackgroundMusic()
+    {
+        MusicOpts mOpts = new MusicOpts("GameMusic1", 0.09f);
+        mOpts.FadeInSeconds = 30f;
+        MusicManager._.PlayBackgroundMusic(mOpts);
     }
 
     private void RetrieveUser()
@@ -72,13 +77,14 @@ public class ClasicLv : MonoBehaviour, ILevel
             return;
         }
 
-        var newPos = new Vector3(BlobsParentT.position.x, BlobsParentT.position.y - Spacing, BlobsParentT.position.z);
+        var blobsParent = BlobFactory._.BlobsParent();
+        var newPos = new Vector3(blobsParent.position.x, blobsParent.position.y - Spacing, blobsParent.position.z);
         if (_descendTweenId.HasValue)
         {
             LeanTween.cancel(_descendTweenId.Value);
             _descendTweenId = null;
         }
-        _descendTweenId = LeanTween.move(BlobsParentT.gameObject,
+        _descendTweenId = LeanTween.move(blobsParent.gameObject,
             newPos,
             HiddenSettings._.BlobExplodeAnimationLength
             ).id;
@@ -201,7 +207,13 @@ public class ClasicLv : MonoBehaviour, ILevel
         {
             i = _increment;
         }
-        GameObject go = HiddenSettings._.GetAnInstantiated(PrefabBank._.Blob);
+
+        Blob blob = BlobFactory._.GetAvailableBlob() as Blob;
+
+        // GameObject go = HiddenSettings._.GetAnInstantiated(PrefabBank._.Blob);
+        // go.transform.SetParent(BlobFactory._.BlobsParent());
+        // var blob = go.GetComponent<Blob>();
+
         Vector3 pos;
         if (i == 0)
         {
@@ -215,11 +227,13 @@ public class ClasicLv : MonoBehaviour, ILevel
                 Blobs[Blobs.Count - 1].Pos.x + Spacing,
                 StartPos.y, 0);
         }
-        go.transform.SetParent(BlobsParentT);
-        var blob = go.GetComponent<Blob>();
         blob.SetPosition(pos, true);
+
+        (blob as IPoolObject).Show();
+
         blob.BlobReveries.SetColor(DificultyService.GetColorByDificulty());
         blob.CalculateNeighbors(Blobs);
+
         Blobs.Add(blob);
     }
 
@@ -338,10 +352,11 @@ public class ClasicLv : MonoBehaviour, ILevel
         foreach (KeyValuePair<int, BlobPointInfo> kvp in _blobsByColor)
         {
             BlobColor blobColor = (BlobColor)kvp.Key;
-            if (blobColor == BlobColor.BROWN) {
+            if (blobColor == BlobColor.BROWN)
+            {
                 continue;
             }
-            
+
             BlobPointInfo blobPointInfo = kvp.Value;
             blobPointInfo.CalculateColorPoints(blobColor);
             // Debug.Log(

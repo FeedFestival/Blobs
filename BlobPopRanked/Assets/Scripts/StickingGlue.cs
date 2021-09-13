@@ -26,10 +26,4 @@ public class StickingGlue : MonoBehaviour
         StickedTo = 0;
         gameObject.SetActive(false);
     }
-
-    // Update is called once per frame
-    void Update()
-    {
-
-    }
 }
