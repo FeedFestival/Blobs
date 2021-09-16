@@ -37,14 +37,7 @@ public class SwitchController : MonoBehaviour
     void moveSwitchableToShootable()
     {
         Game._.Player.SecondProjectile.transform.position = SwitchSettings.ShootableBlobPosition;
-        // TODO: Repeated peace of code
-        Blob currentBlob = Game._.Player.SecondProjectile.GetComponent<Blob>();
-        Game._.Player.PredictionManager.ChangeColor(currentBlob.BlobReveries.BlobColor);
-        if (currentBlob.Bid == 0)
-        {
-            currentBlob.SetId();
-        }
-        Game._.Player._lastBlobFlightBlobId = currentBlob.Bid;
+        Game._.Player.SetupProjectileBlob(ref Game._.Player.SecondProjectile);
     }
 
     void moveShootableToSwitchable()

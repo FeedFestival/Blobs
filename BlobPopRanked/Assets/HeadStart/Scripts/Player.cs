@@ -453,17 +453,13 @@ public class Player : MonoBehaviour
         return _lastBlobFlight;
     }
 
-    internal void MakePlayableBlob(bool firstLevel = false)
+    internal void MakePlayableBlobs()
     {
         Timer._.Debounce(() =>
         {
             FirstProjectile = GetRandomBlob();
             FirstProjectile.transform.position = SwitchSettings.ShootableBlobPosition;
-            // TODO: Repeated peace of code
-            Blob currentBlob = FirstProjectile.GetComponent<Blob>();
-            PredictionManager.ChangeColor(currentBlob.BlobReveries.BlobColor);
-            currentBlob.SetId();
-            _lastBlobFlightBlobId = currentBlob.Bid;
+            SetupProjectileBlob(ref FirstProjectile);
 
             SecondProjectile = GetRandomBlob();
             SecondProjectile.transform.position = SwitchSettings.SwitchableBlobPosition;
@@ -476,6 +472,17 @@ public class Player : MonoBehaviour
         MakingBlob = true;
 
         EventBus._.Emit(Evt.MAKE_ANOTHER_BLOB);
+    }
+
+    public void SetupProjectileBlob(ref BlobProjectile blobProjectile)
+    {
+        Blob currentBlob = blobProjectile.GetComponent<Blob>();
+        PredictionManager.ChangeColor(currentBlob.BlobReveries.BlobColor);
+        if (currentBlob.Bid == 0)
+        {
+            currentBlob.SetId();
+        }
+        _lastBlobFlightBlobId = currentBlob.Bid;
     }
 
     public BlobProjectile GetRandomBlob()

@@ -49,7 +49,7 @@ public class ClasicLv : MonoBehaviour, ILevel
         RetrieveUser();
         PlayBackgroundMusic();
         BlobFactory._.Init();
-        Game._.Player.MakePlayableBlob(firstLevel: FirstLevel);
+        Game._.Player.MakePlayableBlobs();
         GenerateBlobLevel();
         ActivateEndGame(false);
     }
