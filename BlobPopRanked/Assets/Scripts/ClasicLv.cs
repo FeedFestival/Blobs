@@ -49,7 +49,7 @@ public class ClasicLv : MonoBehaviour, ILevel
         RetrieveUser();
         PlayBackgroundMusic();
         BlobFactory._.Init();
-        Game._.Player.MakeBlob(firstLevel: FirstLevel);
+        Game._.Player.MakePlayableBlob(firstLevel: FirstLevel);
         GenerateBlobLevel();
         ActivateEndGame(false);
     }
@@ -107,9 +107,7 @@ public class ClasicLv : MonoBehaviour, ILevel
 
     public void AddAnotherBlobLevel()
     {
-        Debug.Log("---------------------------------------------");
         CalculateDificulty();
-
         if (__debug__._blobGen)
         {
             __debug__.WhenFinishedAddingDescend = true;

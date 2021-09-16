@@ -9,7 +9,7 @@ using System;
 
 public class Player : MonoBehaviour
 {
-    public Vector2 StartPos;
+    public SwitchSettings SwitchSettings;
     public Transform Target;
     public Transform ReflectDir;
     public Transform CenteroidBlob;
@@ -17,7 +17,6 @@ public class Player : MonoBehaviour
     public List<BlobFLight> BlobFlightPositions;
     public BlobProjectile FirstProjectile;
     public BlobProjectile SecondProjectile;
-    public Vector2 SecondBlobPos;
     public bool BlobInMotion;
     public bool MakingBlob;
     public bool IsDragging;
@@ -29,11 +28,12 @@ public class Player : MonoBehaviour
     private IEnumerator _performSecondCheck;
     private IEnumerator _performLastCheck;
     private BlobFLight _lastBlobFlight;
-    private int _lastBlobFlightBlobId;
+    public int _lastBlobFlightBlobId;
     public Vector2 LastDir;
     private int _layerMask;
     private BlobHitStickyInfo _blobHitStickyInfo;
     IObserver<int> _pointerUpObserver;
+    bool _isSwitchInProgress;
 
     void Start()
     {
@@ -50,10 +50,19 @@ public class Player : MonoBehaviour
             {
                 TryShooting();
             });
+
+        EventBus._.On(Evt.STOP_SHOOTING, (object obj) =>
+        {
+            _isSwitchInProgress = (obj as SwitchBlobEvent).IsSwitchInProgress;
+        });
     }
 
     public void PointerDrag(BaseEventData baseEventData)
     {
+        if (_isSwitchInProgress)
+        {
+            return;
+        }
         if (BlobInMotion || FirstProjectile == null)
         {
             IsDragging = false;
@@ -83,7 +92,8 @@ public class Player : MonoBehaviour
 
     public void PointerUp(BaseEventData baseEventData)
     {
-        if (IsDragging) {
+        if (IsDragging)
+        {
             _pointerUpObserver.OnNext(1);
         }
     }
@@ -95,6 +105,11 @@ public class Player : MonoBehaviour
             IsDragging = false;
         }
         PredictionManager.Reset();
+
+        if (_isSwitchInProgress)
+        {
+            return;
+        }
 
         if (ClasicLv._.__debug__._noFiring)
         {
@@ -109,32 +124,6 @@ public class Player : MonoBehaviour
         UIController._.UiPointerArea.SetActive(false);
 
         Shoot();
-    }
-
-    internal void MakeBlob(bool firstLevel = false)
-    {
-        Timer._.Debounce(() =>
-        {
-            if (firstLevel)
-            {
-                FirstProjectile = GetRandomBlob();
-                SecondProjectile = GetRandomBlob();
-            }
-            else
-            {
-                FirstProjectile = SecondProjectile;
-                SecondProjectile = GetRandomBlob();
-            }
-
-            FirstProjectile.transform.position = StartPos;
-            Blob currentBlob = FirstProjectile.GetComponent<Blob>();
-            PredictionManager.ChangeColor(currentBlob.BlobReveries.BlobColor);
-            currentBlob.SetId();
-            _lastBlobFlightBlobId = currentBlob.Bid;
-
-            SecondProjectile.transform.position = SecondBlobPos;
-            MakingBlob = false;
-        }, 0.2f);
     }
 
     public void Shoot()
@@ -255,14 +244,14 @@ public class Player : MonoBehaviour
                 if (hit.transform.tag == TAG.Blob)
                 {
                     Blob newHitBlob = hit.transform.GetComponent<Blob>();
+                    if (newHitBlob == null || blobFlight.Blob == null)
+                    {
+                        Debug.Log("Null Reference Exception... why? Suspect -> " + hit.transform.gameObject.name);
+                    }
                     if (newHitBlob.Bid != blobFlight.Blob.Bid)
                     {
                         Debug.Log("Need another <b>ROUTE</b>: newHitBlob[" + newHitBlob.Bid + "] was found where we expected blobFlight.blob[" + blobFlight.Blob.Bid + "]");
                         FakeHitBlob(hit);
-                    }
-                    else
-                    {
-                        // Debug.Log("Route kept: newHitBlob[" + newHitBlob.Id + "] is the <b>SAME</b>, we expected blobFlight.blob[" + blobFlight.Blob.Id + "]");
                     }
                 }
                 else if (hit.transform.tag == TAG.StickySurface)
@@ -301,16 +290,34 @@ public class Player : MonoBehaviour
                     Debug.Log("We didn't <b>HIT ANYTHING</b> _lastBlobFlight.BlobId: " + _lastBlobFlightBlobId + "LastDir: " + LastDir);
                     Vector2 origin = FirstProjectile.transform.position;
                     Vector2 targetPos = (Vector2)FirstProjectile.transform.position + LastDir;
-                    BlobInMotion = false;
+
+                    var isSameProjectile = _lastBlobFlightBlobId == FirstProjectile.GetComponent<Blob>().Bid;
+                    Debug.Log("There is a bug here! How to catch? <b>isSameProjectile: " + isSameProjectile + "</b>");
+
                     FirstProjectile.GetComponent<CircleCollider2D>().enabled = false;
                     BlobFlightPositions = new List<BlobFLight>();
                     PrepShot(origin, targetPos);
-                    Shoot();
+                    ReShoot();
                 }
             }
         }
         StopCoroutine(_performLastCheck);
         _performLastCheck = null;
+    }
+
+    void ReShoot()
+    {
+        FirstProjectile.GetComponent<CircleCollider2D>().enabled = true;
+        SecondProjectile.GetComponent<CircleCollider2D>().enabled = true;
+
+        _firstAndOnly = BlobFlightPositions.Count == 1;
+        _last = false;
+        _inFlightIndex = -1;
+
+        ShootAnimated();
+
+        ClasicLv._.DificultyService.CalculatePlayTime(start: true);
+        ClasicLv._.ActivateEndGame(false);
     }
 
     public void BlobHitSticky(BlobHitStickyInfo blobHitStickyInfo)
@@ -321,7 +328,7 @@ public class Player : MonoBehaviour
         }
 
         _blobHitStickyInfo = blobHitStickyInfo;
-        
+
         BlobFactory._.AddNewBlobToPool(_blobHitStickyInfo.blob);
         _blobHitStickyInfo.blob.NewBlobBecomesBlob();
         _blobHitStickyInfo.blob.SetPosition(blobHitStickyInfo.blob.transform.position);
@@ -335,24 +342,12 @@ public class Player : MonoBehaviour
         ClasicLv._.TryDestroyNeighbors(_blobHitStickyInfo.blob);
 
         FirstProjectile = null;
-        MakeBlob();
-        MakingBlob = true;
-        BlobInMotion = false;
-        UIController._.UiPointerArea.SetActive(true);
+        MakeSwitchableBlob();
     }
 
     public BlobHitStickyInfo GetBlobHitStickyInfo()
     {
         return _blobHitStickyInfo;
-    }
-
-    private BlobProjectile GetRandomBlob()
-    {
-        var go = HiddenSettings._.GetAnInstantiated(PrefabBank._.NewBlob);
-        go.name = "Nblob";
-        BlobColor blobColor = ClasicLv._.DificultyService.GetColorByDificulty(newBlob: true);
-        go.GetComponent<Blob>().BlobReveries.SetColor(blobColor);
-        return go.GetComponent<BlobProjectile>();
     }
 
     private void PrepShot(Vector2 origin, Vector2 targetPos)
@@ -456,5 +451,39 @@ public class Player : MonoBehaviour
     public BlobFLight GetLastBlobFlight()
     {
         return _lastBlobFlight;
+    }
+
+    internal void MakePlayableBlob(bool firstLevel = false)
+    {
+        Timer._.Debounce(() =>
+        {
+            FirstProjectile = GetRandomBlob();
+            FirstProjectile.transform.position = SwitchSettings.ShootableBlobPosition;
+            // TODO: Repeated peace of code
+            Blob currentBlob = FirstProjectile.GetComponent<Blob>();
+            PredictionManager.ChangeColor(currentBlob.BlobReveries.BlobColor);
+            currentBlob.SetId();
+            _lastBlobFlightBlobId = currentBlob.Bid;
+
+            SecondProjectile = GetRandomBlob();
+            SecondProjectile.transform.position = SwitchSettings.SwitchableBlobPosition;
+
+        }, SwitchSettings.MakeShootableBlobDebounceTime);
+    }
+
+    void MakeSwitchableBlob()
+    {
+        MakingBlob = true;
+
+        EventBus._.Emit(Evt.MAKE_ANOTHER_BLOB);
+    }
+
+    public BlobProjectile GetRandomBlob()
+    {
+        var go = HiddenSettings._.GetAnInstantiated(PrefabBank._.NewBlob);
+        go.name = "Nblob";
+        BlobColor blobColor = ClasicLv._.DificultyService.GetColorByDificulty(newBlob: true);
+        go.GetComponent<Blob>().BlobReveries.SetColor(blobColor);
+        return go.GetComponent<BlobProjectile>();
     }
 }
