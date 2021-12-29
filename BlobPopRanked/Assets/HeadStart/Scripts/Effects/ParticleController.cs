@@ -16,6 +16,7 @@ public class ParticleController : MonoBehaviour
     public int Id;
     public bool AvailableInPool;
     public float TimeLength;
+    public delegate void AfterPlay();
 
     void Start()
     {
@@ -82,18 +83,18 @@ public class ParticleController : MonoBehaviour
         }
     }
 
-    public void Play()
+    public virtual void Play()
     {
         InternalPlay();
     }
 
-    public void Play(Vector2 point)
+    public virtual void Play(Vector2 point)
     {
         transform.position = new Vector3(point.x, point.y, 0);
         InternalPlay();
     }
 
-    public void InternalPlay()
+    public void InternalPlay(AfterPlay afterPlay = null)
     {
         int index = 0;
         // Debug.Log("OriginalEmits.Count: " + OriginalEmits.Count);
@@ -106,6 +107,7 @@ public class ParticleController : MonoBehaviour
         Timer._.InternalWait(() =>
         {
             AvailableInPool = true;
+            if (afterPlay != null) afterPlay();
         }, TimeLength);
     }
 

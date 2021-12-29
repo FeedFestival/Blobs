@@ -56,9 +56,9 @@ public class ClasicLv : MonoBehaviour, ILevel
 
     void PlayBackgroundMusic()
     {
-        MusicOpts mOpts = new MusicOpts("GameMusic1", 0.09f);
-        mOpts.FadeInSeconds = 30f;
-        MusicManager._.PlayBackgroundMusic(mOpts);
+        // MusicOpts mOpts = new MusicOpts("GameMusic1", 0.09f);
+        // mOpts.FadeInSeconds = 30f;
+        // MusicManager._.PlayBackgroundMusic(mOpts);
     }
 
     private void RetrieveUser()
@@ -86,7 +86,7 @@ public class ClasicLv : MonoBehaviour, ILevel
         }
         _descendTweenId = LeanTween.move(blobsParent.gameObject,
             newPos,
-            HiddenSettings._.BlobExplodeAnimationLength
+            HiddenSettings._.WaitDescendBlobs
             ).id;
         LeanTween.descr(_descendTweenId.Value).setEase(LeanTweenType.linear);
         LeanTween.descr(_descendTweenId.Value).setOnComplete(() => { _descendTweenId = null; });
@@ -209,10 +209,6 @@ public class ClasicLv : MonoBehaviour, ILevel
 
         Blob blob = BlobFactory._.GetAvailableBlob() as Blob;
 
-        // GameObject go = HiddenSettings._.GetAnInstantiated(PrefabBank._.Blob);
-        // go.transform.SetParent(BlobFactory._.BlobsParent());
-        // var blob = go.GetComponent<Blob>();
-
         Vector3 pos;
         if (i == 0)
         {
@@ -234,8 +230,7 @@ public class ClasicLv : MonoBehaviour, ILevel
         blob.SetPosition(pos);
         blob.StickedTo.Add(HiddenSettings._.CeilId);
 
-        // (blob as IPoolObject).Show();
-
+        blob.BlobReveries.StopStrechAnim();
         blob.BlobReveries.SetColor(DificultyService.GetColorByDificulty());
         blob.CalculateNeighbors(Blobs);
 
@@ -262,22 +257,22 @@ public class ClasicLv : MonoBehaviour, ILevel
 
     private IEnumerator DestroyNeighbors(Blob blob)
     {
-        yield return new WaitForSeconds(HiddenSettings._.BlobKillAnimationLength);
-
         _toDestroy = new List<int>();
         Affected = new List<int>();
         FindNeighborsToDestroy(blob);
-
         if (_blobsByColor == null)
         {
             _blobsByColor = new Dictionary<int, BlobPointInfo>();
         }
 
+        yield return new WaitForEndOfFrame();
+
         DestroyBlobs();
         CheckAffected();
 
-        CalculatePoints();
+        yield return new WaitForSeconds(1.3f);
 
+        CalculatePoints();
         AfterDestroy();
     }
 
@@ -311,8 +306,8 @@ public class ClasicLv : MonoBehaviour, ILevel
         {
             return;
         }
-
         _toDestroy.Reverse();
+
         foreach (int bId in _toDestroy)
         {
             int index = Blobs.FindIndex(b => b.Bid == bId);

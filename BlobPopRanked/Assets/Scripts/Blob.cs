@@ -137,8 +137,30 @@ public class Blob : MonoBehaviour, IPoolObject
 
     internal void Kill()
     {
-        List<Blob> blobsRef = ClasicLv._.Blobs;
+        removeSticked();
 
+        GetComponent<CircleCollider2D>().enabled = false;
+
+        // if (ClasicLv._.__debug__._blobKilling)
+        // {
+        //     _blobDebugInfo.FakeKill(BlobReveries.BlobColor, ref BlobReveries.Sprite);
+        //     return;
+        // }
+        
+        float explosionL = BlobReveries.PlayExplodeEffect(transform);
+
+        Timer._.InternalWait(() =>
+        {
+            BlobReveries.PlayExplosionSFX();
+            _isUsed = false;
+            Reset();
+        }, explosionL);
+        gameObject.SetActive(false);
+    }
+
+    private void removeSticked()
+    {
+        List<Blob> blobsRef = ClasicLv._.Blobs;
         foreach (var stickedTo in StickedTo)
         {
             int index = blobsRef.FindIndex(b => b.Bid == stickedTo);
@@ -148,26 +170,11 @@ public class Blob : MonoBehaviour, IPoolObject
                 __utils.AddIfNone(blobsRef[index].Bid, ref ClasicLv._.Affected);
             }
         }
-        if (ClasicLv._.__debug__._stickingProcess)
-        {
-            Debug.Log(__debug.DebugList<int>(StickedTo, "StickedTo"));
-        }
 
-        GetComponent<CircleCollider2D>().enabled = false;
-        if (ClasicLv._.__debug__._blobKilling)
-        {
-            _blobDebugInfo.FakeKill(BlobReveries.BlobColor, ref BlobReveries.Sprite);
-        }
-        else
-        {
-            Timer._.InternalWait(() =>
-            {
-                _isUsed = false;
-                // Debug.Log("<b>(" + Bid + ")Blob</b> got out of use");
-                Reset();
-            }, 1f);
-            gameObject.SetActive(false);
-        }
+        // if (ClasicLv._.__debug__._stickingProcess)
+        // {
+        //     Debug.Log(__debug.DebugList<int>(StickedTo, "StickedTo"));
+        // }
     }
 
     internal void CalculateNeighbors(List<Blob> allBlobs)

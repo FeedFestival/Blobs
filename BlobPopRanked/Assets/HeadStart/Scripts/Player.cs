@@ -455,7 +455,7 @@ public class Player : MonoBehaviour
 
     internal void MakePlayableBlobs()
     {
-        Timer._.Debounce(() =>
+        Timer._.InternalWait(() =>
         {
             FirstProjectile = GetRandomBlob();
             FirstProjectile.transform.position = SwitchSettings.ShootableBlobPosition;

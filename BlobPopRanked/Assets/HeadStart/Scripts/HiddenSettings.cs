@@ -35,8 +35,7 @@ public class HiddenSettings : MonoBehaviour
     public int MaxTimeSeconds;
 
     [Header("ANIMATIONS")]
-    public float BlobKillAnimationLength;
-    public float BlobExplodeAnimationLength;
+    public float WaitDescendBlobs;
     public float BlobForcePushAnimL;
     public float BlobElasticBackAnimL;
     public float BallStickyReflectDistanceModifier;

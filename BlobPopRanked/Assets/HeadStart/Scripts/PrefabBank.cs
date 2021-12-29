@@ -17,6 +17,7 @@ public class PrefabBank : MonoBehaviour
 
     [Header("Particle Systems")]
     public GameObject SmallHitParticle;
+    public GameObject BigExplosionParticle;
     public GameObject ExplosionParticle;
     public GameObject PointText;
 

@@ -12,7 +12,6 @@ public class LevelController : MonoBehaviour
     [SerializeField]
     public GameplayState GameplayState;
     public GameObject LevelGo;
-    public EffectsPool EffectsPool;
     public ILevel Level;
     IEnumerator _preStartGameCo;
     IEnumerator _startGameCo;
@@ -29,7 +28,7 @@ public class LevelController : MonoBehaviour
 
         yield return new WaitForSeconds(0.1f);
 
-        EffectsPool.GenerateParticleControllers();
+        EffectsPool._.GenerateParticleControllers();
         UIController._.PointsController.GeneratePoints();
 
         _startGameCo = StartGame();

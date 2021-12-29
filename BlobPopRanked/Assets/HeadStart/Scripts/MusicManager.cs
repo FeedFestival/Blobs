@@ -24,6 +24,10 @@ public class MusicManager : MonoBehaviour
     public AudioClip GameMusic1;
     [Header("Gameplay Sounds")]
     public AudioClip BlobHit;
+    public AudioClip PreExplosion;
+    public AudioClip Explosion;
+    public AudioClip MoneyTravel;
+    public AudioClip MoneyPump;
 
     public void Init()
     {
@@ -32,7 +36,11 @@ public class MusicManager : MonoBehaviour
             { "MainMenuMusic", new MAudio() { AudioClip = MainMenuMusic } },
             { "Click", new MAudio() { AudioClip = ClickSound } },
             { "GameMusic1", new MAudio() { AudioClip = GameMusic1 } },
-            { "BlobHit", new MAudio() { AudioClip = BlobHit } }
+            { "BlobHit", new MAudio() { AudioClip = BlobHit } },
+            { "Pre_Explosion", new MAudio() { AudioClip = PreExplosion } },
+            { "Explosion", new MAudio() { AudioClip = Explosion } },
+            { "MoneyTravel", new MAudio() { AudioClip = MoneyTravel } },
+            { "MoneyPump", new MAudio() { AudioClip = MoneyPump } }
         };
     }
 
@@ -161,11 +169,20 @@ public class MusicManager : MonoBehaviour
         }
     }
 
-    private void PlaySoundAudio(MAudio mAudio, bool loop)
+    public void PlaySFX(MusicOpts opts)
+    {
+        _sound = opts.MusicName;
+        if (Sounds[_sound].AudioClip != null)
+        {
+            PlaySoundAudio(Sounds[_sound], volume: opts.Volume, loop: opts.Loop);
+        }
+    }
+
+    private void PlaySoundAudio(MAudio mAudio, float volume = 0.2f, bool loop = false)
     {
         _soundId = EazySoundManager.PrepareMusic(
             mAudio.AudioClip,
-            0.2f,
+            volume,
             loop,
             false
             );

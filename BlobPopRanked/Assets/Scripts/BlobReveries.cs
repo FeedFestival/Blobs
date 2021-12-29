@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using Assets.Scripts;
 using Assets.Scripts.utils;
+using UnityEditor;
 using UnityEngine;
 
 public class BlobReveries : MonoBehaviour
@@ -27,6 +28,8 @@ public class BlobReveries : MonoBehaviour
     private AfterAnim _afterAnimCallback;
     private IEnumerator _playEID;
     private MusicOpts _blobHitSound;
+    private MusicOpts _preBlobExplodeSound;
+    private MusicOpts _blobExplodeSound;
 
     internal void SetColor(BlobColor blobColor, bool instant = true)
     {
@@ -37,12 +40,15 @@ public class BlobReveries : MonoBehaviour
         if (instant)
         {
             Sprite.color = BlobColorService.GetColorByBlobColor(BlobColor);
-            if (isWall) {
+            if (isWall)
+            {
                 WallBlob.SetActive(true);
-            } else {
+            }
+            else
+            {
                 WallBlob.SetActive(false);
             }
-            
+
             if (TrailRenderer != null)
             {
                 TrailRenderer.startColor = BlobColorService.GetColorByBlobColor(BlobColor);
@@ -61,7 +67,8 @@ public class BlobReveries : MonoBehaviour
             TravelSprite.gameObject.SetActive(false);
         }
 
-        if (AuraSprite != null) {
+        if (AuraSprite != null)
+        {
             AuraSprite.color = BlobColorService.GetBlobAuraColor(blobColor);
         }
     }
@@ -110,7 +117,6 @@ public class BlobReveries : MonoBehaviour
         {
             case BlobAnim.Stretch:
 
-                // Time.timeScale = 0.1f;
                 Sprite.gameObject.SetActive(true);
                 Sprite.transform.eulerAngles = anim.RotE;
                 if (TravelSprite != null)
@@ -129,7 +135,6 @@ public class BlobReveries : MonoBehaviour
                 }
                 _playEID = PlayStretchAnim(anim.Time, () =>
                 {
-                    // Time.timeScale = 1f;
                     BlobStretchAnimator.SetBool(ANIMATE.JustPlay, !anim.Play);
                     if (_afterAnimCallback != null)
                     {
@@ -181,6 +186,16 @@ public class BlobReveries : MonoBehaviour
         _playEID = null;
     }
 
+    public void StopStrechAnim()
+    {
+        if (_playEID != null)
+        {
+            StopCoroutine(_playEID);
+            _playEID = null;
+        }
+        BlobStretchAnimator.SetBool(ANIMATE.JustPlay, false);
+    }
+
     public void AnimateShockwave(List<Blob> proximityBlobs)
     {
         foreach (Blob proxiBlob in proximityBlobs)
@@ -192,7 +207,8 @@ public class BlobReveries : MonoBehaviour
             Vector2 dir = ((proxiBlob.transform.position - transform.position).normalized * ((1 - distance) + 0.1f)) * 0.2f;
 
             if (ClasicLv._.DificultyService.BrownIsWall
-                && proxiBlob.BlobReveries.BlobColor == BlobColor.BROWN) {
+                && proxiBlob.BlobReveries.BlobColor == BlobColor.BROWN)
+            {
                 dir = dir * 0.2f;
             }
 
@@ -240,11 +256,45 @@ public class BlobReveries : MonoBehaviour
 
     public void PlayHitEffect(Vector2 point)
     {
-        if (_blobHitSound == null) {
-            _blobHitSound = new MusicOpts("BlobHit", 0.4f, false);
+        if (_blobHitSound == null)
+        {
+            _blobHitSound = new MusicOpts("BlobHit", 0.5f, false);
         }
-        MusicManager._.PlaySound(_blobHitSound);
-        ParticleController pc = Game._.LevelController.EffectsPool.GetParticle();
+        MusicManager._.PlaySFX(_blobHitSound);
+        ParticleController pc = EffectsPool._.GetParticle(ParticleType.SmallHit);
         pc.Play(point);
+    }
+
+    public float PlayExplodeEffect(Transform blobT)
+    {
+        PC_BigExplosion bpc = (EffectsPool._.GetParticle(ParticleType.BigExplosion) as PC_BigExplosion);
+
+        // StartCoroutine(playExplode(bpc, blobT));
+
+        PlayPreExplosionSFX();
+        bpc.SetColor(BlobColor);
+        bpc.CopyPosition(blobT);
+        bpc.Play(blobT.position);
+
+        return bpc.PreExplosionLengh;
+    }
+
+    public void PlayPreExplosionSFX()
+    {
+        if (_preBlobExplodeSound == null)
+        {
+            _preBlobExplodeSound = new MusicOpts("Pre_Explosion", 0.1f, false);
+        }
+        MusicManager._.PlaySFX(_preBlobExplodeSound);
+    }
+
+    public void PlayExplosionSFX()
+    {
+        // EditorApplication.isPaused = true;
+        if (_blobExplodeSound == null)
+        {
+            _blobExplodeSound = new MusicOpts("Explosion", 0.8f, false);
+        }
+        MusicManager._.PlaySFX(_blobExplodeSound);
     }
 }

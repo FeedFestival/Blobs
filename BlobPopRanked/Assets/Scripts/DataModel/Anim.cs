@@ -13,6 +13,11 @@ public class Anim
 
     public Anim() { }
 
+    public Anim(BlobAnim blobAnim)
+    {
+        BlobAnim = blobAnim;
+    }
+
     public Anim(BlobAnim blobAnim, AfterAnim afterAnim)
     {
         BlobAnim = blobAnim;

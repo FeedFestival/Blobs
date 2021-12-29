@@ -134,8 +134,13 @@ public class PointTextParticle : MonoBehaviour, IPoolObject, IPointText
         LeanTween.descr(_towardsTotalTweenId.Value).setOnComplete(() =>
         {
             UIController._.PointsController.UpdatePoints(_pointsValue, _currentBlobColor);
+            var sound = new MusicOpts("MoneyPump", 1f, false);
+            MusicManager._.PlaySFX(sound);
             InternalShow(false);
         });
+
+        var sound = new MusicOpts("MoneyTravel", 1f, false);
+        MusicManager._.PlaySFX(sound);
     }
 
     void ShowPointsTrail()
