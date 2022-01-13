@@ -1,12 +1,13 @@
 using System.Collections;
 using System.Collections.Generic;
-using Assets.HeadStart.Core.Player;
 using Assets.HeadStart.CoreUi;
-using Assets.Scripts;
 using Assets.Scripts.utils;
 using UnityEngine;
 using UnityEngine.UI;
 using UniRx;
+using Assets.BlobPopClassic;
+using Assets.BlobPopClassic.DataModels;
+using Assets.BlobPopClassic.BlobPopColor;
 
 namespace Assets.ScreenPoints
 {
@@ -133,6 +134,7 @@ namespace Assets.ScreenPoints
             pointText.Show();
 
             Vector2 ballsCenterPos = __world2d.GetCenterPosition(screenPointBlob.BlobsPositions);
+            // TODO: ramake this -> dont use specifics or extends ScreenPoints
             var blobHitStickyInfo = (Main._.Game.Player as BlobPopPlayer).GetBlobHitStickyInfo();
             pointText.ShowOnScreen(ballsCenterPos, blobHitStickyInfo);
         }

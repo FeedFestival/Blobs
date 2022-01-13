@@ -1,42 +1,46 @@
 using System.Collections.Generic;
+using Assets.BlobPopClassic.BlobPopColor;
+using Assets.BlobPopClassic.DataModels;
 using Assets.HeadStart.CoreUi;
 using Assets.ScreenPoints;
-using Assets.Scripts;
 using UnityEngine;
 
-public class ClassicPointsController : MonoBehaviour
+namespace Assets.BlobPopClassic
 {
-    public Transform PointsTextT;
-    public ScreenPointsSubject ScreenPointsSubject;
-
-    internal void Init()
+    public class ClassicPointsController : MonoBehaviour
     {
-        ScreenPointsSubject = new ScreenPointsSubject();
-        ScreenPointsSubject.SetPointsWorldPosition(PointsTextT.position);
+        public Transform PointsTextT;
+        public ScreenPointsSubject ScreenPointsSubject;
 
-        __ui.Register(UiDependency.ScreenPoints, ScreenPointsSubject);
-    }
-
-    public void Calculate(ref Dictionary<int, BlobPointInfo> blobsByColor)
-    {
-        List<ScreenPointBlob> screenPointsBlobs = new List<ScreenPointBlob>();
-        foreach (KeyValuePair<int, BlobPointInfo> kvp in blobsByColor)
+        internal void Init()
         {
-            BlobColor blobColor = (BlobColor)kvp.Key;
-            if (blobColor == BlobColor.BROWN)
-            {
-                continue;
-            }
+            ScreenPointsSubject = new ScreenPointsSubject();
+            ScreenPointsSubject.SetPointsWorldPosition(PointsTextT.position);
 
-            ScreenPointBlob screenPointBlob = new ScreenPointBlob(blobColor, kvp.Value);
-            screenPointsBlobs.Add(screenPointBlob);
+            __ui.Register(UiDependency.ScreenPoints, ScreenPointsSubject);
         }
-        ScreenPointsSubject.Set(screenPointsBlobs);
-        blobsByColor.Clear();
-    }
 
-    internal void UpdatePoints(int points)
-    {
-        ScreenPointsSubject.SetTotalPoints(points);
+        public void Calculate(ref Dictionary<int, BlobPointInfo> blobsByColor)
+        {
+            List<ScreenPointBlob> screenPointsBlobs = new List<ScreenPointBlob>();
+            foreach (KeyValuePair<int, BlobPointInfo> kvp in blobsByColor)
+            {
+                BlobColor blobColor = (BlobColor)kvp.Key;
+                if (blobColor == BlobColor.BROWN)
+                {
+                    continue;
+                }
+
+                ScreenPointBlob screenPointBlob = new ScreenPointBlob(blobColor, kvp.Value);
+                screenPointsBlobs.Add(screenPointBlob);
+            }
+            ScreenPointsSubject.Set(screenPointsBlobs);
+            blobsByColor.Clear();
+        }
+
+        internal void UpdatePoints(int points)
+        {
+            ScreenPointsSubject.SetTotalPoints(points);
+        }
     }
 }

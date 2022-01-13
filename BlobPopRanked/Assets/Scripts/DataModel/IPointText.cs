@@ -1,3 +1,5 @@
+using Assets.BlobPopClassic.BlobPopColor;
+using Assets.BlobPopClassic.DataModels;
 using UnityEngine;
 using UnityEngine.UI;
 
