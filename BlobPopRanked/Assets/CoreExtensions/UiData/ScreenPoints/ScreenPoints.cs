@@ -10,27 +10,22 @@ using UniRx;
 
 namespace Assets.ScreenPoints
 {
-    public enum ScreenPointsObsType
-    {
-        FloatingPoints, TotalText
-    }
-
     public class ScreenPointsSubject : CoreUiObservedValue
     {
-        public ScreenPointsObsType ScreenPointsObsType;
         public List<ScreenPointBlob> ScreenPointsBlobs;
         public int TotalPoints;
-        public ScreenPointsSubject(ScreenPointsObsType screenPointsObsType)
-        {
-            ScreenPointsObsType = screenPointsObsType;
-        }
+        public Vector3 PointsWorldPosition;
         public void Set(List<ScreenPointBlob> screenPointsBlobs)
         {
             ScreenPointsBlobs = screenPointsBlobs;
         }
-        public void SetPoints(int points)
+        public void SetTotalPoints(int points)
         {
             TotalPoints = points;
+        }
+        public void SetPointsWorldPosition(Vector3 pointsWorldPosition)
+        {
+            PointsWorldPosition = pointsWorldPosition;
         }
         public void Clear()
         {
@@ -60,39 +55,39 @@ namespace Assets.ScreenPoints
 
         void Awake()
         {
-            // Test if Awake is not too soon
             __ui.SetAvailable(UiDependency.ScreenPoints, this);
         }
 
         public void Register(CoreUiObservedValue observed)
         {
-            switch ((observed as ScreenPointsSubject).ScreenPointsObsType)
-            {
-                case ScreenPointsObsType.FloatingPoints:
-                    (observed as ScreenPointsSubject)
-                        .ObserveEveryValueChanged(x => x.ScreenPointsBlobs)
-                        .Subscribe(screenPointsBlobs =>
-                        {
-                            if (screenPointsBlobs == null) { return; }
-                            foreach (var spb in screenPointsBlobs)
-                            {
-                                ShowPoints(spb);
-                            }
-                        });
-                    break;
-                case ScreenPointsObsType.TotalText:
-                    (observed as ScreenPointsSubject)
-                        .ObserveEveryValueChanged(x => x.TotalPoints)
-                        .Subscribe(totalPoints =>
-                        {
-                            PointsText.text = totalPoints.ToString();
-                        });
-                    break;
-                default: break;
-            }
+            (observed as ScreenPointsSubject)
+                .ObserveEveryValueChanged(x => x.ScreenPointsBlobs)
+                .Subscribe(screenPointsBlobs =>
+                {
+                    if (screenPointsBlobs == null) { return; }
+                    foreach (var spb in screenPointsBlobs)
+                    {
+                        ShowPoints(spb);
+                    }
+                });
+
+            (observed as ScreenPointsSubject)
+                .ObserveEveryValueChanged(x => x.TotalPoints)
+                .Subscribe(UpdatePoints);
+            (observed as ScreenPointsSubject)
+                .ObserveEveryValueChanged(x => x.PointsWorldPosition)
+                .Subscribe(pointsWorldPosition =>
+                {
+                    Init(pointsWorldPosition);
+                });
         }
 
-        void Start()
+        private void UpdatePoints(int totalPoints)
+        {
+            PointsText.text = totalPoints.ToString();
+        }
+
+        void Init(Vector3 pointsTPos)
         {
             // TODO: re think how this get's initialized
             var canvasSize = Camera.main.GetComponent<CoreCamera>().Canvas.sizeDelta;
@@ -100,7 +95,7 @@ namespace Assets.ScreenPoints
                 (int)canvasSize.x,
                 (int)canvasSize.y
             );
-            
+
             _normalSize = new Vector2(
                 _actualScreenSize.x * 0.3083f,
                 _actualScreenSize.y * 0.0265f
@@ -110,15 +105,11 @@ namespace Assets.ScreenPoints
                 _actualScreenSize.y * 0.0446f
             );
 
-            // TODO: refactor this - we don't need to know of ClassicPointsController (this is not not losely coupled)
             _pointsRt = PointsText.GetComponent<RectTransform>();
             _pointsRt.sizeDelta = _normalSize;
-            var pointsTPos = ClasicLv._.ClassicPointsController.PointsTextT.position;
             _totalPointsPos = __world2d.GetWorldObjScreenPos(pointsTPos, _actualScreenSize, isAtCenter: false);
-            Debug.Log("_totalPointsPos: " + _totalPointsPos);
             _pointsRt.anchoredPosition = _totalPointsPos;
             _totalPointsPos = _totalPointsPos + (_normalSize / 2);
-            Debug.Log("_totalPointsPos: " + _totalPointsPos);
 
             GeneratePoints();
         }
@@ -137,7 +128,6 @@ namespace Assets.ScreenPoints
 
         public void ShowPoints(ScreenPointBlob screenPointBlob)
         {
-            __debug.DumpToConsole(screenPointBlob);
             var pointText = GetAvailablePointText() as IPointText;
             pointText.ChangeValue(screenPointBlob.Points, screenPointBlob.BlobColor);
             pointText.Show();
@@ -164,8 +154,7 @@ namespace Assets.ScreenPoints
                 var lastAdditionalPoints = _splitAdd * _addPoint;
 
                 Points += lastAdditionalPoints;
-                // TODO - refactor this -- make losely coupled
-                ClasicLv._.ClassicPointsController.UpdatePoints((int)Points);
+                UpdatePoints((int)Points);
             }
             if (toAdd > 10)
             {
@@ -210,9 +199,7 @@ namespace Assets.ScreenPoints
 
             _splitAdd -= 1;
             Points += _addPoint;
-            // TODO - refactor this - losesly coupled
-            ClasicLv._.ClassicPointsController.UpdatePoints((int)Points);
-
+            UpdatePoints((int)Points);
             SetPoints();
         }
 
@@ -222,7 +209,7 @@ namespace Assets.ScreenPoints
             {
                 LeanTween.cancel(_pointsEnlargeTweenId.Value);
             }
-            
+
             _pointsEnlargeTweenId = LeanTween.size(_pointsRt,
                 enlarge == true ? _bigSize : _normalSize,
                 PointsEnlargeDurationS
@@ -237,7 +224,7 @@ namespace Assets.ScreenPoints
                 LeanTween.cancel(_pointsColorizeTweenId.Value);
             }
             Color color = BlobColorService.GetColorByBlobColor(blobColor);
-            
+
             _pointsColorizeTweenId = LeanTween.colorText(_pointsRt,
                 color,
                 PointsEnlargeDurationS

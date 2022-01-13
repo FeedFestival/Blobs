@@ -13,9 +13,6 @@ namespace Assets.HeadStart.Core.Player
     {
         public SwitchSettings SwitchSettings;
         public Transform Target;
-        public Transform ReflectDir;
-        public Transform CenteroidBlob;
-        public Transform Centroid;
         public List<BlobFLight> BlobFlightPositions;
         public BlobProjectile FirstProjectile;
         public BlobProjectile SecondProjectile;
@@ -36,6 +33,7 @@ namespace Assets.HeadStart.Core.Player
         private BlobHitStickyInfo _blobHitStickyInfo;
         IObserver<int> _pointerUpObserver;
         bool _isSwitchInProgress;
+        public SwitchController SwitchController;
 
         void Start()
         {
@@ -53,10 +51,12 @@ namespace Assets.HeadStart.Core.Player
                     TryShooting();
                 });
 
-            EventBus._.On(Evt.STOP_SHOOTING, (object obj) =>
+            __.Event.On(Evt.STOP_SHOOTING, (object obj) =>
             {
                 _isSwitchInProgress = (obj as SwitchBlobEvent).IsSwitchInProgress;
             });
+
+            SwitchController.Init(this);
         }
 
         public void PointerDrag(BaseEventData baseEventData)
@@ -78,11 +78,6 @@ namespace Assets.HeadStart.Core.Player
             Vector3 pointerDataPos = (baseEventData as PointerEventData).position;
             Vector3 p = Camera.main.ScreenToWorldPoint(new Vector3(pointerDataPos.x, pointerDataPos.y));
             Vector2 targetPos = new Vector3(p.x, p.y, 0);
-
-            if (ClasicLv._.__debug__._shooting)
-            {
-                Target.position = targetPos;
-            }
 
             _stopAfter = 0;
             Vector2 origin = FirstProjectile.transform.position;
@@ -113,18 +108,12 @@ namespace Assets.HeadStart.Core.Player
                 return;
             }
 
-            if (ClasicLv._.__debug__._noFiring)
-            {
-                return;
-            }
-
             if (BlobInMotion || FirstProjectile == null)
             {
                 return;
             }
 
-            // TODO: refactor this
-            // UIController._.UiPointerArea.SetActive(false);
+            __.Event.Emit(Evt.ACTIVATE_POINTER_AREA, false);
 
             Shoot();
         }
@@ -136,32 +125,18 @@ namespace Assets.HeadStart.Core.Player
                 return;
             }
 
-            if (ClasicLv._.__debug__._shooting == false && Target != null)
-            {
-                Destroy(Target.gameObject);
-                Destroy(ReflectDir.gameObject);
-                Destroy(CenteroidBlob.gameObject);
-                Destroy(Centroid.gameObject);
-            }
             FirstProjectile.GetComponent<CircleCollider2D>().enabled = true;
             SecondProjectile.GetComponent<CircleCollider2D>().enabled = true;
-
-            if (ClasicLv._.__debug__._shooting)
-            {
-                Debug.Log("SHOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOT \n ___________________" + BlobFlightPositions.Count + "_______________________");
-            }
 
             _firstAndOnly = BlobFlightPositions.Count == 1;
             _last = false;
             _inFlightIndex = -1;
 
-            // Time.timeScale = 0.2f;
-
             ShootAnimated();
 
             BlobInMotion = true;
-            ClasicLv._.DificultyService.CalculatePlayTime(start: true);
-            ClasicLv._.ActivateEndGame(false);
+            BlobPopClassic._.DificultyService.CalculatePlayTime(start: true);
+            BlobPopClassic._.ActivateEndGame(false);
         }
 
         public void ShootAnimated()
@@ -219,7 +194,7 @@ namespace Assets.HeadStart.Core.Player
 
         private void EndAnimatedShot()
         {
-            // Time.timeScale = 1f;
+            // BUG: in some circumstances this.BlobFlightPositions is null
             _lastBlobFlight = BlobFlightPositions[BlobFlightPositions.Count - 1];
             if (_performLastCheck != null)
             {
@@ -247,7 +222,7 @@ namespace Assets.HeadStart.Core.Player
                     if (hit.transform.tag == TAG.Blob)
                     {
                         Blob newHitBlob = hit.transform.GetComponent<Blob>();
-                        if (newHitBlob == null || blobFlight.Blob == null)
+                        if (newHitBlob == null || blobFlight == null ||blobFlight.Blob == null)
                         {
                             Debug.Log("Null Reference Exception... why? Suspect -> " + hit.transform.gameObject.name);
                         }
@@ -319,8 +294,8 @@ namespace Assets.HeadStart.Core.Player
 
             ShootAnimated();
 
-            ClasicLv._.DificultyService.CalculatePlayTime(start: true);
-            ClasicLv._.ActivateEndGame(false);
+            BlobPopClassic._.DificultyService.CalculatePlayTime(start: true);
+            BlobPopClassic._.ActivateEndGame(false);
         }
 
         public void BlobHitSticky(BlobHitStickyInfo blobHitStickyInfo)
@@ -340,9 +315,9 @@ namespace Assets.HeadStart.Core.Player
 
             _blobHitStickyInfo.blob.CheckSurroundings(blobHitStickyInfo.otherBlob);
 
-            ClasicLv._.Blobs.Add(_blobHitStickyInfo.blob);
+            BlobPopClassic._.Blobs.Add(_blobHitStickyInfo.blob);
             // ! important to try to destroy AFTER adding
-            ClasicLv._.TryDestroyNeighbors(_blobHitStickyInfo.blob);
+            BlobPopClassic._.TryDestroyNeighbors(_blobHitStickyInfo.blob);
 
             FirstProjectile = null;
             MakeSwitchableBlob();
@@ -357,26 +332,18 @@ namespace Assets.HeadStart.Core.Player
         {
             RaycastHit2D hit = FakeShootBlob(origin: origin, towards: targetPos);
             OnHitSomething(hit, origin);
-            ClasicLv._.DisableWalls(DisableWallOp.Both, false);
+            BlobPopClassic._.DisableWalls(DisableWallOp.Both, false);
         }
 
         private RaycastHit2D FakeShootBlob(Vector2 origin, Vector2 towards)
         {
             var direction = (towards - origin).normalized;
-            if (ClasicLv._.__debug__._shooting)
-            {
-                Debug.Log("direction: " + direction);
-            }
             float radius = FirstProjectile.GetComponent<Blob>().GetRadius();
             return Physics2D.CircleCast(origin, radius, direction, Mathf.Infinity, _layerMask);
         }
 
         private void OnHitSomething(RaycastHit2D hit, Vector2 origin)
         {
-            if (ClasicLv._.__debug__._shooting)
-            {
-                Debug.Log("origin: " + origin);
-            }
             _stopAfter++;
             if (_stopAfter > 100)
             {
@@ -385,20 +352,15 @@ namespace Assets.HeadStart.Core.Player
 
             if (hit)
             {
-                if (ClasicLv._.__debug__._shooting)
-                {
-                    Debug.Log("hit.transform.gameObject.name: " + hit.transform.gameObject.name);
-                    Debug.Log("hit.transform.tag: " + hit.transform.tag);
-                }
                 if (hit.transform.tag == "ReflectSurface")
                 {
                     if (hit.transform.gameObject.name.Contains("RWall"))
                     {
-                        ClasicLv._.DisableWalls(DisableWallOp.RightInverse);
+                        BlobPopClassic._.DisableWalls(DisableWallOp.RightInverse);
                     }
                     else
                     {
-                        ClasicLv._.DisableWalls(DisableWallOp.LeftInverse);
+                        BlobPopClassic._.DisableWalls(DisableWallOp.LeftInverse);
                     }
 
                     Vector2 newOrigin = (Vector2)hit.centroid;
@@ -410,22 +372,6 @@ namespace Assets.HeadStart.Core.Player
                     Vector2 oldDir = ((Vector2)newOrigin - (Vector2)origin).normalized;
                     Vector2 reflectDir = Vector2.Reflect(oldDir, hit.normal.normalized);
                     Vector2 newTowards = (Vector2)newOrigin + reflectDir;
-
-                    if (ClasicLv._.__debug__._shooting)
-                    {
-                        Debug.Log("newOrigin: " + newOrigin);
-                        if (_stopAfter == 1)
-                        {
-                            Centroid.position = newOrigin;
-                        }
-                        Debug.Log("oldDir: " + oldDir);
-                        Debug.Log("reflectDir: " + reflectDir);
-                        Debug.Log("newTowards: " + newTowards);
-                        if (_stopAfter == 1)
-                        {
-                            ReflectDir.position = newTowards;
-                        }
-                    }
 
                     RaycastHit2D newHit = FakeShootBlob(origin: newOrigin, towards: newTowards);
                     OnHitSomething(newHit, newOrigin);
@@ -440,11 +386,6 @@ namespace Assets.HeadStart.Core.Player
         private void FakeHitBlob(RaycastHit2D hit)
         {
             Vector2 newOrigin = (Vector2)hit.centroid;
-            if (ClasicLv._.__debug__._shooting)
-            {
-                Debug.Log("newOrigin: " + newOrigin);
-                CenteroidBlob.position = newOrigin;
-            }
             Blob blob = hit.transform.GetComponent<Blob>();
             BlobFLight blobFLight = new BlobFLight(newOrigin, blob);
             blobFLight.hitPoint = hit.point;
@@ -474,7 +415,7 @@ namespace Assets.HeadStart.Core.Player
         {
             MakingBlob = true;
 
-            EventBus._.Emit(Evt.MAKE_ANOTHER_BLOB);
+            __.Event.Emit(Evt.MAKE_ANOTHER_BLOB);
         }
 
         public void SetupProjectileBlob(ref BlobProjectile blobProjectile)
@@ -493,7 +434,7 @@ namespace Assets.HeadStart.Core.Player
             var prefab = (Main._.Game as BlobPopGame).NewBlob;
             var go = Instantiate(prefab, new Vector3(0, 0, 0), Quaternion.identity);
             go.name = "Nblob";
-            BlobColor blobColor = ClasicLv._.DificultyService.GetColorByDificulty(newBlob: true);
+            BlobColor blobColor = BlobPopClassic._.DificultyService.GetColorByDificulty(newBlob: true);
             go.GetComponent<Blob>().BlobReveries.SetColor(blobColor);
             return go.GetComponent<BlobProjectile>();
         }

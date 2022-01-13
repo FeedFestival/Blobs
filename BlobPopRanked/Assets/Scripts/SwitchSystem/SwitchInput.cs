@@ -1,3 +1,4 @@
+using Assets.HeadStart.Core;
 using UnityEngine;
 using UnityEngine.EventSystems;
 
@@ -5,7 +6,7 @@ public class SwitchInput : MonoBehaviour
 {
     void Start()
     {
-        EventBus._.On(Evt.STOP_SHOOTING, (object obj) =>
+        __.Event.On(Evt.STOP_SHOOTING, (object obj) =>
         {
             this.gameObject.SetActive(!!!(obj as SwitchBlobEvent).IsSwitchInProgress);
         });
@@ -13,6 +14,6 @@ public class SwitchInput : MonoBehaviour
 
     public void PointerDown(BaseEventData baseEventData)
     {
-        EventBus._.Emit(Evt.SWITCH_BLOBS);
+        __.Event.Emit(Evt.SWITCH_BLOBS);
     }
 }

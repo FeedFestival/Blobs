@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 using Assets.HeadStart.CoreUi;
 using Assets.ScreenPoints;
@@ -8,16 +7,14 @@ using UnityEngine;
 public class ClassicPointsController : MonoBehaviour
 {
     public Transform PointsTextT;
-    public ScreenPointsSubject ScreenPointsFloatingPointsSubject;
-    public ScreenPointsSubject ScreenPointsTotalSubject;
+    public ScreenPointsSubject ScreenPointsSubject;
 
     internal void Init()
     {
-        ScreenPointsFloatingPointsSubject = new ScreenPointsSubject(ScreenPointsObsType.FloatingPoints);
-        __ui.Register(UiDependency.ScreenPoints, ScreenPointsFloatingPointsSubject);
+        ScreenPointsSubject = new ScreenPointsSubject();
+        ScreenPointsSubject.SetPointsWorldPosition(PointsTextT.position);
 
-        ScreenPointsTotalSubject = new ScreenPointsSubject(ScreenPointsObsType.TotalText);
-        __ui.Register(UiDependency.ScreenPoints, ScreenPointsTotalSubject);
+        __ui.Register(UiDependency.ScreenPoints, ScreenPointsSubject);
     }
 
     public void Calculate(ref Dictionary<int, BlobPointInfo> blobsByColor)
@@ -34,13 +31,12 @@ public class ClassicPointsController : MonoBehaviour
             ScreenPointBlob screenPointBlob = new ScreenPointBlob(blobColor, kvp.Value);
             screenPointsBlobs.Add(screenPointBlob);
         }
-        ScreenPointsFloatingPointsSubject.Set(screenPointsBlobs);
+        ScreenPointsSubject.Set(screenPointsBlobs);
         blobsByColor.Clear();
     }
 
     internal void UpdatePoints(int points)
     {
-        Debug.Log("points: " + points);
-        ScreenPointsTotalSubject.SetPoints(points);
+        ScreenPointsSubject.SetTotalPoints(points);
     }
 }

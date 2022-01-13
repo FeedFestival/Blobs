@@ -15,9 +15,9 @@ namespace Assets.Scripts
                     );
             if (proximity)
             {
-                return distance < ClasicLv._.NEIGHBOR_PROXIMITY;
+                return distance < BlobPopClassic._.NEIGHBOR_PROXIMITY;
             }
-            return distance < ClasicLv._.NEIGHBOR_TEST_DISTANCE;
+            return distance < BlobPopClassic._.NEIGHBOR_TEST_DISTANCE;
         }
 
         public static List<Blob> FindBlobsInProximity(List<Blob> blobs, Blob blob)
@@ -27,11 +27,6 @@ namespace Assets.Scripts
                 {
                     float distance = 0;
                     bool inProximity = BlobService.AreClose(blob.transform, b.transform, ref distance, proximity: true);
-                    if (ClasicLv._.__debug__._proximity)
-                    {
-                        Debug.Log("blob" + blob.Bid + " and proximityBlob" + b.Bid + " distance: " + distance +
-                            "(min: " + ClasicLv._.NEIGHBOR_PROXIMITY + ") inProximity: " + inProximity);
-                    }
                     return inProximity;
                 }).ToList();
         }

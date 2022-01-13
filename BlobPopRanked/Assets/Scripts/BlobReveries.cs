@@ -40,7 +40,7 @@ public class BlobReveries : MonoBehaviour
     internal void SetColor(BlobColor blobColor, bool instant = true)
     {
         BlobColor = blobColor;
-        bool isWall = ClasicLv._.DificultyService.BrownIsWall
+        bool isWall = BlobPopClassic._.DificultyService.BrownIsWall
             && BlobColor == BlobColor.BROWN;
 
         if (instant)
@@ -91,14 +91,14 @@ public class BlobReveries : MonoBehaviour
         bool hitSomethingElseThenABlob = blobHitStickyInfo.otherBlob == null;
         if (hitSomethingElseThenABlob)
         {
-            _initialPos = new Vector2(transform.localPosition.x, ClasicLv._.WALL_STICK_LIMIT - BlobFactory._.BlobsParent().position.y);
+            _initialPos = new Vector2(transform.localPosition.x, BlobPopClassic._.WALL_STICK_LIMIT - BlobFactory._.BlobsParent().position.y);
         }
         else
         {
             Vector2 dirFromOtherBlobToThisOne = (transform.localPosition - blobHitStickyInfo.otherBlob.transform.localPosition).normalized;
 
             Ray ray = new Ray(blobHitStickyInfo.otherBlob.transform.localPosition, dirFromOtherBlobToThisOne);
-            Vector2 pos = ray.GetPoint(ClasicLv._.Spacing);
+            Vector2 pos = ray.GetPoint(BlobPopClassic._.Spacing);
             _initialPos = pos;
         }
 
@@ -106,7 +106,7 @@ public class BlobReveries : MonoBehaviour
 
         _reflectTweenId = LeanTween.moveLocal(gameObject,
             _reflectToPos,
-            ClasicLv._.BLOB_FORCE_PUSH_ANIM_TIME
+            BlobPopClassic._.BLOB_FORCE_PUSH_ANIM_TIME
             ).id;
         LeanTween.descr(_reflectTweenId.Value).setEase(LeanTweenType.easeOutExpo);
         LeanTween.descr(_reflectTweenId.Value).setOnComplete(() =>
@@ -212,7 +212,7 @@ public class BlobReveries : MonoBehaviour
                     );
             Vector2 dir = ((proxiBlob.transform.position - transform.position).normalized * ((1 - distance) + 0.1f)) * 0.2f;
 
-            if (ClasicLv._.DificultyService.BrownIsWall
+            if (BlobPopClassic._.DificultyService.BrownIsWall
                 && proxiBlob.BlobReveries.BlobColor == BlobColor.BROWN)
             {
                 dir = dir * 0.2f;
@@ -230,7 +230,7 @@ public class BlobReveries : MonoBehaviour
             _forcePushTweenId = null;
         }
         _initialPos = transform.localPosition;
-        _forcePushTweenId = LeanTween.moveLocal(gameObject, _initialPos + dir, ClasicLv._.BLOB_FORCE_PUSH_ANIM_TIME).id;
+        _forcePushTweenId = LeanTween.moveLocal(gameObject, _initialPos + dir, BlobPopClassic._.BLOB_FORCE_PUSH_ANIM_TIME).id;
         LeanTween.descr(_forcePushTweenId.Value).setEase(LeanTweenType.easeOutExpo);
         LeanTween.descr(_forcePushTweenId.Value).setOnComplete(() =>
         {
@@ -246,7 +246,7 @@ public class BlobReveries : MonoBehaviour
             _forcePushTweenId = null;
         }
 
-        _forcePushTweenId = LeanTween.moveLocal(gameObject, _initialPos, ClasicLv._.BLOB_ELASTIC_BACK_ANIM_TIME).id;
+        _forcePushTweenId = LeanTween.moveLocal(gameObject, _initialPos, BlobPopClassic._.BLOB_ELASTIC_BACK_ANIM_TIME).id;
         LeanTweenType ease = (LeanTweenType)__percent.GetRandomFromArray<int>(GameConstants.Eases);
         LeanTween.descr(_forcePushTweenId.Value).setEase(ease);
     }

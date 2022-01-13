@@ -30,7 +30,6 @@ public class DificultyService : MonoBehaviour
     public int MaxHits;
     public int HitsToReset;
     public int Hits;
-    private ClasicLv _clasicLv;
     public List<int> Colors;
     public List<int> LevelIncreseThreshhold;    // 8 to have: Pink, White, Black // 5 to have snooker
     private DateTime PlayStartedTime;
@@ -38,9 +37,8 @@ public class DificultyService : MonoBehaviour
     private int SecondsPlayed;
     public bool BrownIsWall;
 
-    public void Init(ClasicLv levelRandomRanked)
+    public void Init()
     {
-        _clasicLv = levelRandomRanked;
 
         Colors = new List<int>();
         Colors.Add(0);
@@ -68,11 +66,6 @@ public class DificultyService : MonoBehaviour
             Colors.Add(0);
         }
 
-        if (_clasicLv.__debug__._colorDistribution)
-        {
-            Debug.Log("GetColorByDificulty() ------------------- " + __debug.DebugList(Colors, "Colors"));
-        }
-
         int colorInt;
         int splitPercentage;
         List<int> percentages;
@@ -93,23 +86,10 @@ public class DificultyService : MonoBehaviour
             int countOfZeros = Colors.Count(c => c == 0);
             splitPercentage = 100 / Colors.Count;
 
-            if (_clasicLv.__debug__._colorDistribution)
-            {
-                Debug.Log("countOfZeros: " + countOfZeros);
-                Debug.Log("splitPercentage: " + splitPercentage);
-            }
-
             if (countOfZeros == Colors.Count)
             {
                 percentages = GetWithZeroPercentages(splitPercentage, splitPercentage);
                 percentageDistribution = SetupPercentages(percentages);
-
-                if (_clasicLv.__debug__._colorDistribution)
-                {
-                    Debug.Log(__debug.DebugList<int>(percentages, "percentages"));
-                    Debug.Log(__debug.DebugList<int>(percentageDistribution, "percentageDistribution"));
-                }
-
                 colorInt = ExtractRandomColor(percentageDistribution, newBlob);
                 return BlobColorService.ReturnBlobColor(colorInt);
             }
@@ -118,14 +98,6 @@ public class DificultyService : MonoBehaviour
             int numbersPercentage = splitPercentage / Colors.Count;
             int remainingPercentage = 100 - (numbersPercentage * countOfNumbers);
             int zerosPercentage = remainingPercentage / countOfZeros;
-
-            if (_clasicLv.__debug__._colorDistribution)
-            {
-                Debug.Log("countOfNumbers: " + countOfNumbers);
-                Debug.Log("numbersPercentage: " + numbersPercentage);
-                Debug.Log("remainingPercentage: " + remainingPercentage);
-                Debug.Log("zerosPercentage: " + zerosPercentage);
-            }
 
             percentages = GetWithZeroPercentages(zerosPercentage, numbersPercentage);
             percentageDistribution = SetupPercentages(percentages);
@@ -143,14 +115,6 @@ public class DificultyService : MonoBehaviour
         float coeficientSum = coeficientColors.Sum();
         float commonD = 100 / coeficientSum;
 
-        if (_clasicLv.__debug__._colorDistribution)
-        {
-            Debug.Log("maxValue: " + maxValue);
-            Debug.Log(__debug.DebugList<float>(coeficientColors, "coeficientColors"));
-            Debug.Log("coeficientSum: " + coeficientSum);
-            Debug.Log("commonD: " + commonD);
-        }
-
         percentages = new List<int>();
         for (var i = 0; i < Colors.Count; i++)
         {
@@ -160,13 +124,6 @@ public class DificultyService : MonoBehaviour
         int remaineder = 100 - percentages.Sum();
         percentages[percentages.Count - 1] += remaineder;
         percentageDistribution = SetupPercentages(percentages);
-
-        if (_clasicLv.__debug__._colorDistribution)
-        {
-            Debug.Log("remaineder: " + remaineder);
-            Debug.Log(__debug.DebugList<int>(percentages, "percentages"));
-            Debug.Log(__debug.DebugList<int>(percentageDistribution, "percentageDistribution"));
-        }
 
         colorInt = ExtractRandomColor(percentageDistribution, newBlob);
         return BlobColorService.ReturnBlobColor(colorInt);
@@ -203,11 +160,6 @@ public class DificultyService : MonoBehaviour
         int randomNumber = UnityEngine.Random.Range(0, 100);
         int index = percentages.FindIndex(p => randomNumber < p);
 
-        if (_clasicLv.__debug__._colorDistribution)
-        {
-            Debug.Log("randomNumber: " + randomNumber + ", indexIn_colors: " + index);
-        }
-
         // When making a new Blob and BROWN is Wall
         //  - we dont want to shoot brown so we pick the lowest color
         int brownIndex = (int)BlobColor.BROWN;
@@ -239,34 +191,30 @@ public class DificultyService : MonoBehaviour
         {
             Colors[index]--;
         }
-        if (_clasicLv.__debug__._colorDistribution)
-        {
-            Debug.Log(__debug.DebugList<int>(Colors, "Colors"));
-        }
     }
 
     
 
     public void CheckIfAddingNewRow()
     {
-        bool isAtLeastOnBlobConnectedToCeil = (_clasicLv.Blobs == null || _clasicLv.Blobs.Count == 0) == false;
+        bool isAtLeastOnBlobConnectedToCeil = (BlobPopClassic._.Blobs == null || BlobPopClassic._.Blobs.Count == 0) == false;
 
         if (isAtLeastOnBlobConnectedToCeil == false)
         {
-            isAtLeastOnBlobConnectedToCeil = _clasicLv.Blobs.Exists(b =>
+            isAtLeastOnBlobConnectedToCeil = BlobPopClassic._.Blobs.Exists(b =>
             {
-                bool isConnectedToCeil = b.StickedTo.Exists(s => s == ClasicLv._.CEILD_ID);
+                bool isConnectedToCeil = b.StickedTo.Exists(s => s == BlobPopClassic._.CEILD_ID);
                 return isConnectedToCeil;
             });
         }
 
         if (isAtLeastOnBlobConnectedToCeil)
         {
-            float blobY = _clasicLv.Blobs.Min(b => b.transform.position.y);
+            float blobY = BlobPopClassic._.Blobs.Min(b => b.transform.position.y);
 
             float dashedLine = -4.23f;
-            float newDashedLine = dashedLine - ClasicLv._.WALL_STICK_LIMIT;
-            float newBlobY = blobY - ClasicLv._.WALL_STICK_LIMIT;
+            float newDashedLine = dashedLine - BlobPopClassic._.WALL_STICK_LIMIT;
+            float newBlobY = blobY - BlobPopClassic._.WALL_STICK_LIMIT;
 
             int minHealthPercent = 25;
             _healthPercent = Mathf.CeilToInt(__percent.What(_is: newBlobY, _of: newDashedLine));
@@ -296,16 +244,16 @@ public class DificultyService : MonoBehaviour
             if (Hits >= HitsToReset)
             {
                 Hits = 0;
-                _clasicLv.AddAnotherBlobLevel();
+                BlobPopClassic._.AddAnotherBlobLevel();
             }
             else if (_healthPercent > 80)
             {
-                _clasicLv.ActivateEndGame();
+                BlobPopClassic._.ActivateEndGame();
             }
         }
         else
         {
-            _clasicLv.AddAnotherBlobLevel();
+            BlobPopClassic._.AddAnotherBlobLevel();
         }
     }
 

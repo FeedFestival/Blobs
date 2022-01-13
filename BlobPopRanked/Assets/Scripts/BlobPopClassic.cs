@@ -7,11 +7,10 @@ using Assets.HeadStart.Core;
 using Assets.HeadStart.Core.Player;
 using Assets.HeadStart.Core.SFX;
 
-public class ClasicLv : MonoBehaviour
+public class BlobPopClassic : MonoBehaviour
 {
-    private static ClasicLv _clasicLv;
-    public static ClasicLv _ { get { return _clasicLv; } }
-    public ClasicLvDebug __debug__;
+    private static BlobPopClassic _instance;
+    public static BlobPopClassic _ { get { return _instance; } }
     public BlobPopEffects EffectsPool;
     //
     public int BlobsPerRow;
@@ -53,7 +52,7 @@ public class ClasicLv : MonoBehaviour
 
     void Awake()
     {
-        _clasicLv = this;
+        _instance = this;
     }
 
     public void Init()
@@ -63,10 +62,7 @@ public class ClasicLv : MonoBehaviour
         EffectsPool.Init();
         EffectsPool.GenerateParticleControllers();
 
-        // TODO: remake this
-        // UIController._.ScreenPoints.GeneratePoints();
-
-        DificultyService.Init(this);
+        DificultyService.Init();
         ClassicPointsController.Init();
 
         Main._.Game.StartGame();
@@ -130,32 +126,16 @@ public class ClasicLv : MonoBehaviour
         {
             blob.Descend();
         }
-        if (__debug__._blobKilling)
-        {
-            foreach (Blob blob in __debug__.DeadBlobs)
-            {
-                blob.Descend();
-            }
-        }
     }
 
     public void AddAnotherBlobLevel()
     {
         CalculateDificulty();
-        if (__debug__._blobGen)
-        {
-            __debug__.WhenFinishedAddingDescend = true;
-        }
-        else
-        {
-            GenerateBlobLevel(alreadyCalculateDificulty: true);
-        }
+        GenerateBlobLevel(alreadyCalculateDificulty: true);
     }
 
     public void GenerateBlobLevel(bool alreadyCalculateDificulty = false)
     {
-        if (__debug__._blobGen) { return; }
-
         CalculateDificulty(alreadyCalculateDificulty);
         MakeBlobLevel();
         OnFinishedMakingBlobLevel();
@@ -188,43 +168,6 @@ public class ClasicLv : MonoBehaviour
         {
             DescendBlobs();
             ActivateEndGame();
-        }
-    }
-
-    public void CreateBlob_Debug()
-    {
-        IncrementAndRun_Debug(BlobsPerRow, () => { MakeABlob(); });
-    }
-
-    public void IncrementAndRun_Debug(int length, AndRunCallback andRun)
-    {
-        bool reachedMax = (length - 2) < _increment;
-        if (reachedMax)
-        {
-            __debug__.ChangeDebugState(LevelDebugState.AddNewRow);
-            return;
-        }
-        else
-        {
-            _increment++;
-            andRun();
-        }
-    }
-
-    public void ResetIncrement_Debug()
-    {
-        if (__debug__.WhenFinishedAddingDescend)
-        {
-            __debug__.WhenFinishedAddingDescend = false;
-            OnFinishedMakingBlobLevel();
-        }
-        else
-        {
-            if (FirstLevel)
-            {
-                EndFirstLevel();
-                return;
-            }
         }
     }
 
@@ -262,7 +205,7 @@ public class ClasicLv : MonoBehaviour
         blob.SetId();
         blob.Init();
         blob.SetPosition(pos);
-        blob.StickedTo.Add(ClasicLv._.CEILD_ID);
+        blob.StickedTo.Add(BlobPopClassic._.CEILD_ID);
 
         blob.BlobReveries.StopStrechAnim();
         blob.BlobReveries.SetColor(DificultyService.GetColorByDificulty());
@@ -363,16 +306,7 @@ public class ClasicLv : MonoBehaviour
 
             DificultyService.ChangeColorNumbers(colorIndex, false);
             Blobs[index].Kill();
-            if (__debug__._blobKilling)
-            {
-                __debug__.DeadBlobs.Add(Blobs[index]);
-            }
             Blobs.RemoveAt(index);
-        }
-
-        if (__debug__._destroyProcess)
-        {
-            Debug.Log(__debug.DebugList(_toDestroy, "_toDestroy"));
         }
 
         if (affectedCheck)
@@ -393,20 +327,11 @@ public class ClasicLv : MonoBehaviour
         }
         if (Affected == null || Affected.Count == 0)
         {
-            if (__debug__._destroyProcess)
-            {
-                Debug.Log("Affected not found.");
-            }
             return;
         }
 
         _toDestroy = new List<int>();
         _verified = new List<int>();
-
-        if (__debug__._destroyProcess)
-        {
-            Debug.Log(__debug.DebugList(Affected, "Affected"));
-        }
 
         foreach (int id in Affected)
         {
@@ -414,18 +339,10 @@ public class ClasicLv : MonoBehaviour
             var blob = Blobs[index];
             if (blob.StickedTo.Count == 0)
             {
-                if (__debug__._destroyProcess)
-                {
-                    Debug.Log("blob" + blob.Bid + " is isolated so it get's destroyed.");
-                }
                 _toDestroy.Add(blob.Bid);
             }
             else
             {
-                if (__debug__._destroyProcess)
-                {
-                    Debug.Log("blob" + blob.Bid + " - checking To See If is touching ceil");
-                }
                 _checked = new List<int>();
                 if (isTouchingCeil(blob) == false)
                 {
@@ -440,71 +357,35 @@ public class ClasicLv : MonoBehaviour
 
     private bool isTouchingCeil(Blob blob)
     {
-        __utils.AddIfNone(blob.Bid, ref _checked,
-            debugAdd: __debug__._destroyProcess ? "------------- blob" + blob.Bid + " added to " + __debug.DebugList(_checked, "_checked") : null);
-        if (blob.StickedTo.Contains(ClasicLv._.CEILD_ID))
+        __utils.AddIfNone(blob.Bid, ref _checked);
+        if (blob.StickedTo.Contains(BlobPopClassic._.CEILD_ID))
         {
-            if (__debug__._destroyProcess)
-            {
-                Debug.Log("------------- blob" + blob.Bid + " touches ceiling.");
-            }
-            __utils.AddIfNone(blob.Bid, ref _verified,
-                debugAdd: __debug__._destroyProcess ? "------------- blob" + blob.Bid + " added to _verified." : null);
+            __utils.AddIfNone(blob.Bid, ref _verified);
             return true;
-        }
-        if (__debug__._destroyProcess)
-        {
-            Debug.Log("------------- " + __debug.DebugList(blob.StickedTo, "blob" + blob.Bid + ".StickedTo"));
         }
         foreach (var blobId in blob.StickedTo)
         {
             if (_checked.Contains(blobId))
             {
-                if (__debug__._destroyProcess)
-                {
-                    Debug.Log("------------- " + __debug.DebugList(_checked, "_checked") +
-                        " contains blob" + blobId + " so we are not checking him.");
-                }
                 continue;
             }
             if (_verified.Contains(blobId))
             {
-                if (__debug__._destroyProcess)
-                {
-                    Debug.Log("------------- _verified contains blob" + blobId + " so it's touching Ceil.");
-                }
                 return true;
             }
             var stickedBlob = GetBlobById(blobId);
-            if (__debug__._destroyProcess)
-            {
-                Debug.Log("------------- blob" + stickedBlob.Bid + " - checking To See If is touching ceil");
-            }
             bool isTouching = isTouchingCeil(stickedBlob);
             if (isTouching)
             {
-                if (__debug__._destroyProcess)
-                {
-                    Debug.Log("------------- one of it's sticking blobs(" + stickedBlob.Bid + ") touches ceil");
-                }
-                __utils.AddIfNone(blob.Bid, ref _verified,
-                    debugAdd: __debug__._destroyProcess ? "------------- blob" + blob.Bid + " added to _verified." : null);
+                __utils.AddIfNone(blob.Bid, ref _verified);
                 return true;
             }
-        }
-        if (__debug__._destroyProcess)
-        {
-            Debug.Log("------------- blob" + blob.Bid + " doesn't touch ceiling.");
         }
         return false;
     }
 
     public bool CanFireBlob(Vector3? point = null)
     {
-        if (__debug__._noFiring)
-        {
-            return false;
-        }
         if (point.HasValue)
         {
             (Main._.Game.Player as BlobPopPlayer).Target.position = point.Value;
@@ -537,8 +418,6 @@ public class ClasicLv : MonoBehaviour
                 RightWall.enabled = !disable;
                 break;
         }
-        // Debug.Log(LeftWall.gameObject.name + " - " + LeftWall.enabled);
-        // Debug.Log(RightWall.gameObject.name + " - " + RightWall.enabled);
     }
 
     public void ActivateEndGame(bool activate = true)

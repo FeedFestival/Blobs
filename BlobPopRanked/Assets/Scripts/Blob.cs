@@ -70,23 +70,15 @@ public class Blob : MonoBehaviour, IPoolObject
     {
         Bid = Main._.Game.GetUniqueId();
         gameObject.name += " " + Bid + " ";
-
-        if (ClasicLv._.__debug__._debugBlobs)
-        {
-            var prefab = (Main._.Game as BlobPopGame).BlobDebugInfoPrefab;
-            var go = Instantiate(prefab, new Vector3(0, 0, 0), Quaternion.identity);
-            _blobDebugInfo = go.GetComponent<BlobDebugInfo>();
-            _blobDebugInfo.SetId(transform, Bid);
-        }
     }
 
     internal void Descend()
     {
-        float spacing = ClasicLv._.Spacing;
+        float spacing = BlobPopClassic._.Spacing;
         SetWorldPosition(new Vector3(Pos.x, Pos.y - spacing, Pos.z));
-        if (Pos.y < ClasicLv._.WALL_STICK_LIMIT)
+        if (Pos.y < BlobPopClassic._.WALL_STICK_LIMIT)
         {
-            RemoveSticked(ClasicLv._.CEILD_ID);
+            RemoveSticked(BlobPopClassic._.CEILD_ID);
         }
     }
 
@@ -108,15 +100,11 @@ public class Blob : MonoBehaviour, IPoolObject
         }
         if (otherBlob == null)
         {
-            otherBlob = ClasicLv._.GetBlobById(id.Value);
+            otherBlob = BlobPopClassic._.GetBlobById(id.Value);
         }
 
         if (Neighbors.Contains(id.Value))
         {
-            if (ClasicLv._.__debug__._neighborsProcess)
-            {
-                Debug.LogWarning("      - blob(" + Bid + ") has " + id + " as neighbor.");
-            }
             return;
         }
 
@@ -129,12 +117,6 @@ public class Blob : MonoBehaviour, IPoolObject
         }
 
         Neighbors.Add(id.Value);
-
-        if (ClasicLv._.__debug__._debugBlobs
-            && ClasicLv._.__debug__._neighborsProcess)
-        {
-            if (_blobDebugInfo != null) _blobDebugInfo.NeighborText.text = __debug.DebugList<int>(Neighbors);
-        }
     }
 
     internal void Kill()
@@ -142,12 +124,6 @@ public class Blob : MonoBehaviour, IPoolObject
         removeSticked();
 
         GetComponent<CircleCollider2D>().enabled = false;
-
-        // if (ClasicLv._.__debug__._blobKilling)
-        // {
-        //     _blobDebugInfo.FakeKill(BlobReveries.BlobColor, ref BlobReveries.Sprite);
-        //     return;
-        // }
         
         float explosionL = BlobReveries.PlayExplodeEffect(transform);
 
@@ -162,18 +138,18 @@ public class Blob : MonoBehaviour, IPoolObject
 
     private void removeSticked()
     {
-        List<Blob> blobsRef = ClasicLv._.Blobs;
+        List<Blob> blobsRef = BlobPopClassic._.Blobs;
         foreach (var stickedTo in StickedTo)
         {
             int index = blobsRef.FindIndex(b => b.Bid == stickedTo);
             if (index >= 0 && index < blobsRef.Count)
             {
                 blobsRef[index].RemoveSticked(Bid);
-                __utils.AddIfNone(blobsRef[index].Bid, ref ClasicLv._.Affected);
+                __utils.AddIfNone(blobsRef[index].Bid, ref BlobPopClassic._.Affected);
             }
         }
 
-        // if (ClasicLv._.__debug__._stickingProcess)
+        // if (BlobPopClassic._.__debug__._stickingProcess)
         // {
         //     Debug.Log(__debug.DebugList<int>(StickedTo, "StickedTo"));
         // }
@@ -208,18 +184,6 @@ public class Blob : MonoBehaviour, IPoolObject
             StickTo(otherBlob);
         }
 
-        if (ClasicLv._.__debug__._neighborsProcess)
-        {
-            var pre = "NO ... distance: " + distance;
-            if (areClose)
-            {
-                pre = "YES !!! distance: " + distance;
-            }
-            Debug.Log(pre + " between " + Bid + "(x:" + transform.position.x + ",y:" + transform.position.y + ") and "
-                + otherBlob.Bid + "(x:" + otherBlob.transform.position.x + ",y:" + otherBlob.transform.position.y + ") max: "
-                + ClasicLv._.NEIGHBOR_TEST_DISTANCE);
-        }
-
         var areSameColor = BlobReveries.BlobColor == otherBlob.BlobReveries.BlobColor;
         return areClose && areSameColor;
     }
@@ -228,11 +192,6 @@ public class Blob : MonoBehaviour, IPoolObject
     {
         if (viceVersa)
         {
-            if (ClasicLv._.__debug__._stickingProcess)
-            {
-                Debug.Log("blob" + Bid + " sticked to otherBlob" + otherBlob.Bid);
-            }
-
             int index = BlobReveries.StickingGlues.FindIndex(sG => sG.gameObject.activeSelf == false);
             if (otherBlob.StickedTo.Contains(Bid) == false)
             {
@@ -255,10 +214,6 @@ public class Blob : MonoBehaviour, IPoolObject
         int index = StickedTo.FindIndex(s => s == id);
         if (index >= 0)
         {
-            if (ClasicLv._.__debug__._stickingProcess)
-            {
-                Debug.Log("blob" + Bid + " removed stickedBlob[" + id + "]");
-            }
             StickedTo.RemoveAt(index);
             BlobReveries.RemoveStickingGlue(id);
         }
@@ -268,10 +223,10 @@ public class Blob : MonoBehaviour, IPoolObject
     {
         if (otherBlob == null)
         {
-            StickedTo.Add(ClasicLv._.CEILD_ID);
+            StickedTo.Add(BlobPopClassic._.CEILD_ID);
         }
 
-        List<Blob> proximityBlobs = BlobService.FindBlobsInProximity(ClasicLv._.Blobs, this);
+        List<Blob> proximityBlobs = BlobService.FindBlobsInProximity(BlobPopClassic._.Blobs, this);
 
         BlobReveries.AnimateShockwave(proximityBlobs);
 
@@ -296,10 +251,6 @@ public class Blob : MonoBehaviour, IPoolObject
                 continue;
             }
             bool areNeighbors = IfNeighborAdd(otherBlob: proximityBlob);
-            if (ClasicLv._.__debug__._proximity && areNeighbors)
-            {
-                Debug.Log("From Proximity found blob" + proximityBlob.Bid + " as neighbor");
-            }
             if (areNeighbors && HasAnyNeighbors == false)
             {
                 HasAnyNeighbors = true;
@@ -314,21 +265,11 @@ public class Blob : MonoBehaviour, IPoolObject
             _linkedNeighbors = new List<int>();
             FindLinkedNeighbors(this);
 
-            if (ClasicLv._.__debug__._destroyCheck)
-            {
-                Debug.Log(__debug.DebugList<int>(_linkedNeighbors, "_linkedNeighbors"));
-            }
-
-            if (_linkedNeighbors.Count > ClasicLv._.MIN_NEIGHBOR_COUNT_TO_DESTROY)
+            if (_linkedNeighbors.Count > BlobPopClassic._.MIN_NEIGHBOR_COUNT_TO_DESTROY)
             {
                 _linkedNeighbors = null;
                 return true;
             }
-        }
-
-        if (ClasicLv._.__debug__._destroyCheck)
-        {
-            Debug.Log("Has no Neighbors to Destroy");
         }
         return false;
     }
@@ -341,7 +282,7 @@ public class Blob : MonoBehaviour, IPoolObject
             {
                 continue;
             }
-            Blob foundNeighbor = ClasicLv._.Blobs
+            Blob foundNeighbor = BlobPopClassic._.Blobs
                     .FirstOrDefault(b => b.Bid == neighborId);
             _linkedNeighbors.Add(neighborId);
 
