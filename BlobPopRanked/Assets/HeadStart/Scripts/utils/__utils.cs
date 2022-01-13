@@ -1,18 +1,14 @@
-﻿using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Reflection;
+﻿using System.Collections.Generic;
 using UnityEngine;
-using Object = UnityEngine.Object;
 using Random = UnityEngine.Random;
 
 namespace Assets.Scripts.utils
 {
     public static class __utils
     {
-        public static readonly string _version = "1.0.3";
+#pragma warning disable 0414 // private field assigned but not used.
+        public static readonly string _version = "2.0.0";
+#pragma warning restore 0414 //
         public static string ConvertNumberToK(int num)
         {
             if (num >= 1000)
@@ -30,14 +26,14 @@ namespace Assets.Scripts.utils
 
         public static float GetAlphaValue(int value)
         {
-            var perc = percent.What(value, 255);
+            var perc = __percent.What(value, 255);
             return perc * 0.01f;
         }
 
         public static int GetRGBAAlphaValue(float value)
         {
             float perc = value * 100;
-            return (int)percent.Find(perc, 255);
+            return (int)__percent.Find(perc, 255);
         }
 
         public static void AddIfNone(int value, ref List<int> array, string debugAdd = null)
@@ -64,7 +60,7 @@ namespace Assets.Scripts.utils
         }
     }
 
-    public static class percent
+    public static class __percent
     {
         public static float Find(float _percent, float _of)
         {
@@ -122,7 +118,7 @@ namespace Assets.Scripts.utils
         }
     }
 
-    public static class world2d
+    public static class __world2d
     {
         public static Vector2 GetNormalizedDirection(Vector2 lastVelocity, Vector2 collisionNormal)
         {
@@ -141,30 +137,66 @@ namespace Assets.Scripts.utils
             return q.eulerAngles;
         }
 
+        public static void PositionRtBasedOnScreenAnchors(
+            Vector3 topLeftAnchor,
+            Vector3 bottomRightAnchor,
+            RectTransform rt,
+            Vector2 screenSize
+        )
+        {
+            var left = topLeftAnchor.x;
+            var top = bottomRightAnchor.y;
+            var width = Mathf.Abs(topLeftAnchor.x - bottomRightAnchor.x);
+            var height = Mathf.Abs(topLeftAnchor.y - bottomRightAnchor.y);
+
+            rt.pivot = Vector2.zero;
+            rt.anchorMax = Vector2.zero;
+            rt.anchorMin = Vector2.zero;
+
+            rt.offsetMin = Vector2.zero;
+            rt.offsetMax = Vector2.zero;
+
+            rt.SetLeft(left);
+
+            rt.offsetMax = new Vector2(
+                rt.offsetMin.x + rt.offsetMax.x + width,
+                rt.offsetMin.y + (height + top)
+            );
+
+            rt.offsetMin = new Vector2(
+                rt.offsetMin.x,
+                rt.offsetMax.y + rt.offsetMin.y - height
+            );
+        }
+
         public static void ShowOnScreen(
             ref RectTransform rt,
             Vector3 worldPosition,
-            bool isAtCenter = true)
+            Vector2 canvasSize,
+            bool isAtCenter = true
+        )
         {
-            // then you calculate the position of the UI element
-            // 0,0 for the canvas is at the center of the screen, whereas WorldToViewPortPoint treats the lower left corner as 0,0.
-            // Because of this, you need to subtract the height / width of the canvas * 0.5 to get the correct position.
+            rt.anchoredPosition = GetWorldObjScreenPos(worldPosition, canvasSize, isAtCenter);
+        }
 
+        // then you calculate the position of the UI element
+        // 0,0 for the canvas is at the center of the screen, whereas WorldToViewPortPoint treats the lower left corner as 0,0.
+        // Because of this, you need to subtract the height / width of the canvas * 0.5 to get the correct position.
+        public static Vector2 GetWorldObjScreenPos(Vector3 worldPosition, Vector2 canvasSize, bool isAtCenter = true)
+        {
             var viewportPosition = Camera.main.WorldToViewportPoint(worldPosition);
             Vector2 worldObjectScreenPosition = new Vector2(
-                ((viewportPosition.x * UIController._.Canvas.sizeDelta.x) - (UIController._.Canvas.sizeDelta.x * 0.5f)),
-                ((viewportPosition.y * UIController._.Canvas.sizeDelta.y) - (UIController._.Canvas.sizeDelta.y * 0.5f))
+                ((viewportPosition.x * canvasSize.x) - (canvasSize.x * 0.5f)),
+                ((viewportPosition.y * canvasSize.y) - (canvasSize.y * 0.5f))
             );
             if (isAtCenter == false)
             {
                 worldObjectScreenPosition = new Vector2(
-                    ((viewportPosition.x * UIController._.Canvas.sizeDelta.x)),
-                    ((viewportPosition.y * UIController._.Canvas.sizeDelta.y))
+                    ((viewportPosition.x * canvasSize.x)),
+                    ((viewportPosition.y * canvasSize.y))
                 );
             }
-
-            //now you can set the position of the ui element
-            rt.anchoredPosition = worldObjectScreenPosition;
+            return worldObjectScreenPosition;
         }
 
         public static void SetPivot(ref RectTransform rectTransform, Vector2 pivot)

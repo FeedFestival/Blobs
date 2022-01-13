@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using Assets.HeadStart.Core;
+using Assets.HeadStart.Core.SFX;
 using Assets.Scripts;
 using Assets.Scripts.utils;
 using UnityEditor;
@@ -30,6 +32,10 @@ public class BlobReveries : MonoBehaviour
     private MusicOpts _blobHitSound;
     private MusicOpts _preBlobExplodeSound;
     private MusicOpts _blobExplodeSound;
+    private readonly float STRETCH_SPEED = 4.44f;
+    private readonly float STRETCH_SPEED_STICKY = 2.5f;
+    private readonly float START_TRAVEL_SPEED = 7;
+    private readonly float TRAVEL_SPEED = 2;
 
     internal void SetColor(BlobColor blobColor, bool instant = true)
     {
@@ -85,7 +91,7 @@ public class BlobReveries : MonoBehaviour
         bool hitSomethingElseThenABlob = blobHitStickyInfo.otherBlob == null;
         if (hitSomethingElseThenABlob)
         {
-            _initialPos = new Vector2(transform.localPosition.x, HiddenSettings._.WallStickLimit - BlobFactory._.BlobsParent().position.y);
+            _initialPos = new Vector2(transform.localPosition.x, ClasicLv._.WALL_STICK_LIMIT - BlobFactory._.BlobsParent().position.y);
         }
         else
         {
@@ -100,7 +106,7 @@ public class BlobReveries : MonoBehaviour
 
         _reflectTweenId = LeanTween.moveLocal(gameObject,
             _reflectToPos,
-            HiddenSettings._.BlobForcePushAnimL
+            ClasicLv._.BLOB_FORCE_PUSH_ANIM_TIME
             ).id;
         LeanTween.descr(_reflectTweenId.Value).setEase(LeanTweenType.easeOutExpo);
         LeanTween.descr(_reflectTweenId.Value).setOnComplete(() =>
@@ -125,7 +131,7 @@ public class BlobReveries : MonoBehaviour
                 }
 
                 BlobStretchAnimator.SetFloat(ANIM_PARAM.StretchMultiplier,
-                        hitSticky ? HiddenSettings._.StretchSpeedSticky : HiddenSettings._.StretchSpeed);
+                        hitSticky ? STRETCH_SPEED_STICKY : STRETCH_SPEED);
                 BlobStretchAnimator.SetBool(ANIMATE.JustPlay, anim.Play);
 
                 if (_playEID != null)
@@ -152,8 +158,8 @@ public class BlobReveries : MonoBehaviour
 
                 TravelAnimator.SetBool(ANIMATE.StartTravel, anim.Play);
 
-                TravelAnimator.SetFloat(ANIM_PARAM.StartTravelMultiplier, HiddenSettings._.StartTravelSpeed);
-                TravelAnimator.SetFloat(ANIM_PARAM.TravelMultiplier, HiddenSettings._.TravelSpeed);
+                TravelAnimator.SetFloat(ANIM_PARAM.StartTravelMultiplier, START_TRAVEL_SPEED);
+                TravelAnimator.SetFloat(ANIM_PARAM.TravelMultiplier, TRAVEL_SPEED);
 
                 break;
             case BlobAnim.Idle:
@@ -170,10 +176,10 @@ public class BlobReveries : MonoBehaviour
         Anim anim = new Anim(BlobAnim.Stretch, afterAnimation);
         anim.Play = true;
         float stretchTime = StretchClip.length
-            / (hitSticky ? HiddenSettings._.StretchSpeedSticky : HiddenSettings._.StretchSpeed);
+            / (hitSticky ? STRETCH_SPEED_STICKY : STRETCH_SPEED);
         anim.Time = stretchTime;
         var pos = new Vector2(transform.position.x, transform.position.y);
-        anim.RotE = world2d.LookRotation2D(pos, pos + normalDir, fromFront: true);
+        anim.RotE = __world2d.LookRotation2D(pos, pos + normalDir, fromFront: true);
         PlayAnim(anim, hitSticky);
     }
 
@@ -224,7 +230,7 @@ public class BlobReveries : MonoBehaviour
             _forcePushTweenId = null;
         }
         _initialPos = transform.localPosition;
-        _forcePushTweenId = LeanTween.moveLocal(gameObject, _initialPos + dir, HiddenSettings._.BlobForcePushAnimL).id;
+        _forcePushTweenId = LeanTween.moveLocal(gameObject, _initialPos + dir, ClasicLv._.BLOB_FORCE_PUSH_ANIM_TIME).id;
         LeanTween.descr(_forcePushTweenId.Value).setEase(LeanTweenType.easeOutExpo);
         LeanTween.descr(_forcePushTweenId.Value).setOnComplete(() =>
         {
@@ -240,8 +246,8 @@ public class BlobReveries : MonoBehaviour
             _forcePushTweenId = null;
         }
 
-        _forcePushTweenId = LeanTween.moveLocal(gameObject, _initialPos, HiddenSettings._.BlobElasticBackAnimL).id;
-        LeanTweenType ease = (LeanTweenType)percent.GetRandomFromArray<int>(GameConstants.Eases);
+        _forcePushTweenId = LeanTween.moveLocal(gameObject, _initialPos, ClasicLv._.BLOB_ELASTIC_BACK_ANIM_TIME).id;
+        LeanTweenType ease = (LeanTweenType)__percent.GetRandomFromArray<int>(GameConstants.Eases);
         LeanTween.descr(_forcePushTweenId.Value).setEase(ease);
     }
 
@@ -260,7 +266,7 @@ public class BlobReveries : MonoBehaviour
         {
             _blobHitSound = new MusicOpts("BlobHit", 0.5f, false);
         }
-        MusicManager._.PlaySFX(_blobHitSound);
+        __.SFX.PlaySFX(_blobHitSound);
         ParticleController pc = EffectsPool._.GetParticle(ParticleType.SmallHit);
         pc.Play(point);
     }
@@ -285,7 +291,7 @@ public class BlobReveries : MonoBehaviour
         {
             _preBlobExplodeSound = new MusicOpts("Pre_Explosion", 0.1f, false);
         }
-        MusicManager._.PlaySFX(_preBlobExplodeSound);
+        __.SFX.PlaySFX(_preBlobExplodeSound);
     }
 
     public void PlayExplosionSFX()
@@ -295,6 +301,6 @@ public class BlobReveries : MonoBehaviour
         {
             _blobExplodeSound = new MusicOpts("Explosion", 0.8f, false);
         }
-        MusicManager._.PlaySFX(_blobExplodeSound);
+        __.SFX.PlaySFX(_blobExplodeSound);
     }
 }

@@ -15,9 +15,9 @@ namespace Assets.Scripts
                     );
             if (proximity)
             {
-                return distance < HiddenSettings._.NeighborProximity;
+                return distance < ClasicLv._.NEIGHBOR_PROXIMITY;
             }
-            return distance < HiddenSettings._.NeighborTestDistance;
+            return distance < ClasicLv._.NEIGHBOR_TEST_DISTANCE;
         }
 
         public static List<Blob> FindBlobsInProximity(List<Blob> blobs, Blob blob)
@@ -30,7 +30,7 @@ namespace Assets.Scripts
                     if (ClasicLv._.__debug__._proximity)
                     {
                         Debug.Log("blob" + blob.Bid + " and proximityBlob" + b.Bid + " distance: " + distance +
-                            "(min: " + HiddenSettings._.NeighborProximity + ") inProximity: " + inProximity);
+                            "(min: " + ClasicLv._.NEIGHBOR_PROXIMITY + ") inProximity: " + inProximity);
                     }
                     return inProximity;
                 }).ToList();

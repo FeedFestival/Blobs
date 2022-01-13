@@ -1,3 +1,5 @@
+using Assets.HeadStart.Core;
+using Assets.HeadStart.Core.Player;
 using UnityEngine;
 
 public class SwitchController : MonoBehaviour
@@ -27,7 +29,7 @@ public class SwitchController : MonoBehaviour
         moveShootableToSwitchable();
         switchThemUp();
 
-        Timer._.InternalWait(() =>
+        __.Time.RxWait(() =>
         {
             data.IsSwitchInProgress = false;
             EventBus._.Emit(Evt.STOP_SHOOTING, data);
@@ -36,36 +38,37 @@ public class SwitchController : MonoBehaviour
 
     void moveSwitchableToShootable()
     {
-        Game._.Player.SecondProjectile.transform.position = SwitchSettings.ShootableBlobPosition;
-        Game._.Player.SetupProjectileBlob(ref Game._.Player.SecondProjectile);
+        (Main._.Game.Player as BlobPopPlayer).SecondProjectile.transform.position = SwitchSettings.ShootableBlobPosition;
+        (Main._.Game.Player as BlobPopPlayer).SetupProjectileBlob(ref (Main._.Game.Player as BlobPopPlayer).SecondProjectile);
     }
 
     void moveShootableToSwitchable()
     {
-        Game._.Player.FirstProjectile.transform.position = SwitchSettings.SwitchableBlobPosition;
+        (Main._.Game.Player as BlobPopPlayer).FirstProjectile.transform.position = SwitchSettings.SwitchableBlobPosition;
     }
 
     void switchThemUp()
     {
-        BlobProjectile previousShootable = Game._.Player.FirstProjectile;
-        Game._.Player.FirstProjectile = Game._.Player.SecondProjectile;
-        Game._.Player.SecondProjectile = previousShootable;
+        BlobProjectile previousShootable = (Main._.Game.Player as BlobPopPlayer).FirstProjectile;
+        (Main._.Game.Player as BlobPopPlayer).FirstProjectile = (Main._.Game.Player as BlobPopPlayer).SecondProjectile;
+        (Main._.Game.Player as BlobPopPlayer).SecondProjectile = previousShootable;
     }
 
     void makeAnotherBlob()
     {
         moveSwitchableToShootable();
 
-        Timer._.InternalWait(() =>
+        __.Time.RxWait(() =>
         {
-            Game._.Player.FirstProjectile = Game._.Player.SecondProjectile;
+            (Main._.Game.Player as BlobPopPlayer).FirstProjectile = (Main._.Game.Player as BlobPopPlayer).SecondProjectile;
 
-            Game._.Player.SecondProjectile = Game._.Player.GetRandomBlob();
-            Game._.Player.SecondProjectile.transform.position = SwitchSettings.SwitchableBlobPosition;
+            (Main._.Game.Player as BlobPopPlayer).SecondProjectile = (Main._.Game.Player as BlobPopPlayer).GetRandomBlob();
+            (Main._.Game.Player as BlobPopPlayer).SecondProjectile.transform.position = SwitchSettings.SwitchableBlobPosition;
 
-            Game._.Player.MakingBlob = false;
-            Game._.Player.BlobInMotion = false;
-            UIController._.UiPointerArea.SetActive(true);
+            (Main._.Game.Player as BlobPopPlayer).MakingBlob = false;
+            (Main._.Game.Player as BlobPopPlayer).BlobInMotion = false;
+            // TODO - refactor this
+            // UIController._.UiPointerArea.SetActive(true);
 
         }, SwitchSettings.MakeShootableBlobDebounceTime);
     }

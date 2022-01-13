@@ -117,7 +117,7 @@ public class ClasicLvDebug : MonoBehaviour
                     ClasicLv.ResetIncrement_Debug();
                     break;
                 case LevelDebugState.DebugKeepScore:
-                    Game._.OnGameOver();
+                    (Main._.Game as BlobPopGame).OnGameOver();
                     break;
                 default:
                     TextHelper.text = "";

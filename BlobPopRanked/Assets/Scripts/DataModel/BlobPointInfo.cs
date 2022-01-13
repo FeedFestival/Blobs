@@ -8,13 +8,33 @@ namespace Assets.Scripts
         public List<int> BlobsIds;
         public List<Vector2> BlobsPositions;
         public int Points;
-        public BlobPointInfo()
-        {
+        public BlobPointInfo() { }
+    }
 
+    public class ScreenPointBlob : BlobPointInfo
+    {
+        public BlobColor BlobColor;
+
+        public ScreenPointBlob() { }
+
+        public ScreenPointBlob(BlobPointInfo blobPointInfo)
+        {
+            BlobsIds = blobPointInfo.BlobsIds;
+            BlobsPositions = blobPointInfo.BlobsPositions;
+            Points =blobPointInfo.Points;
+        }
+        public ScreenPointBlob(BlobColor blobColor, BlobPointInfo blobPointInfo)
+        {
+            BlobsIds = blobPointInfo.BlobsIds;
+            BlobsPositions = blobPointInfo.BlobsPositions;
+            Points =blobPointInfo.Points;
+            CalculateColorPoints(blobColor);
         }
 
         public void CalculateColorPoints(BlobColor blobColor)
         {
+            BlobColor = blobColor;
+
             // Refactor this so we take into account the color when adding points
             if (BlobsIds.Count <= 3)
             {

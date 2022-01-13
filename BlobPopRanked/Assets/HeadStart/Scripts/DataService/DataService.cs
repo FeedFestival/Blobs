@@ -7,13 +7,12 @@ using System.IO;
 #endif
 using System.Collections.Generic;
 using System.Linq;
-using System.Security.Cryptography.X509Certificates;
-using Assets.Scripts.utils;
-using System.Globalization;
 
 public class DataService
 {
-    public static readonly string _version = "1.0.1";
+#pragma warning disable 0414 // private field assigned but not used.
+    public static readonly string _version = "2.0.0";
+#pragma warning restore 0414 //
     public string DefaultDatabaseName = "Database.db";
     const string _assetsPath = "Assets/HeadStart";
     private SQLiteConnection _connection;
@@ -71,7 +70,9 @@ public class DataService
         #endregion
 
         _connection = new SQLiteConnection(dbPath, SQLiteOpenFlags.ReadWrite | SQLiteOpenFlags.Create);
-        Debug.Log("Final PATH: " + dbPath);
+#if UNITY_ANDROID
+        // Debug.Log("Final PATH: " + dbPath);
+#endif
     }
 
     public void CleanUpUsers()

@@ -1,4 +1,5 @@
-﻿using Assets.Scripts.utils;
+﻿using Assets.HeadStart.Core.Player;
+using Assets.Scripts.utils;
 using UnityEngine;
 
 public class BlobProjectile : MonoBehaviour
@@ -22,7 +23,7 @@ public class BlobProjectile : MonoBehaviour
         }
 
         Anim anim = new Anim(BlobAnim.Travel, time: blobFLight.time);
-        anim.RotE = world2d.LookRotation2D(new Vector2(transform.position.x, transform.position.y), blobFLight.Pos, fromFront: true);
+        anim.RotE = __world2d.LookRotation2D(new Vector2(transform.position.x, transform.position.y), blobFLight.Pos, fromFront: true);
         BlobReveries.PlayAnim(anim);
 
         bool isWall = blobFLight.Blob == null;
@@ -73,14 +74,14 @@ public class BlobProjectile : MonoBehaviour
     {
         BlobHitStickyInfo blobHitStickyInfo = new BlobHitStickyInfo(transform.position.y, GetComponent<Blob>());
         blobHitStickyInfo.otherBlob = otherBlob;
-        blobHitStickyInfo.ReflectDir = world2d.GetNormalizedDirection(Game._.Player.LastDir, surfaceContact.normal);
+        blobHitStickyInfo.ReflectDir = __world2d.GetNormalizedDirection((Main._.Game.Player as BlobPopPlayer).LastDir, surfaceContact.normal);
 
-        var lastBlobFlight = Game._.Player.GetLastBlobFlight();
+        var lastBlobFlight = (Main._.Game.Player as BlobPopPlayer).GetLastBlobFlight();
         if (lastBlobFlight != null) {
             BlobReveries.PlayHitEffect(lastBlobFlight.hitPoint);
         }
 
-        Game._.Player.BlobHitSticky(blobHitStickyInfo);
+        (Main._.Game.Player as BlobPopPlayer).BlobHitSticky(blobHitStickyInfo);
 
         BlobReveries.StretchOnCollision(blobHitStickyInfo.ReflectDir, null, hitSticky: true);
 

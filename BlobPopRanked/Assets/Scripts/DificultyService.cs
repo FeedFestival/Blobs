@@ -9,13 +9,14 @@ public class DificultyService : MonoBehaviour
 {
     [Range(0.0f, 100.0f)]
     public float PercentIncrease = 0f;
+    private readonly int MAX_TIME_SECONDS = 600;
     private float _dificultyPercentIncrease
     {
         get
         {
             CalculatePlayTime();
 
-            PercentIncrease = percent.What(_is: SecondsPlayed, _of: HiddenSettings._.MaxTimeSeconds);
+            PercentIncrease = __percent.What(_is: SecondsPlayed, _of: MAX_TIME_SECONDS);
             PercentIncrease = PercentIncrease < 100 ? PercentIncrease : 100;
             return 100 - PercentIncrease;
         }
@@ -31,7 +32,7 @@ public class DificultyService : MonoBehaviour
     public int Hits;
     private ClasicLv _clasicLv;
     public List<int> Colors;
-    public List<int> LevelIncreseThreshhold;
+    public List<int> LevelIncreseThreshhold;    // 8 to have: Pink, White, Black // 5 to have snooker
     private DateTime PlayStartedTime;
     [SerializeField]
     private int SecondsPlayed;
@@ -84,7 +85,7 @@ public class DificultyService : MonoBehaviour
                     allOtherCombined += Colors[i];
                 }
             }
-            Colors[(int)BlobColor.BROWN] = (int)percent.Find(_healthPercent, allOtherCombined);
+            Colors[(int)BlobColor.BROWN] = (int)__percent.Find(_healthPercent, allOtherCombined);
         }
 
         if (Colors.Any(c => c == 0))
@@ -254,7 +255,7 @@ public class DificultyService : MonoBehaviour
         {
             isAtLeastOnBlobConnectedToCeil = _clasicLv.Blobs.Exists(b =>
             {
-                bool isConnectedToCeil = b.StickedTo.Exists(s => s == HiddenSettings._.CeilId);
+                bool isConnectedToCeil = b.StickedTo.Exists(s => s == ClasicLv._.CEILD_ID);
                 return isConnectedToCeil;
             });
         }
@@ -264,23 +265,23 @@ public class DificultyService : MonoBehaviour
             float blobY = _clasicLv.Blobs.Min(b => b.transform.position.y);
 
             float dashedLine = -4.23f;
-            float newDashedLine = dashedLine - HiddenSettings._.WallStickLimit;
-            float newBlobY = blobY - HiddenSettings._.WallStickLimit;
+            float newDashedLine = dashedLine - ClasicLv._.WALL_STICK_LIMIT;
+            float newBlobY = blobY - ClasicLv._.WALL_STICK_LIMIT;
 
             int minHealthPercent = 25;
-            _healthPercent = Mathf.CeilToInt(percent.What(_is: newBlobY, _of: newDashedLine));
+            _healthPercent = Mathf.CeilToInt(__percent.What(_is: newBlobY, _of: newDashedLine));
             _healthPercent = _healthPercent > minHealthPercent ? _healthPercent : minHealthPercent;
 
 
-            int minHits = Mathf.CeilToInt(percent.Find(_dificultyPercentIncrease, MinHits));
+            int minHits = Mathf.CeilToInt(__percent.Find(_dificultyPercentIncrease, MinHits));
             if (minHits <= 0)
             {
                 minHits = 1;
             }
-            int maxHits = Mathf.CeilToInt(percent.Find(_dificultyPercentIncrease, MaxHits));
+            int maxHits = Mathf.CeilToInt(__percent.Find(_dificultyPercentIncrease, MaxHits));
             maxHits = maxHits > MinHits ? maxHits : MinHits;
 
-            HitsToReset = Mathf.CeilToInt(percent.Find(_healthPercent, maxHits));
+            HitsToReset = Mathf.CeilToInt(__percent.Find(_healthPercent, maxHits));
 
             if (HitsToReset < minHits)
             {

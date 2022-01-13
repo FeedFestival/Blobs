@@ -3,6 +3,7 @@ using UnityEngine;
 using Assets.Scripts.utils;
 using static UnityEngine.ParticleSystem;
 using System;
+using Assets.HeadStart.Core;
 
 public class ParticleController : MonoBehaviour
 {
@@ -16,7 +17,6 @@ public class ParticleController : MonoBehaviour
     public int Id;
     public bool AvailableInPool;
     public float TimeLength;
-    public delegate void AfterPlay();
 
     void Start()
     {
@@ -25,7 +25,7 @@ public class ParticleController : MonoBehaviour
 
     internal void Init()
     {
-        Id = Game._.GetUniqueId();
+        Id = Main._.Game.GetUniqueId();
         AvailableInPool = true;
         gameObject.name = gameObject.name + "    " + Id;
     }
@@ -63,7 +63,7 @@ public class ParticleController : MonoBehaviour
                 {
                     OriginalSizes.Add(module.startSize.constant);
                 }
-                float newSize = percent.Find(Size, module.startSize.constant);
+                float newSize = __percent.Find(Size, module.startSize.constant);
                 module.startSize = newSize;
             }
         }
@@ -94,7 +94,7 @@ public class ParticleController : MonoBehaviour
         InternalPlay();
     }
 
-    public void InternalPlay(AfterPlay afterPlay = null)
+    public void InternalPlay()
     {
         int index = 0;
         // Debug.Log("OriginalEmits.Count: " + OriginalEmits.Count);
@@ -104,10 +104,9 @@ public class ParticleController : MonoBehaviour
             index++;
         }
 
-        Timer._.InternalWait(() =>
+        __.Time.RxWait(() =>
         {
             AvailableInPool = true;
-            if (afterPlay != null) afterPlay();
         }, TimeLength);
     }
 
@@ -120,8 +119,8 @@ public class ParticleController : MonoBehaviour
                 Original3DSizes.Add(new Vector3(module.startSize.constantMax, module.startSize.constantMax, module.startSize.constantMax));
                 Original3DSizes.Add(new Vector3(module.startSize.constantMin, module.startSize.constantMin, module.startSize.constantMin));
             }
-            float newSizeMax = percent.Find(Size, module.startSize.constantMax);
-            float newSizeMin = percent.Find(Size, module.startSize.constantMin);
+            float newSizeMax = __percent.Find(Size, module.startSize.constantMax);
+            float newSizeMin = __percent.Find(Size, module.startSize.constantMin);
             module.startSizeX = new MinMaxCurve(newSizeMax, newSizeMin);
             module.startSizeY = new MinMaxCurve(newSizeMax, newSizeMin);
             module.startSizeZ = new MinMaxCurve(newSizeMax, newSizeMin);

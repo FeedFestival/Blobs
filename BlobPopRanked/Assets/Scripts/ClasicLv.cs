@@ -1,15 +1,18 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using Assets.Scripts.LevelService;
 using Assets.Scripts.utils;
 using Assets.Scripts;
+using Assets.HeadStart.Core;
+using Assets.HeadStart.Core.Player;
+using Assets.HeadStart.Core.SFX;
 
-public class ClasicLv : MonoBehaviour, ILevel
+public class ClasicLv : MonoBehaviour
 {
     private static ClasicLv _clasicLv;
     public static ClasicLv _ { get { return _clasicLv; } }
     public ClasicLvDebug __debug__;
+    public BlobPopEffects EffectsPool;
     //
     public int BlobsPerRow;
     public Vector2 StartPos;
@@ -32,42 +35,73 @@ public class ClasicLv : MonoBehaviour, ILevel
     public Collider2D LeftWall;
     public Collider2D RightWall;
     public PolygonCollider2D EndGameCollider;
+    [Header("Systems")]
+    public ClassicPointsController ClassicPointsController;
+
+    //--------------------------- GAME CONSTANTS ------------------------
+    //---------------------------
+    [HideInInspector]
+    public readonly int CEILD_ID = 0;
+    public readonly float WALL_STICK_LIMIT = 4.44f;
+    public readonly float NEIGHBOR_TEST_DISTANCE = 0.437f;
+    public readonly float NEIGHBOR_PROXIMITY = 1.3f;
+    public readonly float GAME_OVER_OFFSET_Y = 3.95f;
+    public readonly int MIN_NEIGHBOR_COUNT_TO_DESTROY = 2;
+    public readonly float BLOB_FORCE_PUSH_ANIM_TIME = 0.15f;
+    public readonly float BLOB_ELASTIC_BACK_ANIM_TIME = 0.5f;
+    private readonly float WAIT_DESCEND_BLOBS = 0.15f;
 
     void Awake()
     {
         _clasicLv = this;
     }
 
-    void Start()
+    public void Init()
     {
         DificultyService = GetComponent<DificultyService>();
+
+        EffectsPool.Init();
+        EffectsPool.GenerateParticleControllers();
+
+        // TODO: remake this
+        // UIController._.ScreenPoints.GeneratePoints();
+
+        DificultyService.Init(this);
+        ClassicPointsController.Init();
+
+        Main._.Game.StartGame();
     }
 
-    void ILevel.StartLevel()
+    // TODO: refactor this
+    public void StartLevel()
     {
-        DificultyService.Init(this);
-        RetrieveUser();
+        CheckCoreSession();
         PlayBackgroundMusic();
         BlobFactory._.Init();
-        Game._.Player.MakePlayableBlobs();
+        (Main._.Game.Player as BlobPopPlayer).MakePlayableBlobs();
         GenerateBlobLevel();
         ActivateEndGame(false);
     }
 
     void PlayBackgroundMusic()
     {
-        // MusicOpts mOpts = new MusicOpts("GameMusic1", 0.09f);
-        // mOpts.FadeInSeconds = 30f;
-        // MusicManager._.PlayBackgroundMusic(mOpts);
+        MusicOpts mOpts = new MusicOpts("GameMusic1", 0.09f);
+        mOpts.FadeInSeconds = 30f;
+        __.SFX.PlayBackgroundMusic(mOpts);
     }
 
-    private void RetrieveUser()
+    private void CheckCoreSession()
     {
-        if (Game._.PlayingUser == null)
+        bool hasCoreSession = CoreSession._ != null;
+        if (hasCoreSession == false)
         {
-            Game._.PlayingUser = Game._.User;
+            SessionOpts sessionOpts = new SessionOpts()
+            {
+                HighScoreType = HighScoreType.RANKED,
+                User = Main._.Game.DeviceUser()
+            };
+            CoreIoC.IoCDependencyResolver.CreateSession(sessionOpts);
         }
-        Debug.Log("Starting Level.... [" + Game._.PlayingUser.Name + "]");
     }
 
     public void DescendBlobs()
@@ -86,7 +120,7 @@ public class ClasicLv : MonoBehaviour, ILevel
         }
         _descendTweenId = LeanTween.move(blobsParent.gameObject,
             newPos,
-            HiddenSettings._.WaitDescendBlobs
+            WAIT_DESCEND_BLOBS
             ).id;
         LeanTween.descr(_descendTweenId.Value).setEase(LeanTweenType.linear);
         LeanTween.descr(_descendTweenId.Value).setOnComplete(() => { _descendTweenId = null; });
@@ -228,7 +262,7 @@ public class ClasicLv : MonoBehaviour, ILevel
         blob.SetId();
         blob.Init();
         blob.SetPosition(pos);
-        blob.StickedTo.Add(HiddenSettings._.CeilId);
+        blob.StickedTo.Add(ClasicLv._.CEILD_ID);
 
         blob.BlobReveries.StopStrechAnim();
         blob.BlobReveries.SetColor(DificultyService.GetColorByDificulty());
@@ -272,7 +306,7 @@ public class ClasicLv : MonoBehaviour, ILevel
 
         yield return new WaitForSeconds(1.3f);
 
-        CalculatePoints();
+        ClassicPointsController.Calculate(ref _blobsByColor);
         AfterDestroy();
     }
 
@@ -347,28 +381,6 @@ public class ClasicLv : MonoBehaviour, ILevel
         }
     }
 
-    private void CalculatePoints()
-    {
-        foreach (KeyValuePair<int, BlobPointInfo> kvp in _blobsByColor)
-        {
-            BlobColor blobColor = (BlobColor)kvp.Key;
-            if (blobColor == BlobColor.BROWN)
-            {
-                continue;
-            }
-
-            BlobPointInfo blobPointInfo = kvp.Value;
-            blobPointInfo.CalculateColorPoints(blobColor);
-            // Debug.Log(
-            //     "Color: " + blobColor.ToString()
-            //     + " (count: " + kvp.Value.BlobsIds.Count
-            //     + ") -> points: " + blobPointInfo.Points
-            // );
-            UIController._.PointsController.ShowPoints(blobColor, blobPointInfo);
-        }
-        _blobsByColor.Clear();
-    }
-
     public void CheckAffected()
     {
         foreach (int id in _toDestroy)
@@ -430,7 +442,7 @@ public class ClasicLv : MonoBehaviour, ILevel
     {
         __utils.AddIfNone(blob.Bid, ref _checked,
             debugAdd: __debug__._destroyProcess ? "------------- blob" + blob.Bid + " added to " + __debug.DebugList(_checked, "_checked") : null);
-        if (blob.StickedTo.Contains(HiddenSettings._.CeilId))
+        if (blob.StickedTo.Contains(ClasicLv._.CEILD_ID))
         {
             if (__debug__._destroyProcess)
             {
@@ -495,7 +507,7 @@ public class ClasicLv : MonoBehaviour, ILevel
         }
         if (point.HasValue)
         {
-            Game._.Player.Target.position = point.Value;
+            (Main._.Game.Player as BlobPopPlayer).Target.position = point.Value;
             return true;
         }
         return false;
@@ -536,10 +548,10 @@ public class ClasicLv : MonoBehaviour, ILevel
             EndGameCollider.gameObject.SetActive(activate);
             return;
         }
-        Timer._.InternalWait(() =>
+        __.Time.RxWait(() =>
         {
             EndGameCollider.gameObject.SetActive(activate);
-        }, HiddenSettings._.BlobForcePushAnimL + HiddenSettings._.BlobElasticBackAnimL + 1f);
+        }, BLOB_FORCE_PUSH_ANIM_TIME + BLOB_ELASTIC_BACK_ANIM_TIME + 1f);
     }
 }
 

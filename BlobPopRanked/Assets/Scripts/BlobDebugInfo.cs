@@ -1,4 +1,6 @@
-﻿using Assets.Scripts;
+﻿using Assets.HeadStart.Core;
+using Assets.Scripts;
+using Assets.Scripts.utils;
 using UnityEngine;
 
 public class BlobDebugInfo : MonoBehaviour
@@ -19,10 +21,10 @@ public class BlobDebugInfo : MonoBehaviour
         Color color = BlobColorService.GetColorByBlobColor(blobColor);
         color.a = transparency;
         spriteColor.color = color;
-        color = HiddenSettings._.White;
+        color = __gameColor.GetColor("#FFFFFF");
         color.a = transparency;
         IdText.color = color;
-        color = HiddenSettings._.White;
+        color = __gameColor.GetColor("#FFFFFF");
         color.a = transparency;
         NeighborText.color = color;
     }

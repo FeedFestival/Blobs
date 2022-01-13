@@ -1,124 +1,61 @@
-﻿#pragma warning disable 0414 // private field assigned but not used.
-using System.Collections;
+﻿using System.Collections;
 using UnityEngine;
+using UniRx;
+using System;
+using Assets.HeadStart.Core;
 
 public class Main : MonoBehaviour
 {
-    public static readonly string _version = "1.0.1 (Updated - modified Player)";
-    public GameObject HiddenSettingsPrefab;
-
-    [Header("GOs")]
-    public LevelController LevelController;
-    private Game _game;
-    private IEnumerator _waitForLevelLoad;
-
-    private IEnumerator _firstCheck;
-    private IEnumerator _afterCheck;
-
+#pragma warning disable 0414 // private field assigned but not used.
+    public static readonly string _version = "2.0.0";
+#pragma warning restore 0414 //
+    private static Main _instance;
+    public static Main _ { get { return _instance; } }
     void Awake()
     {
-        Debug.Log("Starting... Checking to Make Sure Everything is running");
-
-        _firstCheck = FirstCheck();
-        StartCoroutine(_firstCheck);
+        _instance = this;
     }
 
-    IEnumerator FirstCheck()
+    public bool ConsoleLog;
+    public GameBase Game;
+    [HideInInspector]
+    public CoreCamera CoreCamera;
+    private Subject<bool> _checkVersionSub__ = new Subject<bool>();
+    private Subject<bool> _preStartGameSub__ = new Subject<bool>();
+    private const float MILISECONDS_BETWEEN_CHECKS = 100;
+
+    void Start()
     {
-        yield return new WaitForSeconds(0.1f);
+        CoreCamera = Camera.main.GetComponent<CoreCamera>();
+        __.Transition.PitchBlack();
 
-        var domainLogic = FindObjectOfType<DomainLogic>();
-        if (domainLogic != null)
+        if (ConsoleLog)
         {
-            Destroy(domainLogic.gameObject);
+            Debug.Log("Starting... Checking to Make Sure Everything is running");
         }
 
-        GameObject go;
-        var settings = FindObjectOfType<HiddenSettings>();
-        if (settings == null)
-        {
-            go = Instantiate(HiddenSettingsPrefab, new Vector3(0, 0, 0), Quaternion.identity);
-            settings = go.GetComponent<HiddenSettings>();
-            settings.ActualScreenSize = new Vector2Int(CameraResolution._.ScreenSizeX, CameraResolution._.ScreenSizeY);
-        }
-
-        var prefabBank = FindObjectOfType<PrefabBank>();
-        if (prefabBank == null)
-        {
-            go = Instantiate(settings.PrefabBankPrefab, new Vector3(0, 0, 0), Quaternion.identity);
-            prefabBank = go.GetComponent<PrefabBank>();
-        }
-
-        _game = FindObjectOfType<Game>();
-        if (_game == null)
-        {
-            go = Instantiate(prefabBank.GamePrefab, new Vector3(0, 0, 0), Quaternion.identity);
-            _game = go.GetComponent<Game>();
-        }
-
-        if (FindObjectOfType<Timer>() == null)
-        {
-            go = Instantiate(prefabBank.TimerPrefab, new Vector3(0, 0, 0), Quaternion.identity);
-        }
-
-        if (FindObjectOfType<MusicManager>() == null)
-        {
-            go = Instantiate(prefabBank.MusicManagerPrefab, new Vector3(0, 0, 0), Quaternion.identity);
-        }
-        MusicManager._.Init();
-
-        if (FindObjectOfType<ColorBank>() == null)
-        {
-            go = Instantiate(prefabBank.ColorBankPrefab, new Vector3(0, 0, 0), Quaternion.identity);
-            ColorBank._.CalculateColors();
-        }
-
-        if (_game.LevelController == null)
-        {
-            _game.LevelController = LevelController;
-        }
-
-        Debug.Log("_game.AfterLoading: " + _game.AfterLoading);
-
-        if (_game.AfterLoading == AfterLoading.GoToGame || _game.AfterLoading == AfterLoading.Nothing)
-        {
-            var player = FindObjectOfType<Player>();
-            if (player == null)
+        _checkVersionSub__
+            .Delay(TimeSpan.FromMilliseconds(MILISECONDS_BETWEEN_CHECKS))
+            .Subscribe((bool _) =>
             {
-                Debug.LogError("No Player");
-            }
-            else
-            {
-                if (_game.Player == null)
-                {
-                    _game.Player = player;
-                }
-            }
-        }
-        go = null;
-
 #if UNITY_EDITOR
-        VersionChecker versionChecker = gameObject.AddComponent<VersionChecker>();
-        versionChecker.Check();
-        Destroy(gameObject.GetComponent<VersionChecker>());
+                VersionChecker versionChecker = gameObject.AddComponent<VersionChecker>();
+                versionChecker.Check();
+                Destroy(gameObject.GetComponent<VersionChecker>());
 #endif
+                _preStartGameSub__.OnNext(true);
+            });
 
-        _afterCheck = AfterCheck();
-        StartCoroutine(_afterCheck);
-    }
+        _preStartGameSub__
+            .Delay(TimeSpan.FromMilliseconds(MILISECONDS_BETWEEN_CHECKS))
+            .Subscribe((bool _) =>
+            {
+                _checkVersionSub__.Dispose();
+                _preStartGameSub__.Dispose();
 
-    IEnumerator AfterCheck()
-    {
-        StopCoroutine(_firstCheck);
-        _firstCheck = null;
+                Game.PreStartGame();
+            });
 
-        Debug.Log("Main - Check Completed, starting...");
-
-        yield return new WaitForSeconds(0.1f);
-
-        _game.Init();
-
-        StopCoroutine(_afterCheck);
-        _afterCheck = null;
+        _checkVersionSub__.OnNext(true);
     }
 }

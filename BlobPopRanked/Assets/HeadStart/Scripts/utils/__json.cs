@@ -1,6 +1,4 @@
-﻿#pragma warning disable 0414 // private field assigned but not used.
-using UnityEngine;
-using System.Collections;
+﻿using UnityEngine;
 
 namespace Assets.Scripts.utils
 {
@@ -8,10 +6,12 @@ namespace Assets.Scripts.utils
     {
         string ToJsonString();
     }
-
+    
     public static class __json
     {
-        public static readonly string _version = "1.0.1";
+#pragma warning disable 0414 // private field assigned but not used.
+        public static readonly string _version = "2.0.0";
+#pragma warning restore 0414 //
         public static T[] FromJson<T>(string json)
         {
             json = FixJson(json);

@@ -54,7 +54,8 @@ public class BlobFactory : MonoBehaviour
         {
             index = _allBlobs.Count + 1;
         }
-        GameObject go = HiddenSettings._.GetAnInstantiated(PrefabBank._.Blob);
+        var prefab = (Main._.Game as BlobPopGame).Blob;
+        GameObject go = Instantiate(prefab, new Vector3(0, 0, 0), Quaternion.identity);
         go.transform.SetParent(this.transform);
         go.name = "Blob";
         var blob = go.GetComponent<Blob>();

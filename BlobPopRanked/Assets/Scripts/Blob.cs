@@ -3,6 +3,7 @@ using Assets.Scripts;
 using UnityEngine;
 using System.Linq;
 using Assets.Scripts.utils;
+using Assets.HeadStart.Core;
 
 public class Blob : MonoBehaviour, IPoolObject
 {
@@ -48,9 +49,9 @@ public class Blob : MonoBehaviour, IPoolObject
         {
             var fullSize = transform.localScale.z;
             var currentSize = transform.localScale.x;
-            var perc = percent.What(currentSize, fullSize);
+            var perc = __percent.What(currentSize, fullSize);
             var radius = GetComponent<CircleCollider2D>().radius;
-            _radius = percent.Find(perc, radius);
+            _radius = __percent.Find(perc, radius);
         }
         return _radius.Value;
     }
@@ -67,12 +68,13 @@ public class Blob : MonoBehaviour, IPoolObject
 
     public void SetId()
     {
-        Bid = Game._.GetUniqueId();
+        Bid = Main._.Game.GetUniqueId();
         gameObject.name += " " + Bid + " ";
 
         if (ClasicLv._.__debug__._debugBlobs)
         {
-            var go = HiddenSettings._.GetAnInstantiated(PrefabBank._.BlobDebugInfoPrefab);
+            var prefab = (Main._.Game as BlobPopGame).BlobDebugInfoPrefab;
+            var go = Instantiate(prefab, new Vector3(0, 0, 0), Quaternion.identity);
             _blobDebugInfo = go.GetComponent<BlobDebugInfo>();
             _blobDebugInfo.SetId(transform, Bid);
         }
@@ -82,9 +84,9 @@ public class Blob : MonoBehaviour, IPoolObject
     {
         float spacing = ClasicLv._.Spacing;
         SetWorldPosition(new Vector3(Pos.x, Pos.y - spacing, Pos.z));
-        if (Pos.y < HiddenSettings._.WallStickLimit)
+        if (Pos.y < ClasicLv._.WALL_STICK_LIMIT)
         {
-            RemoveSticked(HiddenSettings._.CeilId);
+            RemoveSticked(ClasicLv._.CEILD_ID);
         }
     }
 
@@ -149,7 +151,7 @@ public class Blob : MonoBehaviour, IPoolObject
         
         float explosionL = BlobReveries.PlayExplodeEffect(transform);
 
-        Timer._.InternalWait(() =>
+        __.Time.RxWait(() =>
         {
             BlobReveries.PlayExplosionSFX();
             _isUsed = false;
@@ -215,7 +217,7 @@ public class Blob : MonoBehaviour, IPoolObject
             }
             Debug.Log(pre + " between " + Bid + "(x:" + transform.position.x + ",y:" + transform.position.y + ") and "
                 + otherBlob.Bid + "(x:" + otherBlob.transform.position.x + ",y:" + otherBlob.transform.position.y + ") max: "
-                + HiddenSettings._.NeighborTestDistance);
+                + ClasicLv._.NEIGHBOR_TEST_DISTANCE);
         }
 
         var areSameColor = BlobReveries.BlobColor == otherBlob.BlobReveries.BlobColor;
@@ -266,7 +268,7 @@ public class Blob : MonoBehaviour, IPoolObject
     {
         if (otherBlob == null)
         {
-            StickedTo.Add(HiddenSettings._.CeilId);
+            StickedTo.Add(ClasicLv._.CEILD_ID);
         }
 
         List<Blob> proximityBlobs = BlobService.FindBlobsInProximity(ClasicLv._.Blobs, this);
@@ -317,7 +319,7 @@ public class Blob : MonoBehaviour, IPoolObject
                 Debug.Log(__debug.DebugList<int>(_linkedNeighbors, "_linkedNeighbors"));
             }
 
-            if (_linkedNeighbors.Count > HiddenSettings._.MinNeighborCountToDestroy)
+            if (_linkedNeighbors.Count > ClasicLv._.MIN_NEIGHBOR_COUNT_TO_DESTROY)
             {
                 _linkedNeighbors = null;
                 return true;

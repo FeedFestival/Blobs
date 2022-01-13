@@ -1,4 +1,5 @@
 ﻿using System.Collections;
+using Assets.HeadStart.Core.Player;
 using Assets.Scripts;
 using UnityEngine;
 
@@ -83,7 +84,7 @@ public class PredictionManager : MonoBehaviour
     {
         yield return new WaitForSeconds(0.33f);
 
-        if (Game._.Player.IsDragging)
+        if ((Main._.Game.Player as BlobPopPlayer).IsDragging)
         {
             _isShowing = true;
             DisplayPrediction();

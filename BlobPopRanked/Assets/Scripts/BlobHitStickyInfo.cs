@@ -3,11 +3,11 @@ using UnityEngine;
 
 public class BlobHitStickyInfo
 {
-
     public float blobY;
     public Blob blob;
     public Blob otherBlob;
     public Vector3 ReflectDir;
+    private readonly float REFLECT_DISTANCE_MODIFIER = 0.33f;
 
     public BlobHitStickyInfo()
     {
@@ -21,9 +21,7 @@ public class BlobHitStickyInfo
     }
     public Vector2 GetReflectPos(Vector2 localPosition)
     {
-        return localPosition + ((Vector2)ReflectDir.normalized
-            * HiddenSettings._.BallStickyReflectDistanceModifier
-        );
+        return localPosition + ((Vector2)ReflectDir.normalized * REFLECT_DISTANCE_MODIFIER);
     }
 }
 

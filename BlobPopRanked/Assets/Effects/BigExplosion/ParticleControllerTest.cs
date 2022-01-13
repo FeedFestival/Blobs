@@ -6,10 +6,11 @@ public class ParticleControllerTest : MonoBehaviour
     public List<Blob> TestBlobs;
     public int CurrentBlob = 0;
     public ParticleController particleController;
+    public EffectsPool EffectsPool;
 
     void Start()
     {
-        EffectsPool._.GenerateParticleControllers();
+        EffectsPool.GenerateParticleControllers();
 
         int i = 0;
 

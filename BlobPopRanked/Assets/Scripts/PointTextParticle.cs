@@ -1,3 +1,5 @@
+using Assets.HeadStart.Core;
+using Assets.HeadStart.Core.SFX;
 using Assets.Scripts;
 using Assets.Scripts.utils;
 using UnityEngine;
@@ -17,6 +19,13 @@ public class PointTextParticle : MonoBehaviour, IPoolObject, IPointText
     private int? _towardsTotalTweenId;
     private BlobColor _currentBlobColor;
     public TrailRenderer Trail;
+    private Vector2Int _actualScreenSize;
+    private OnPointsUpdated _onPointsUpdated;
+    private Vector2 _totalPointsPos;
+
+    // CONSTANTS
+    private readonly float TOWARD_TOTAL_ANIM_TIME = 1;
+    public delegate void OnPointsUpdated(int points, BlobColor blobColor);
 
     int IPoolObject.Id
     {
@@ -26,10 +35,13 @@ public class PointTextParticle : MonoBehaviour, IPoolObject, IPointText
     {
         get => _isUsed;
     }
-    void IPointText.Init(int id, Text text)
+    void IPointText.Init(int id, Text text, Vector2 totalPointsPos, Vector2Int actualScreenSize, OnPointsUpdated onPointsUpdated)
     {
         _id = id;
         _textComponent = text;
+        _totalPointsPos = totalPointsPos;
+        _actualScreenSize = actualScreenSize;
+        _onPointsUpdated = onPointsUpdated;
         _rt = this.gameObject.GetComponent<RectTransform>();
     }
     void IPoolObject.Show() => InternalShow(true);
@@ -43,9 +55,9 @@ public class PointTextParticle : MonoBehaviour, IPoolObject, IPointText
     }
     public void ShowOnScreen(Vector3 ballsCenterPosition, BlobHitStickyInfo blobHitStickyInfo)
     {
-        world2d.ShowOnScreen(ref _rt, ballsCenterPosition, isAtCenter: false);
+        __world2d.ShowOnScreen(ref _rt, ballsCenterPosition, _actualScreenSize, isAtCenter: false);
 
-        var multiplier = HiddenSettings._.ActualScreenSize.x / 4;
+        var multiplier = _actualScreenSize.x / 4;
         var reflectDir = new Vector2(blobHitStickyInfo.ReflectDir.x, -1);
         Vector2 reflectToPos = _rt.anchoredPosition + (reflectDir * multiplier);
 
@@ -79,8 +91,8 @@ public class PointTextParticle : MonoBehaviour, IPoolObject, IPointText
 
     private void AnimateIncreaseSize(float timeDiff)
     {
-        float smallestSize = HiddenSettings._.ActualScreenSize.x * 0.02f;
-        float biggestSize = HiddenSettings._.ActualScreenSize.x * 0.6f;
+        float smallestSize = _actualScreenSize.x * 0.02f;
+        float biggestSize = _actualScreenSize.x * 0.6f;
 
         _sizeTweenId = LeanTween.value(gameObject,
             smallestSize,
@@ -101,8 +113,8 @@ public class PointTextParticle : MonoBehaviour, IPoolObject, IPointText
 
     private void AnimateDecreaseSize(float timeDiff)
     {
-        float smallestSize = HiddenSettings._.ActualScreenSize.x * 0.03f;
-        float biggestSize = HiddenSettings._.ActualScreenSize.x * 0.7f;
+        float smallestSize = _actualScreenSize.x * 0.03f;
+        float biggestSize = _actualScreenSize.x * 0.7f;
 
         _sizeTweenId = LeanTween.value(gameObject,
                 biggestSize,
@@ -122,25 +134,21 @@ public class PointTextParticle : MonoBehaviour, IPoolObject, IPointText
 
     private void AnimateAddNumberToTotal()
     {
-        float x = ((HiddenSettings._.ActualScreenSize.x) * 0.12f);
-        float y = ((HiddenSettings._.ActualScreenSize.y) * 0.03f);
-        Vector2 totalPointsPosition = new Vector2(x, y);
-
         _towardsTotalTweenId = LeanTween.move(_rt,
-            totalPointsPosition,
-            HiddenSettings._.TowardTotalAnimL
+            _totalPointsPos,
+            TOWARD_TOTAL_ANIM_TIME
             ).id;
         LeanTween.descr(_towardsTotalTweenId.Value).setEase(LeanTweenType.easeInOutQuart);
         LeanTween.descr(_towardsTotalTweenId.Value).setOnComplete(() =>
         {
-            UIController._.PointsController.UpdatePoints(_pointsValue, _currentBlobColor);
+            _onPointsUpdated(_pointsValue, _currentBlobColor);
             var sound = new MusicOpts("MoneyPump", 1f, false);
-            MusicManager._.PlaySFX(sound);
+            __.SFX.PlaySFX(sound);
             InternalShow(false);
         });
 
         var sound = new MusicOpts("MoneyTravel", 1f, false);
-        MusicManager._.PlaySFX(sound);
+        __.SFX.PlaySFX(sound);
     }
 
     void ShowPointsTrail()

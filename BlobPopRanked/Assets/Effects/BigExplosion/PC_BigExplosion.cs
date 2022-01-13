@@ -1,4 +1,5 @@
 using System;
+using Assets.HeadStart.Core;
 using UniRx;
 using UnityEngine;
 using static UnityEngine.ParticleSystem;
@@ -101,7 +102,7 @@ public class PC_BigExplosion : ParticleController
         LeanTween.scale(ExplosionBubbleT.gameObject, bubbleScale, PreExplosionLengh);
         PreExplosionAnmtor.gameObject.SetActive(true);
 
-        Timer._.InternalWait(() =>
+        __.Time.RxWait(() =>
         {
             InternalPlay();
             _copyPosSub.Dispose();
