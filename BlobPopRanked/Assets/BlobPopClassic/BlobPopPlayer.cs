@@ -229,6 +229,13 @@ namespace Assets.BlobPopClassic
                         Blob newHitBlob = hit.transform.GetComponent<Blob>();
                         if (newHitBlob == null || blobFlight == null ||blobFlight.Blob == null)
                         {
+                            // BUG: this happens when a bunch of blobs explode and at the same time
+                            // - we fire another blob towards it and there is no blob behind but the top wall
+                            // - then while we are in air another blob row descends
+                            // - and in here we hit a new blob
+                            Debug.Log("newHitBlob: " + __debug.ToJsonString(newHitBlob));
+                            Debug.Log("blobFlight: " + __debug.ToJsonString(blobFlight));
+                            Debug.Log("newHitBlob: " + __debug.ToJsonString(newHitBlob));
                             Debug.Log("Null Reference Exception... why? Suspect -> " + hit.transform.gameObject.name);
                         }
                         if (newHitBlob.Bid != blobFlight.Blob.Bid)
