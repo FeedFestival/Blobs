@@ -1,17 +1,9 @@
+using System.Collections;
 using System.Collections.Generic;
+using UnityEngine;
 
 namespace Assets.HeadStart.CoreUi
 {
-    public static class CoreUiIoC
-    {
-
-    }
-
-    public enum UiDependency
-    {
-        ScreenPoints
-    }
-
     public static class __ui
     {
         private static Dictionary<UiDependency, IUiDependency> _uiCoreDependencies = new Dictionary<UiDependency, IUiDependency>();
@@ -28,15 +20,5 @@ namespace Assets.HeadStart.CoreUi
         {
             _uiCoreDependencies.Add(dependency, uiDependency);
         }
-    }
-
-    public interface IUiDependency
-    {
-        void Register(CoreUiObservedValue obj);
-    }
-
-    public class CoreUiObservedValue
-    {
-        public CoreUiObservedValue() { }
     }
 }
