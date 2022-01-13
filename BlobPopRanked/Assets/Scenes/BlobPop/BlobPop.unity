@@ -263,7 +263,7 @@ GameObject:
   - component: {fileID: 127379432}
   - component: {fileID: 127379433}
   m_Layer: 0
-  m_Name: _ClasicColorManager
+  m_Name: ClasicColorManager
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -391,7 +391,7 @@ GameObject:
   - component: {fileID: 186202666}
   - component: {fileID: 186202667}
   m_Layer: 0
-  m_Name: _PredictionManager
+  m_Name: PredictionManager
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -1186,7 +1186,7 @@ GameObject:
   - component: {fileID: 852430989}
   - component: {fileID: 852430990}
   m_Layer: 0
-  m_Name: _BlobFactory (parent) [BlobFactory]
+  m_Name: BlobFactory [s]
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -2302,7 +2302,7 @@ GameObject:
   - component: {fileID: 1814022078}
   - component: {fileID: 1814022079}
   m_Layer: 0
-  m_Name: BlobPopClassic
+  m_Name: BlobPopClassic [s]
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
