@@ -2,7 +2,7 @@ namespace Assets.HeadStart.CoreUi
 {
     public enum UiDependency
     {
-        ScreenPoints
+        ScreenData
     }
 
     public interface IUiDependency

@@ -1,8 +1,8 @@
 using System.Collections.Generic;
 using Assets.BlobPopClassic.BlobPopColor;
 using Assets.BlobPopClassic.DataModels;
+using Assets.CoreExtensions.ScreenData;
 using Assets.HeadStart.CoreUi;
-using Assets.ScreenPoints;
 using UnityEngine;
 
 namespace Assets.BlobPopClassic
@@ -10,19 +10,19 @@ namespace Assets.BlobPopClassic
     public class ClassicPointsController : MonoBehaviour
     {
         public Transform PointsTextT;
-        public ScreenPointsSubject ScreenPointsSubject;
+        public ScreenDataSubject ScreenDataSubject;
 
         internal void Init()
         {
-            ScreenPointsSubject = new ScreenPointsSubject();
-            ScreenPointsSubject.SetPointsWorldPosition(PointsTextT.position);
+            ScreenDataSubject = new ScreenDataSubject();
+            ScreenDataSubject.SetPointsWorldPosition(PointsTextT.position);
 
-            __ui.Register(UiDependency.ScreenPoints, ScreenPointsSubject);
+            __ui.Register(UiDependency.ScreenData, ScreenDataSubject);
         }
 
         public void Calculate(ref Dictionary<int, BlobPointInfo> blobsByColor)
         {
-            List<ScreenPointBlob> screenPointsBlobs = new List<ScreenPointBlob>();
+            List<ScreenPointBlob> screenDataBlobs = new List<ScreenPointBlob>();
             foreach (KeyValuePair<int, BlobPointInfo> kvp in blobsByColor)
             {
                 BlobColor blobColor = (BlobColor)kvp.Key;
@@ -32,15 +32,15 @@ namespace Assets.BlobPopClassic
                 }
 
                 ScreenPointBlob screenPointBlob = new ScreenPointBlob(blobColor, kvp.Value);
-                screenPointsBlobs.Add(screenPointBlob);
+                screenDataBlobs.Add(screenPointBlob);
             }
-            ScreenPointsSubject.Set(screenPointsBlobs);
+            ScreenDataSubject.Set(screenDataBlobs);
             blobsByColor.Clear();
         }
 
         internal void UpdatePoints(int points)
         {
-            ScreenPointsSubject.SetTotalPoints(points);
+            ScreenDataSubject.SetTotalPoints(points);
         }
     }
 }

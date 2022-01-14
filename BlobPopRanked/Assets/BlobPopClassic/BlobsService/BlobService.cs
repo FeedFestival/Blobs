@@ -15,9 +15,9 @@ namespace Assets.BlobPopClassic.BlobsService
                     );
             if (proximity)
             {
-                return distance < BlobPopClassic._.NEIGHBOR_PROXIMITY;
+                return distance < BlobPopGame._.NEIGHBOR_PROXIMITY;
             }
-            return distance < BlobPopClassic._.NEIGHBOR_TEST_DISTANCE;
+            return distance < BlobPopGame._.NEIGHBOR_TEST_DISTANCE;
         }
 
         public static List<Blob> FindBlobsInProximity(List<Blob> blobs, Blob blob)

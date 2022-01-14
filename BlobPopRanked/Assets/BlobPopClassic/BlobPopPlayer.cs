@@ -140,8 +140,8 @@ namespace Assets.BlobPopClassic
             ShootAnimated();
 
             BlobInMotion = true;
-            BlobPopClassic._.DificultyService.CalculatePlayTime(start: true);
-            BlobPopClassic._.ActivateEndGame(false);
+            BlobPopGame._.DificultyService.CalculatePlayTime(start: true);
+            BlobPopGame._.ActivateEndGame(false);
         }
 
         public void ShootAnimated()
@@ -306,8 +306,8 @@ namespace Assets.BlobPopClassic
 
             ShootAnimated();
 
-            BlobPopClassic._.DificultyService.CalculatePlayTime(start: true);
-            BlobPopClassic._.ActivateEndGame(false);
+            BlobPopGame._.DificultyService.CalculatePlayTime(start: true);
+            BlobPopGame._.ActivateEndGame(false);
         }
 
         public void BlobHitSticky(BlobHitStickyInfo blobHitStickyInfo)
@@ -327,9 +327,9 @@ namespace Assets.BlobPopClassic
 
             _blobHitStickyInfo.blob.CheckSurroundings(blobHitStickyInfo.otherBlob);
 
-            BlobPopClassic._.Blobs.Add(_blobHitStickyInfo.blob);
+            BlobPopGame._.Blobs.Add(_blobHitStickyInfo.blob);
             // ! important to try to destroy AFTER adding
-            BlobPopClassic._.TryDestroyNeighbors(_blobHitStickyInfo.blob);
+            BlobPopGame._.TryDestroyNeighbors(_blobHitStickyInfo.blob);
 
             FirstProjectile = null;
             MakeSwitchableBlob();
@@ -344,7 +344,7 @@ namespace Assets.BlobPopClassic
         {
             RaycastHit2D hit = FakeShootBlob(origin: origin, towards: targetPos);
             OnHitSomething(hit, origin);
-            BlobPopClassic._.DisableWalls(DisableWallOp.Both, false);
+            BlobPopGame._.DisableWalls(DisableWallOp.Both, false);
         }
 
         private RaycastHit2D FakeShootBlob(Vector2 origin, Vector2 towards)
@@ -368,11 +368,11 @@ namespace Assets.BlobPopClassic
                 {
                     if (hit.transform.gameObject.name.Contains("RWall"))
                     {
-                        BlobPopClassic._.DisableWalls(DisableWallOp.RightInverse);
+                        BlobPopGame._.DisableWalls(DisableWallOp.RightInverse);
                     }
                     else
                     {
-                        BlobPopClassic._.DisableWalls(DisableWallOp.LeftInverse);
+                        BlobPopGame._.DisableWalls(DisableWallOp.LeftInverse);
                     }
 
                     Vector2 newOrigin = (Vector2)hit.centroid;
@@ -446,7 +446,7 @@ namespace Assets.BlobPopClassic
             var prefab = (Main._.Game as BlobPopGame).NewBlob;
             var go = Instantiate(prefab, new Vector3(0, 0, 0), Quaternion.identity);
             go.name = "Nblob";
-            BlobColor blobColor = BlobPopClassic._.DificultyService.GetColorByDificulty(newBlob: true);
+            BlobColor blobColor = BlobPopGame._.DificultyService.GetColorByDificulty(newBlob: true);
             go.GetComponent<Blob>().BlobReveries.SetColor(blobColor);
             return go.GetComponent<BlobProjectile>();
         }

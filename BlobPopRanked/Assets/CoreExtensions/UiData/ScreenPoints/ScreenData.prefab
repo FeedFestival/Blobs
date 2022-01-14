@@ -159,7 +159,7 @@ GameObject:
   - component: {fileID: 244015790208843500}
   - component: {fileID: 244015790208843502}
   m_Layer: 5
-  m_Name: ScreenPoints
+  m_Name: ScreenData
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -233,7 +233,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e913812dbfa72e94c8b9867384959723, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  Points: 0
   _holderT: {fileID: 244015788809897579}
   PointsText: {fileID: 747438534}
-  Points: 0
+  PointTextPrefab: {fileID: 4472081050924165608, guid: 25a11c0dc4e6f2741932b95b12b101ba,
+    type: 3}
   PointsEnlargeDurationS: 0.3

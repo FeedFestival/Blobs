@@ -9,42 +9,18 @@ using Assets.BlobPopClassic;
 using Assets.BlobPopClassic.DataModels;
 using Assets.BlobPopClassic.BlobPopColor;
 
-namespace Assets.ScreenPoints
+namespace Assets.CoreExtensions.ScreenData
 {
-    public class ScreenPointsSubject : CoreUiObservedValue
+    public class ScreenData : MonoBehaviour, IUiDependency
     {
-        public List<ScreenPointBlob> ScreenPointsBlobs;
-        public int TotalPoints;
-        public Vector3 PointsWorldPosition;
-        public void Set(List<ScreenPointBlob> screenPointsBlobs)
-        {
-            ScreenPointsBlobs = screenPointsBlobs;
-        }
-        public void SetTotalPoints(int points)
-        {
-            TotalPoints = points;
-        }
-        public void SetPointsWorldPosition(Vector3 pointsWorldPosition)
-        {
-            PointsWorldPosition = pointsWorldPosition;
-        }
-        public void Clear()
-        {
-            ScreenPointsBlobs = null;
-        }
-    }
-
-    public class ScreenPoints : MonoBehaviour, IUiDependency
-    {
+        public float Points;
         public Transform _holderT;
         public Text PointsText;
+        public GameObject PointTextPrefab;
         private RectTransform _pointsRt;
         private Vector2 _totalPointsPos;
         List<IPoolObject> _pointTexts;
-        int _startPointsLength = 2;
-        public float Points;
         int? _pointsEnlargeTweenId;
-        public float PointsEnlargeDurationS = 0.3f;
         Vector2 _normalSize;
         Vector2 _bigSize;
         int? _pointsColorizeTweenId;
@@ -53,29 +29,33 @@ namespace Assets.ScreenPoints
         float _addPoint;
         IEnumerator __setTimedPoints;
         private Vector2Int _actualScreenSize;
+        //--------------------------- GAME CONSTANTS ------------------------
+        //---------------------------
+        private readonly int START_POINTS_LENGTH = 2;
+        private readonly float POINTS_ENLARGE_DURATION_SECONDS = 0.3f;
 
         void Awake()
         {
-            __ui.SetAvailable(UiDependency.ScreenPoints, this);
+            __ui.SetAvailable(UiDependency.ScreenData, this);
         }
 
         public void Register(CoreUiObservedValue observed)
         {
-            (observed as ScreenPointsSubject)
-                .ObserveEveryValueChanged(x => x.ScreenPointsBlobs)
-                .Subscribe(screenPointsBlobs =>
+            (observed as ScreenDataSubject)
+                .ObserveEveryValueChanged(x => x.ScreenDataBlobs)
+                .Subscribe(screenDataBlobs =>
                 {
-                    if (screenPointsBlobs == null) { return; }
-                    foreach (var spb in screenPointsBlobs)
+                    if (screenDataBlobs == null) { return; }
+                    foreach (var spb in screenDataBlobs)
                     {
                         ShowPoints(spb);
                     }
                 });
 
-            (observed as ScreenPointsSubject)
+            (observed as ScreenDataSubject)
                 .ObserveEveryValueChanged(x => x.TotalPoints)
                 .Subscribe(UpdatePoints);
-            (observed as ScreenPointsSubject)
+            (observed as ScreenDataSubject)
                 .ObserveEveryValueChanged(x => x.PointsWorldPosition)
                 .Subscribe(pointsWorldPosition =>
                 {
@@ -121,7 +101,7 @@ namespace Assets.ScreenPoints
             {
                 _pointTexts = new List<IPoolObject>();
             }
-            for (var i = 0; i < _startPointsLength; i++)
+            for (var i = 0; i < START_POINTS_LENGTH; i++)
             {
                 GenerateNewPoint(i);
             }
@@ -134,12 +114,12 @@ namespace Assets.ScreenPoints
             pointText.Show();
 
             Vector2 ballsCenterPos = __world2d.GetCenterPosition(screenPointBlob.BlobsPositions);
-            // TODO: ramake this -> dont use specifics or extends ScreenPoints
+            // TODO: ramake this -> dont use specifics or extends ScreenData
             var blobHitStickyInfo = (Main._.Game.Player as BlobPopPlayer).GetBlobHitStickyInfo();
             pointText.ShowOnScreen(ballsCenterPos, blobHitStickyInfo);
         }
 
-        public void UpdateScreenPoints(int toAdd, BlobColor blobColor)
+        public void UpdateScreenData(int toAdd, BlobColor blobColor)
         {
             SetupTweenVariables(toAdd);
             SetPoints();
@@ -168,7 +148,7 @@ namespace Assets.ScreenPoints
                 _splitAdd = toAdd;
                 _addPoint = 1;
             }
-            _time = PointsEnlargeDurationS / _splitAdd;
+            _time = POINTS_ENLARGE_DURATION_SECONDS / _splitAdd;
         }
 
         void SetPoints()
@@ -214,7 +194,7 @@ namespace Assets.ScreenPoints
 
             _pointsEnlargeTweenId = LeanTween.size(_pointsRt,
                 enlarge == true ? _bigSize : _normalSize,
-                PointsEnlargeDurationS
+                POINTS_ENLARGE_DURATION_SECONDS
                 ).id;
             LeanTween.descr(_pointsEnlargeTweenId.Value).setEase(LeanTweenType.linear);
         }
@@ -229,7 +209,7 @@ namespace Assets.ScreenPoints
 
             _pointsColorizeTweenId = LeanTween.colorText(_pointsRt,
                 color,
-                PointsEnlargeDurationS
+                POINTS_ENLARGE_DURATION_SECONDS
                 ).id;
             LeanTween.descr(_pointsColorizeTweenId.Value).setEase(LeanTweenType.linear);
         }
@@ -258,14 +238,13 @@ namespace Assets.ScreenPoints
             {
                 index = _pointTexts.Count + 1;
             }
-            var prefab = (Main._.Game as BlobPopGame).PointText;
-            var go = Instantiate(prefab, new Vector3(0, 0, 0), Quaternion.identity);
+            var go = Instantiate(PointTextPrefab, new Vector3(0, 0, 0), Quaternion.identity);
             go.transform.SetParent(_holderT);
             var rect = go.GetComponent<RectTransform>();
             rect.localScale = Vector3.one;
             var textComponent = go.GetComponent<Text>();
             var pointParticle = go.GetComponent<PointTextParticle>() as IPointText;
-            pointParticle.Init(index.Value, textComponent, _totalPointsPos, _actualScreenSize, UpdateScreenPoints);
+            pointParticle.Init(index.Value, textComponent, _totalPointsPos, _actualScreenSize, UpdateScreenData);
             return pointParticle;
         }
     }

@@ -75,11 +75,11 @@ namespace Assets.BlobPopClassic.Blobs
 
         internal void Descend()
         {
-            float spacing = BlobPopClassic._.Spacing;
+            float spacing = BlobPopGame._.Spacing;
             SetWorldPosition(new Vector3(Pos.x, Pos.y - spacing, Pos.z));
-            if (Pos.y < BlobPopClassic._.WALL_STICK_LIMIT)
+            if (Pos.y < BlobPopGame._.WALL_STICK_LIMIT)
             {
-                RemoveSticked(BlobPopClassic._.CEILD_ID);
+                RemoveSticked(BlobPopGame._.CEILD_ID);
             }
         }
 
@@ -101,7 +101,7 @@ namespace Assets.BlobPopClassic.Blobs
             }
             if (otherBlob == null)
             {
-                otherBlob = BlobPopClassic._.GetBlobById(id.Value);
+                otherBlob = BlobPopGame._.GetBlobById(id.Value);
             }
 
             if (Neighbors.Contains(id.Value))
@@ -139,14 +139,14 @@ namespace Assets.BlobPopClassic.Blobs
 
         private void removeSticked()
         {
-            List<Blob> blobsRef = BlobPopClassic._.Blobs;
+            List<Blob> blobsRef = BlobPopGame._.Blobs;
             foreach (var stickedTo in StickedTo)
             {
                 int index = blobsRef.FindIndex(b => b.Bid == stickedTo);
                 if (index >= 0 && index < blobsRef.Count)
                 {
                     blobsRef[index].RemoveSticked(Bid);
-                    __utils.AddIfNone(blobsRef[index].Bid, ref BlobPopClassic._.Affected);
+                    __utils.AddIfNone(blobsRef[index].Bid, ref BlobPopGame._.Affected);
                 }
             }
         }
@@ -219,10 +219,10 @@ namespace Assets.BlobPopClassic.Blobs
         {
             if (otherBlob == null)
             {
-                StickedTo.Add(BlobPopClassic._.CEILD_ID);
+                StickedTo.Add(BlobPopGame._.CEILD_ID);
             }
 
-            List<Blob> proximityBlobs = BlobService.FindBlobsInProximity(BlobPopClassic._.Blobs, this);
+            List<Blob> proximityBlobs = BlobService.FindBlobsInProximity(BlobPopGame._.Blobs, this);
 
             BlobReveries.AnimateShockwave(proximityBlobs);
 
@@ -261,7 +261,7 @@ namespace Assets.BlobPopClassic.Blobs
                 _linkedNeighbors = new List<int>();
                 FindLinkedNeighbors(this);
 
-                if (_linkedNeighbors.Count > BlobPopClassic._.MIN_NEIGHBOR_COUNT_TO_DESTROY)
+                if (_linkedNeighbors.Count > BlobPopGame._.MIN_NEIGHBOR_COUNT_TO_DESTROY)
                 {
                     _linkedNeighbors = null;
                     return true;
@@ -278,7 +278,7 @@ namespace Assets.BlobPopClassic.Blobs
                 {
                     continue;
                 }
-                Blob foundNeighbor = BlobPopClassic._.Blobs
+                Blob foundNeighbor = BlobPopGame._.Blobs
                         .FirstOrDefault(b => b.Bid == neighborId);
                 _linkedNeighbors.Add(neighborId);
 

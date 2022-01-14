@@ -282,7 +282,7 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 329484809}
-  m_RootOrder: 3
+  m_RootOrder: 2
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &127379433
 MonoBehaviour:
@@ -413,7 +413,7 @@ Transform:
   - {fileID: 2025158382}
   - {fileID: 50752168}
   m_Father: {fileID: 329484809}
-  m_RootOrder: 5
+  m_RootOrder: 4
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &186202667
 MonoBehaviour:
@@ -589,7 +589,7 @@ GameObject:
   - component: {fileID: 329484809}
   - component: {fileID: 329484810}
   m_Layer: 0
-  m_Name: BlobPopGame
+  m_Name: BlobPopGame [s]
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -608,7 +608,6 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 1814022077}
-  - {fileID: 575866193}
   - {fileID: 852430989}
   - {fileID: 127379432}
   - {fileID: 1450516083}
@@ -616,7 +615,7 @@ Transform:
   - {fileID: 702104035}
   - {fileID: 1538114477}
   m_Father: {fileID: 0}
-  m_RootOrder: 2
+  m_RootOrder: 3
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &329484810
 MonoBehaviour:
@@ -633,10 +632,19 @@ MonoBehaviour:
   Player: {fileID: 575866194}
   Blob: {fileID: 5860757720808198434, guid: 9d7cad3ca956a4a4983bb1907fb23121, type: 3}
   NewBlob: {fileID: 485944421924740932, guid: 7be4a1cbef7bcc24c8bdb084012c56c7, type: 3}
-  BlobDebugInfoPrefab: {fileID: 9205759509074552445, guid: c83c86be79c09fa4f8f14eb70bbb4c68,
-    type: 3}
-  PointText: {fileID: 4472081050924165608, guid: 25a11c0dc4e6f2741932b95b12b101ba,
-    type: 3}
+  BlobsPerRow: 14
+  StartPos: {x: -2.59, y: 4.505}
+  Spacing: 0.39685
+  Blobs: []
+  _increment: -1
+  FirstLevel: 1
+  Affected: 
+  LeftWall: {fileID: 958943071}
+  RightWall: {fileID: 640657189}
+  EndGameCollider: {fileID: 1375231959}
+  EffectsPool: {fileID: 1450516082}
+  DificultyService: {fileID: 1814022079}
+  ClassicPointsController: {fileID: 1538114476}
 --- !u!1 &418716648
 GameObject:
   m_ObjectHideFlags: 0
@@ -882,8 +890,8 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 788415153}
-  m_Father: {fileID: 329484809}
-  m_RootOrder: 1
+  m_Father: {fileID: 0}
+  m_RootOrder: 2
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &575866194
 MonoBehaviour:
@@ -1052,7 +1060,7 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 329484809}
-  m_RootOrder: 6
+  m_RootOrder: 5
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &702104036
 MonoBehaviour:
@@ -1213,7 +1221,7 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 329484809}
-  m_RootOrder: 2
+  m_RootOrder: 1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &852430990
 MonoBehaviour:
@@ -1309,7 +1317,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 22457152, guid: 67117722a812a2e46ab8cb8eafbf5f5e, type: 3}
       propertyPath: m_RootOrder
-      value: 3
+      value: 4
       objectReference: {fileID: 0}
     - target: {fileID: 22457152, guid: 67117722a812a2e46ab8cb8eafbf5f5e, type: 3}
       propertyPath: m_AnchorMax.x
@@ -1801,6 +1809,11 @@ PrefabInstance:
       propertyPath: m_Name
       value: Main Camera
       objectReference: {fileID: 0}
+    - target: {fileID: 7085069107375332429, guid: a044c8d5b2d8b91488e5fed3626d754e,
+        type: 3}
+      propertyPath: m_Name
+      value: ScreenData
+      objectReference: {fileID: 0}
     - target: {fileID: 7085069108266493141, guid: a044c8d5b2d8b91488e5fed3626d754e,
         type: 3}
       propertyPath: m_AnchorMax.y
@@ -2253,7 +2266,7 @@ Transform:
   m_Children:
   - {fileID: 236325109}
   m_Father: {fileID: 329484809}
-  m_RootOrder: 7
+  m_RootOrder: 6
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1592384026
 GameObject:
@@ -2312,10 +2325,9 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1814022077}
-  - component: {fileID: 1814022078}
   - component: {fileID: 1814022079}
   m_Layer: 0
-  m_Name: BlobPopClassic [s]
+  m_Name: DificultyService
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -2344,32 +2356,6 @@ Transform:
   m_Father: {fileID: 329484809}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &1814022078
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1814022076}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: c2517356e8ae00e468f8e70cb9c04c78, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  EffectsPool: {fileID: 1450516082}
-  BlobsPerRow: 14
-  StartPos: {x: -2.59, y: 4.505}
-  Spacing: 0.39685
-  Blobs: []
-  _increment: -1
-  FirstLevel: 1
-  Affected: 
-  DificultyService: {fileID: 0}
-  ClasicColorManager: {fileID: 0}
-  LeftWall: {fileID: 958943071}
-  RightWall: {fileID: 640657189}
-  EndGameCollider: {fileID: 1375231959}
-  ClassicPointsController: {fileID: 1538114476}
 --- !u!114 &1814022079
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2683,7 +2669,7 @@ PrefabInstance:
     - target: {fileID: 2962000725682473759, guid: 8e4273ae1cf9259409e36b7c3aaff402,
         type: 3}
       propertyPath: m_RootOrder
-      value: 4
+      value: 3
       objectReference: {fileID: 0}
     - target: {fileID: 2962000725682473759, guid: 8e4273ae1cf9259409e36b7c3aaff402,
         type: 3}

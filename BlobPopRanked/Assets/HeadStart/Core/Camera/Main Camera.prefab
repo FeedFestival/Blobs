@@ -736,6 +736,12 @@ PrefabInstance:
       propertyPath: m_AnchoredPosition.x
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 244015790208843502, guid: 4f7fd16851f230745957f7126b007971,
+        type: 3}
+      propertyPath: PointTextPrefab
+      value: 
+      objectReference: {fileID: 4472081050924165608, guid: 25a11c0dc4e6f2741932b95b12b101ba,
+        type: 3}
     - target: {fileID: 244015790208843506, guid: 4f7fd16851f230745957f7126b007971,
         type: 3}
       propertyPath: m_Pivot.x

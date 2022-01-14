@@ -206,24 +206,24 @@ namespace Assets.BlobPopClassic.BlobsService
 
         public void CheckIfAddingNewRow()
         {
-            bool isAtLeastOnBlobConnectedToCeil = (BlobPopClassic._.Blobs == null || BlobPopClassic._.Blobs.Count == 0) == false;
+            bool isAtLeastOnBlobConnectedToCeil = (BlobPopGame._.Blobs == null || BlobPopGame._.Blobs.Count == 0) == false;
 
             if (isAtLeastOnBlobConnectedToCeil == false)
             {
-                isAtLeastOnBlobConnectedToCeil = BlobPopClassic._.Blobs.Exists(b =>
+                isAtLeastOnBlobConnectedToCeil = BlobPopGame._.Blobs.Exists(b =>
                 {
-                    bool isConnectedToCeil = b.StickedTo.Exists(s => s == BlobPopClassic._.CEILD_ID);
+                    bool isConnectedToCeil = b.StickedTo.Exists(s => s == BlobPopGame._.CEILD_ID);
                     return isConnectedToCeil;
                 });
             }
 
             if (isAtLeastOnBlobConnectedToCeil)
             {
-                float blobY = BlobPopClassic._.Blobs.Min(b => b.transform.position.y);
+                float blobY = BlobPopGame._.Blobs.Min(b => b.transform.position.y);
 
                 float dashedLine = -4.23f;
-                float newDashedLine = dashedLine - BlobPopClassic._.WALL_STICK_LIMIT;
-                float newBlobY = blobY - BlobPopClassic._.WALL_STICK_LIMIT;
+                float newDashedLine = dashedLine - BlobPopGame._.WALL_STICK_LIMIT;
+                float newBlobY = blobY - BlobPopGame._.WALL_STICK_LIMIT;
 
                 int minHealthPercent = 25;
                 _healthPercent = Mathf.CeilToInt(__percent.What(_is: newBlobY, _of: newDashedLine));
@@ -253,16 +253,16 @@ namespace Assets.BlobPopClassic.BlobsService
                 if (Hits >= HitsToReset)
                 {
                     Hits = 0;
-                    BlobPopClassic._.AddAnotherBlobLevel();
+                    BlobPopGame._.AddAnotherBlobLevel();
                 }
                 else if (_healthPercent > 80)
                 {
-                    BlobPopClassic._.ActivateEndGame();
+                    BlobPopGame._.ActivateEndGame();
                 }
             }
             else
             {
-                BlobPopClassic._.AddAnotherBlobLevel();
+                BlobPopGame._.AddAnotherBlobLevel();
             }
         }
 
