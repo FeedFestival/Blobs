@@ -17,9 +17,11 @@ namespace Assets.CoreExtensions.ScreenData
         public Transform _holderT;
         public Text PointsText;
         public GameObject PointTextPrefab;
+        public GameObject PointIconPrefab;
         private RectTransform _pointsRt;
         private Vector2 _totalPointsPos;
         List<IPoolObject> _pointTexts;
+        List<IPoolObject> _pointIcons;
         int? _pointsEnlargeTweenId;
         Vector2 _normalSize;
         Vector2 _bigSize;
@@ -31,7 +33,7 @@ namespace Assets.CoreExtensions.ScreenData
         private Vector2Int _actualScreenSize;
         //--------------------------- GAME CONSTANTS ------------------------
         //---------------------------
-        private readonly int START_POINTS_LENGTH = 2;
+        private readonly int START_POINTS_LENGTH = 5;   // 3
         private readonly float POINTS_ENLARGE_DURATION_SECONDS = 0.3f;
 
         void Awake()
@@ -48,13 +50,18 @@ namespace Assets.CoreExtensions.ScreenData
                     if (screenDataBlobs == null) { return; }
                     foreach (var spb in screenDataBlobs)
                     {
+                        __debug.DumpToConsole(spb);
                         ShowPoints(spb);
                     }
                 });
 
             (observed as ScreenDataSubject)
-                .ObserveEveryValueChanged(x => x.TotalPoints)
-                .Subscribe(UpdatePoints);
+                .ObserveEveryValueChanged(x => x.ScreenToiletPaper)
+                .Subscribe(screenToiletPaper =>
+                {
+                    if (screenToiletPaper == null) { return; }
+                    ShowPoints(screenToiletPaper);
+                });
             (observed as ScreenDataSubject)
                 .ObserveEveryValueChanged(x => x.PointsWorldPosition)
                 .Subscribe(pointsWorldPosition =>
@@ -101,6 +108,10 @@ namespace Assets.CoreExtensions.ScreenData
             {
                 _pointTexts = new List<IPoolObject>();
             }
+            if (_pointIcons == null)
+            {
+                _pointIcons = new List<IPoolObject>();
+            }
             for (var i = 0; i < START_POINTS_LENGTH; i++)
             {
                 GenerateNewPoint(i);
@@ -109,7 +120,16 @@ namespace Assets.CoreExtensions.ScreenData
 
         public void ShowPoints(ScreenPointBlob screenPointBlob)
         {
-            var pointText = GetAvailablePointText() as IPointText;
+            IPointText pointText;
+            if (screenPointBlob.BlobColor == BlobColor.BROWN)
+            {
+                // TODO: we want to show the toilet paper next to a number
+                pointText = GetAvailablePointIcon() as IPointText;
+            }
+            else
+            {
+                pointText = GetAvailablePointText() as IPointText;
+            }
             pointText.ChangeValue(screenPointBlob.Points, screenPointBlob.BlobColor);
             pointText.Show();
 
@@ -125,6 +145,15 @@ namespace Assets.CoreExtensions.ScreenData
             SetPoints();
             EnlargePoints();
             ColorizePoints(blobColor);
+        }
+
+        public void UpdateToiletPaperScreenData(int toAdd, BlobColor blobColor)
+        {
+            Debug.Log("toAdd: " + toAdd);
+            // SetupTweenVariables(toAdd);
+            // SetPoints();
+            // EnlargePoints();
+            // ColorizePoints(blobColor);
         }
 
         void SetupTweenVariables(int toAdd)
@@ -224,28 +253,63 @@ namespace Assets.CoreExtensions.ScreenData
             return pointText;
         }
 
+        IPoolObject GetAvailablePointIcon()
+        {
+            var pointIcon = _pointIcons.Find(pT => pT.IsUsed == false);
+            if (pointIcon == null)
+            {
+                pointIcon = GenerateNewPointIcon();
+            }
+            return pointIcon;
+        }
+
         IPoolObject GenerateNewPoint(int? index = null)
         {
-            var pointText = GetNewText(index);
+            var pointText = GetNewPointText(PointTextPrefab, index);
             pointText.Hide();
             _pointTexts.Add(pointText);
             return pointText;
         }
 
-        IPoolObject GetNewText(int? index)
+        IPoolObject GenerateNewPointIcon(int? index = null)
+        {
+            var pointIcon = GetNewPointIcon(PointIconPrefab, index);
+            pointIcon.Hide();
+            _pointIcons.Add(pointIcon);
+            return pointIcon;
+        }
+
+        IPoolObject GetNewPointText(GameObject prefab, int? index)
         {
             if (index.HasValue == false)
             {
                 index = _pointTexts.Count + 1;
             }
-            var go = Instantiate(PointTextPrefab, new Vector3(0, 0, 0), Quaternion.identity);
+            var go = createPointText(prefab, index);
+            var pointParticle = go.GetComponent<PointTextParticle>() as IPointText;
+            pointParticle.Init(index.Value, _totalPointsPos, _actualScreenSize, UpdateScreenData);
+            return pointParticle;
+        }
+
+        IPoolObject GetNewPointIcon(GameObject prefab, int? index)
+        {
+            if (index.HasValue == false)
+            {
+                index = _pointTexts.Count + 1;
+            }
+            var go = createPointText(prefab, index);
+            var pointParticle = go.GetComponent<PointIconParticle>() as IPointText;
+            pointParticle.Init(index.Value, _totalPointsPos, _actualScreenSize, UpdateToiletPaperScreenData);
+            return pointParticle;
+        }
+
+        private GameObject createPointText(GameObject prefab, int? index)
+        {
+            var go = Instantiate(prefab, new Vector3(0, 0, 0), Quaternion.identity);
             go.transform.SetParent(_holderT);
             var rect = go.GetComponent<RectTransform>();
             rect.localScale = Vector3.one;
-            var textComponent = go.GetComponent<Text>();
-            var pointParticle = go.GetComponent<PointTextParticle>() as IPointText;
-            pointParticle.Init(index.Value, textComponent, _totalPointsPos, _actualScreenSize, UpdateScreenData);
-            return pointParticle;
+            return go;
         }
     }
 }

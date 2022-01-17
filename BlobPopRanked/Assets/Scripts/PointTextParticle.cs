@@ -10,15 +10,15 @@ public class PointTextParticle : MonoBehaviour, IPoolObject, IPointText
 {
     private int _id;
     private bool _isUsed;
-    private Text _textComponent;
-    private int _pointsValue;
+    protected Text _textComponent;
+    protected int _pointsValue;
     private Vector2 _viewportPosition;
     private Vector2 _worldObjectScreenPosition;
     private RectTransform _rt;
     private int? _reflectTweenId;
     private int? _sizeTweenId;
     private int? _towardsTotalTweenId;
-    private BlobColor _currentBlobColor;
+    protected BlobColor _currentBlobColor;
     public TrailRenderer Trail;
     private Vector2Int _actualScreenSize;
     private OnPointsUpdated _onPointsUpdated;
@@ -36,10 +36,10 @@ public class PointTextParticle : MonoBehaviour, IPoolObject, IPointText
     {
         get => _isUsed;
     }
-    void IPointText.Init(int id, Text text, Vector2 totalPointsPos, Vector2Int actualScreenSize, OnPointsUpdated onPointsUpdated)
+    void IPointText.Init(int id, Vector2 totalPointsPos, Vector2Int actualScreenSize, OnPointsUpdated onPointsUpdated)
     {
         _id = id;
-        _textComponent = text;
+        _textComponent = gameObject.GetComponent<Text>();
         _totalPointsPos = totalPointsPos;
         _actualScreenSize = actualScreenSize;
         _onPointsUpdated = onPointsUpdated;

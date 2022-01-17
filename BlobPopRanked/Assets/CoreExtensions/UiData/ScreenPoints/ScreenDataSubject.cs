@@ -9,15 +9,15 @@ namespace Assets.CoreExtensions.ScreenData
     public class ScreenDataSubject : CoreUiObservedValue
     {
         public List<ScreenPointBlob> ScreenDataBlobs;
-        public int TotalPoints;
+        public ScreenToiletPaper ScreenToiletPaper;
         public Vector3 PointsWorldPosition;
         public void Set(List<ScreenPointBlob> screenDataBlobs)
         {
             ScreenDataBlobs = screenDataBlobs;
         }
-        public void SetTotalPoints(int points)
+        public void SetToiletPaper(ScreenToiletPaper screenToiletPaper)
         {
-            TotalPoints = points;
+            ScreenToiletPaper = screenToiletPaper;
         }
         public void SetPointsWorldPosition(Vector3 pointsWorldPosition)
         {

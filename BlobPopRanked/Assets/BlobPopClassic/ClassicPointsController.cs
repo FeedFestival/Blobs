@@ -3,6 +3,7 @@ using Assets.BlobPopClassic.BlobPopColor;
 using Assets.BlobPopClassic.DataModels;
 using Assets.CoreExtensions.ScreenData;
 using Assets.HeadStart.CoreUi;
+using Assets.Scripts.utils;
 using UnityEngine;
 
 namespace Assets.BlobPopClassic
@@ -28,6 +29,11 @@ namespace Assets.BlobPopClassic
                 BlobColor blobColor = (BlobColor)kvp.Key;
                 if (blobColor == BlobColor.BROWN)
                 {
+                    ScreenToiletPaper screenToiletPaper = new ScreenToiletPaper(kvp.Value);
+                    if (screenToiletPaper.Points > 0)
+                    {
+                        ScreenDataSubject.SetToiletPaper(screenToiletPaper);
+                    }
                     continue;
                 }
 
@@ -38,9 +44,19 @@ namespace Assets.BlobPopClassic
             blobsByColor.Clear();
         }
 
-        internal void UpdatePoints(int points)
+        void Update()
         {
-            ScreenDataSubject.SetTotalPoints(points);
+            if (Input.GetKeyUp(KeyCode.R))
+            {
+                BlobPointInfo bpi = new BlobPointInfo()
+                {
+                    Points = 1,
+                    BlobsIds = new List<int> { 13 },
+                    BlobsPositions = new List<Vector2> { new Vector2(0.596f, 4.515f) }
+                };
+                ScreenToiletPaper stp = new ScreenToiletPaper(bpi);
+                ScreenDataSubject.SetToiletPaper(stp);
+            }
         }
     }
 }

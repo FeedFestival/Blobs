@@ -738,6 +738,12 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 244015790208843502, guid: 4f7fd16851f230745957f7126b007971,
         type: 3}
+      propertyPath: PointIconPrefab
+      value: 
+      objectReference: {fileID: 4472081050924165608, guid: 68d3520f639ed8c4aa03b5649a6854f7,
+        type: 3}
+    - target: {fileID: 244015790208843502, guid: 4f7fd16851f230745957f7126b007971,
+        type: 3}
       propertyPath: PointTextPrefab
       value: 
       objectReference: {fileID: 4472081050924165608, guid: 25a11c0dc4e6f2741932b95b12b101ba,
@@ -850,7 +856,7 @@ PrefabInstance:
     - target: {fileID: 244015790208843507, guid: 4f7fd16851f230745957f7126b007971,
         type: 3}
       propertyPath: m_Name
-      value: ScreenPoints
+      value: ScreenData
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 4f7fd16851f230745957f7126b007971, type: 3}

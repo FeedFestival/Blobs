@@ -75,15 +75,15 @@ namespace Assets.BlobPopClassic.BlobPopColor
                 case BlobColor.BROWN:
                     multiplier = 0;
                     break;
-                case BlobColor.PINK:
-                    multiplier = 5;
-                    break;
-                case BlobColor.WHITE:
-                    multiplier = 6;
-                    break;
-                case BlobColor.BLACK:
-                    multiplier = 7;
-                    break;
+                // case BlobColor.PINK:
+                //     multiplier = 5;
+                //     break;
+                // case BlobColor.WHITE:
+                //     multiplier = 6;
+                //     break;
+                // case BlobColor.BLACK:
+                //     multiplier = 7;
+                //     break;
                 case BlobColor.RED:
                 default:
                     multiplier = 1;

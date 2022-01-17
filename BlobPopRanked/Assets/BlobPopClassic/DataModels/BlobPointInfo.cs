@@ -15,28 +15,19 @@ namespace Assets.BlobPopClassic.DataModels
     public class ScreenPointBlob : BlobPointInfo
     {
         public BlobColor BlobColor;
-
         public ScreenPointBlob() { }
 
-        public ScreenPointBlob(BlobPointInfo blobPointInfo)
-        {
-            BlobsIds = blobPointInfo.BlobsIds;
-            BlobsPositions = blobPointInfo.BlobsPositions;
-            Points =blobPointInfo.Points;
-        }
         public ScreenPointBlob(BlobColor blobColor, BlobPointInfo blobPointInfo)
         {
             BlobsIds = blobPointInfo.BlobsIds;
             BlobsPositions = blobPointInfo.BlobsPositions;
-            Points =blobPointInfo.Points;
             CalculateColorPoints(blobColor);
         }
 
-        public void CalculateColorPoints(BlobColor blobColor)
+        private void CalculateColorPoints(BlobColor blobColor)
         {
             BlobColor = blobColor;
 
-            // Refactor this so we take into account the color when adding points
             if (BlobsIds.Count <= 3)
             {
                 Points = BlobsIds.Count;
@@ -46,8 +37,29 @@ namespace Assets.BlobPopClassic.DataModels
             {
                 rest = BlobsIds.Count - 3;
             }
-            var points = (3 + (rest * 2));
-            Points = points * BlobColorService.GetBlobColorPoints(blobColor);
+            // TODO: CALCULATE how long it took the user to make the move
+            // - and try adding some extra points if he didnt use the Prediction
+            // TODO: CALCULATE if user used the Prediction to get passed an obstable
+            // - and give him some extra points for that
+            Points = (3 + (rest * 2)) * BlobColorService.GetBlobColorPoints(blobColor);
+        }
+    }
+
+    public class ScreenToiletPaper : ScreenPointBlob
+    {
+        public ScreenToiletPaper() { }
+        public ScreenToiletPaper(BlobPointInfo blobPointInfo)
+        {
+            BlobsIds = blobPointInfo.BlobsIds;
+            BlobColor = BlobColor.BROWN;
+            BlobsPositions = blobPointInfo.BlobsPositions;
+            CalculateToiletPaperPoints();
+        }
+
+        private void CalculateToiletPaperPoints()
+        {
+            // TODO: do the whole 10% + 5% thing
+            Points = 1;
         }
     }
 }
