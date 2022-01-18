@@ -43,7 +43,8 @@ public class Main : MonoBehaviour
                 CheckForUpdates = false;
 #endif
 #if UNITY_EDITOR
-                if (CheckForUpdates) {
+                if (CheckForUpdates)
+                {
                     VersionChecker versionChecker = gameObject.AddComponent<VersionChecker>();
                     versionChecker.Check();
                     Destroy(gameObject.GetComponent<VersionChecker>());

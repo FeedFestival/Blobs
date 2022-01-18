@@ -63,7 +63,7 @@ namespace Assets.BlobPopClassic
         public override void PreStartGame()
         {
             __.Transition.Do(Transition.END);
-            
+
             EffectsPool.Init();
             EffectsPool.GenerateParticleControllers();
 
@@ -87,13 +87,25 @@ namespace Assets.BlobPopClassic
 
         internal void OnGameOver()
         {
+            __.Event.Emit(Evt.ACTIVATE_POINTER_AREA, false);
             PauseGame();
-            DialogOptions dialogOptions = new DialogOptions()
+            DialogOptions options = new DialogOptions()
             {
-                Title = "Failed",
-                Info = ""
+                Title = "Congrats " + CoreSession._.SessionOpts.User.Name + "!",
+                Info = CoreSession._.SessionOpts.Points.ToString(),
+                ContinueCallback = () =>
+                {
+                    __.Transition.Do(Transition.START, () =>
+                    {
+                        Main._.Game.GoToMainMenu();
+                    });
+                },
+                RetryCallback = () =>
+                {
+                    Main._.Game.Restart();
+                }
             };
-            __.Dialog.Show(dialogOptions);
+            __.Dialog.Show(options);
         }
 
         void PlayBackgroundMusic()

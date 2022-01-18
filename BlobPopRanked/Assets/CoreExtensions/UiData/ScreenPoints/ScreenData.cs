@@ -8,12 +8,13 @@ using UniRx;
 using Assets.BlobPopClassic;
 using Assets.BlobPopClassic.DataModels;
 using Assets.BlobPopClassic.BlobPopColor;
+using Assets.HeadStart.Core;
 
 namespace Assets.CoreExtensions.ScreenData
 {
     public class ScreenData : MonoBehaviour, IUiDependency
     {
-        public float Points;
+        public float RealPoints;
         public Transform _holderT;
         public Text PointsText;
         public GameObject PointTextPrefab;
@@ -50,7 +51,6 @@ namespace Assets.CoreExtensions.ScreenData
                     if (screenDataBlobs == null) { return; }
                     foreach (var spb in screenDataBlobs)
                     {
-                        __debug.DumpToConsole(spb);
                         ShowPoints(spb);
                     }
                 });
@@ -70,9 +70,9 @@ namespace Assets.CoreExtensions.ScreenData
                 });
         }
 
-        private void UpdatePoints(int totalPoints)
+        private void UpdatePoints()
         {
-            PointsText.text = totalPoints.ToString();
+            PointsText.text = CoreSession._.SessionOpts.Points.ToString();
         }
 
         void Init(Vector3 pointsTPos)
@@ -150,6 +150,11 @@ namespace Assets.CoreExtensions.ScreenData
         public void UpdateToiletPaperScreenData(int toAdd, BlobColor blobColor)
         {
             Debug.Log("toAdd: " + toAdd);
+            
+            // for now 
+            CoreSession._.SessionOpts.ToiletPaper += toAdd;
+
+            // TODO - add this functionality
             // SetupTweenVariables(toAdd);
             // SetPoints();
             // EnlargePoints();
@@ -164,8 +169,9 @@ namespace Assets.CoreExtensions.ScreenData
                 __setTimedPoints = null;
                 var lastAdditionalPoints = _splitAdd * _addPoint;
 
-                Points += lastAdditionalPoints;
-                UpdatePoints((int)Points);
+                RealPoints += lastAdditionalPoints;
+                CoreSession._.SessionOpts.Points = Mathf.CeilToInt(RealPoints);
+                UpdatePoints();
             }
             if (toAdd > 10)
             {
@@ -209,8 +215,9 @@ namespace Assets.CoreExtensions.ScreenData
             yield return new WaitForSeconds(_time);
 
             _splitAdd -= 1;
-            Points += _addPoint;
-            UpdatePoints((int)Points);
+            RealPoints += _addPoint;
+            CoreSession._.SessionOpts.Points = Mathf.CeilToInt(RealPoints);
+            UpdatePoints();
             SetPoints();
         }
 
