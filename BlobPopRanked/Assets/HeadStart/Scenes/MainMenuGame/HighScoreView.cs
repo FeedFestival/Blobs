@@ -65,15 +65,14 @@ public class HighScoreView : MonoBehaviour, IUiView
         var fullUrl = url + "?" + secret + "&" + latReq + "&" + longReq;
         Debug.Log("fullUrl: " + fullUrl);
 
-        // TODO: reimport 
-        // ObservableUnityWebRequest
-        //     .GetAsObservable(fullUrl, _requestHeaders)
-        //     .Subscribe(responseBody =>
-        //     {
-        //         Debug.Log(responseBody);
-        //         RankingLeague rLeague = JsonUtility.FromJson<RankingLeague>(responseBody);
-        //         CheckLeague(rLeague);
-        //     });
+        ObservableUnityWebRequest
+            .GetAsObservable(fullUrl, _requestHeaders)
+            .Subscribe(responseBody =>
+            {
+                Debug.Log(responseBody);
+                RankingLeague rLeague = JsonUtility.FromJson<RankingLeague>(responseBody);
+                CheckLeague(rLeague);
+            });
     }
 
     public void OnFocussed()
@@ -92,9 +91,8 @@ public class HighScoreView : MonoBehaviour, IUiView
         var fullUrl = url + "?" + secret + "&" + rLeague.ToRouteParams() + "&" + points;
         Debug.Log("fullUrl: " + fullUrl);
 
-        // TODO: reimport 
-        // ObservableUnityWebRequest
-        //     .GetAsObservable(fullUrl, _requestHeaders)
-        //     .Subscribe(responseBody => Debug.Log(responseBody));
+        ObservableUnityWebRequest
+            .GetAsObservable(fullUrl, _requestHeaders)
+            .Subscribe(responseBody => Debug.Log(responseBody));
     }
 }

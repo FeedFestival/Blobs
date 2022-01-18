@@ -124,21 +124,19 @@ public class GameSession : MonoBehaviour, IUiView
                             emailReq = "&email=simionescudani07@gmail.com";
                         }
                         var fullUrl = url + "?" + secret + "&" + usernameReq + emailReq;
+                        ObservableUnityWebRequest
+                            .GetAsObservable(fullUrl)
+                            .Subscribe(responseBody =>
+                            {
+                                UserDebug user = JsonUtility.FromJson<UserDebug>(responseBody);
+                                _sessionOpts.User.LocalId = user.LocalId;
+                                _sessionOpts.User.Name = user.Name;
 
-                        // TODO: reimport 
-                        // ObservableUnityWebRequest
-                        //     .GetAsObservable(fullUrl)
-                        //     .Subscribe(responseBody =>
-                        //     {
-                        //         UserDebug user = JsonUtility.FromJson<UserDebug>(responseBody);
-                        //         _sessionOpts.User.LocalId = user.LocalId;
-                        //         _sessionOpts.User.Name = user.Name;
+                                Main._.Game.DataService.UpdateUser(_sessionOpts.User);
+                                Main._.Game.LoadUser();
 
-                        //         Main._.Game.DataService.UpdateUser(_sessionOpts.User);
-                        //         Main._.Game.LoadUser();
-
-                        //         UpdateHighScore();
-                        //     });
+                                UpdateHighScore();
+                            });
                         return;
                     }
 

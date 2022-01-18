@@ -268,15 +268,13 @@ namespace Assets.BlobPopClassic.Blobs
                 _blobHitSound = new MusicOpts("BlobHit", 0.5f, false);
             }
             __.SFX.PlaySFX(_blobHitSound);
-            ParticleController pc = EffectsPool._.GetParticle(ParticleType.SmallHit);
+            ParticleController pc = BlobPopGame._.EffectsPool.GetParticle(ParticleType.SmallHit);
             pc.Play(point);
         }
 
         public float PlayExplodeEffect(Transform blobT)
         {
-            PC_BigExplosion bpc = (EffectsPool._.GetParticle(ParticleType.BigExplosion) as PC_BigExplosion);
-
-            // StartCoroutine(playExplode(bpc, blobT));
+            PC_BigExplosion bpc = (BlobPopGame._.EffectsPool.GetParticle(ParticleType.BigExplosion) as PC_BigExplosion);
 
             PlayPreExplosionSFX();
             bpc.SetColor(BlobColor);

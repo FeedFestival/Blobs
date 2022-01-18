@@ -3,18 +3,11 @@ using UnityEngine;
 
 public class EffectsPool : MonoBehaviour
 {
-    private static EffectsPool _effectsPool;
-    public static EffectsPool _ { get { return _effectsPool; } }
     public Dictionary<ParticleType, List<ParticleController>> ParticleControllers;
-
-    void Awake()
-    {
-        _effectsPool = this;
-    }
 
     public virtual void GenerateParticleControllers()
     {
-
+        
     }
 
     public ParticleController GetParticle(ParticleType particleType)
