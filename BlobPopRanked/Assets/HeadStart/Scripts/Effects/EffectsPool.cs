@@ -7,7 +7,6 @@ public class EffectsPool : MonoBehaviour
 
     public virtual void GenerateParticleControllers()
     {
-        
     }
 
     public ParticleController GetParticle(ParticleType particleType)

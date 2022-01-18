@@ -1,3 +1,4 @@
+using System;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -81,7 +82,6 @@ public class CoreCamera : MonoBehaviour
         _alignCameraToHelperTwid = null;
 
         _currentCameraSize = _camera.orthographicSize;
-        Debug.Log("orthographicSize: " + _currentCameraSize);
         PlayerPrefs.SetFloat("orthographicSize", _currentCameraSize);
 
         _onCameraSetupDone();
