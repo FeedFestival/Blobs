@@ -110,7 +110,6 @@ namespace Assets.BlobPopClassic
             {
                 SessionOpts sessionOpts = new SessionOpts()
                 {
-                    HighScoreType = HighScoreType.RANKED,
                     User = Main._.Game.DeviceUser()
                 };
                 CoreIoC.IoCDependencyResolver.CreateSession(sessionOpts);

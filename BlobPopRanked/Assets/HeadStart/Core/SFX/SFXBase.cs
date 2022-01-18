@@ -10,11 +10,11 @@ namespace Assets.HeadStart.Core.SFX
 #pragma warning disable 0414 // private field assigned but not used.
         public static readonly string _version = "2.0.0";
 #pragma warning restore 0414 //
-        protected Dictionary<string, MAudio> Sounds;
+        protected  Dictionary<string, MAudio> Sounds;
         public AudioClip MainMenuMusic;
         public AudioClip ClickSound;
 
-        public virtual void Init()
+        public virtual  void Init()
         {
             Sounds = new Dictionary<string, MAudio>()
         {
@@ -77,7 +77,7 @@ namespace Assets.HeadStart.Core.SFX
                 audio = EazySoundManager.GetAudio(_ambientMusicId.Value);
                 if (audio == null)
                 {
-                    Debug.LogError("audio has a problem");
+                    Debug.LogWarning("audio has a problem");
                     return;
                 }
                 audio.Stop();

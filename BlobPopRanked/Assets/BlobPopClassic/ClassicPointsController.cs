@@ -41,6 +41,7 @@ namespace Assets.BlobPopClassic
                 screenDataBlobs.Add(screenPointBlob);
             }
             ScreenDataSubject.Set(screenDataBlobs);
+            // TODO: investigate if possibly creating a bug // https://app.clickup.com/t/2323y7k
             blobsByColor.Clear();
         }
 

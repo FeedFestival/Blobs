@@ -1,12 +1,12 @@
 ﻿using Assets.HeadStart.Core;
 using UnityEngine;
 
-public class HotSeatView : MonoBehaviour, IUiView
+public class ChallengeView : MonoBehaviour, IUiView
 {
     public GameButton ButtonBack;
     public GameButton ButtonPlay;
-    private HotSeatCanvas _hotseatCanvas;
-    public HotseatSettingsSO HotseatSettings;
+    private ChallengeCanvas _challengeCanvas;
+    public ChallengeSettingsSO ChallengeSettings;
     [Header("Canvas Points")]
     public Transform TLPoint;
     public Transform BRPoint;
@@ -16,24 +16,26 @@ public class HotSeatView : MonoBehaviour, IUiView
     {
         ButtonBack.OnClick(() =>
         {
-            _hotseatCanvas.gameObject.SetActive(false);
+            _challengeCanvas.gameObject.SetActive(false);
             MenuEnvironment._.Back();
         });
+
+        ButtonPlay.Init();
         ButtonPlay.OnClick(() =>
         {
-            _hotseatCanvas.gameObject.SetActive(false);
+            _challengeCanvas.gameObject.SetActive(false);
             MenuEnvironment._.InputNameForChallenge = true;
             MenuEnvironment._.SwitchView(VIEW.InputName);
         });
 
         var go = Instantiate(
-            HotseatSettings.HotseatConvas,
+            ChallengeSettings.ChallengeConvas,
             Vector3.zero,
             Quaternion.identity,
             parent: Main._.CoreCamera.Views
         );
         (go.transform as RectTransform).localPosition = Vector3.zero;
-        _hotseatCanvas = go.GetComponent<HotSeatCanvas>();
+        _challengeCanvas = go.GetComponent<ChallengeCanvas>();
 
         _isInitialized = true;
     }
@@ -50,10 +52,12 @@ public class HotSeatView : MonoBehaviour, IUiView
             Init();
         }
 
+        ResetActions();
+
         __.Time.RxWait(() =>
         {
-            _hotseatCanvas.gameObject.SetActive(true);
-            _hotseatCanvas.Show(TLPoint, BRPoint);
+            _challengeCanvas.gameObject.SetActive(true);
+            _challengeCanvas.Show(TLPoint, BRPoint);
             if (TLPoint == null)
             {
                 return;
@@ -63,6 +67,21 @@ public class HotSeatView : MonoBehaviour, IUiView
             Destroy(BRPoint.gameObject);
             BRPoint = null;
         }, MenuEnvironment._.MOVE_CAMERA_TIME);
+    }
 
+    public void OnFocussed()
+    {
+        EnableActions();
+    }
+
+
+    private void ResetActions()
+    {
+        ButtonPlay.Reset();
+    }
+
+    private void EnableActions()
+    {
+        ButtonPlay.Enable();
     }
 }

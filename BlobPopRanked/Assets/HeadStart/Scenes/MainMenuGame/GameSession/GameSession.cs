@@ -1,11 +1,14 @@
+using System;
 using Assets.HeadStart.Core;
 using Assets.HeadStart.Core.SceneService;
 using Assets.Scripts.utils;
+using UniRx;
 using UnityEngine;
 
 public class GameSession : MonoBehaviour, IUiView
 {
     private bool _isInitialized;
+    private SessionOpts _sessionOpts;
 
     private void Init()
     {
@@ -33,13 +36,13 @@ public class GameSession : MonoBehaviour, IUiView
 
         __.Time.RxWait(() =>
         {
-            SessionOpts sessionOpts = MenuEnvironment._.GetHotseatSession();
+            SessionOpts sessionOpts = MenuEnvironment._.GetChallengeSession();
+            MenuEnvironment._.ClearChallengeSession();
 
             if (sessionOpts == null)
             {
                 sessionOpts = new SessionOpts()
                 {
-                    HighScoreType = HighScoreType.RANKED,
                     User = Main._.Game.DeviceUser()
                 };
             }
@@ -52,82 +55,162 @@ public class GameSession : MonoBehaviour, IUiView
         }, MenuEnvironment._.MOVE_CAMERA_TIME);
     }
 
+    public void OnFocussed()
+    {
+        __.Time.RxWait(() =>
+        {
+            // ButtonHighscore.Interactable = false;
+        }, 1f);
+    }
+
     private void AfterTheGame()
     {
         Main._.Game.InitDatabaseConnection();
 
         __.Transition.Do(Transition.END, () =>
         {
-            SessionOpts sessionOpts = CoreSession._.SessionOpts;
+            _sessionOpts = CoreSession._.SessionOpts;
             Destroy(CoreSession._.gameObject);
 
-            if (sessionOpts.HighScoreType == HighScoreType.RANKED)
+            Score score = _sessionOpts.GetScore();
+            score.Id = Main._.Game.DataService.AddScore(score);
+
+            UpdateToiletPaper();
+
+            User deviceUser = Main._.Game.DeviceUser();
+            bool isDeviceUser = deviceUser.LocalId == _sessionOpts.User.LocalId;
+
+            if (_sessionOpts.IsChallenge)
             {
-                WeekDetails week = __data.GetWeekDetails();
-                TryUpdateLatestWeekScore(week, sessionOpts.Points);
-                UpdateHighScore(week, sessionOpts);
+                TryUpdateChallengerScore(score);
+                if (isDeviceUser)
+                {
+                    TryUpdateWeekScore(deviceUser, score);
+                }
+                
+                MenuEnvironment._.SetupBackToMainMenuFor(VIEW.Challenge);
+                MenuEnvironment._.SwitchView(VIEW.Challenge);
 
-                // If ranked and the game was a highscore that week
-                // If player wants to save points
-                // If he has enough toilet paper
-
-                // Get the points saved in the database
-
-                // Send them to SERVER for first check
-
-                // then -> move the player to Ranked Ladder View
-                // there the second check on the SERVER for authenticity
+                return;
             }
-            else
-            {
-                WeekDetails week = __data.GetWeekDetails();
-                UpdateHighScore(week, sessionOpts);
 
-                MenuEnvironment._.SetupBackToMainMenuFor(VIEW.HotSeat);
-                MenuEnvironment._.SwitchView(VIEW.HotSeat);
+            if (isDeviceUser)
+            {
+                TryUpdateChallengerScore(score);
+
+                if (deviceUser.UserType == UserType.CASUAL)
+                {
+                    bool wasAHighScore = TryUpdateWeekScore(deviceUser, score);
+                    if (wasAHighScore || _sessionOpts.User.IsFirstTime)
+                    {
+                        Debug.Log("Ask user if he wants to go Ranked");
+                        return;
+                    }
+
+                    MenuEnvironment._.SwitchView(VIEW.MainMenu);
+                }
+                else
+                {
+                    if (_sessionOpts.User.IsRegistered == false)
+                    {
+                        string url = "http://localhost/gameScrypt/be/Ranked/RegisterUser.php";
+                        var secret = "a=gameScrypt";
+                        var usernameReq = "username=" + _sessionOpts.User.Name;
+                        string emailReq = "";
+                        if (string.IsNullOrWhiteSpace(_sessionOpts.User.Email))
+                        {
+                            // TODO: IF no email, login to Google Play Services
+                            // emailReq = "&email=" + _sessionOpts.User.Name + "@gmail.com";
+                            emailReq = "&email=simionescudani07@gmail.com";
+                        }
+                        var fullUrl = url + "?" + secret + "&" + usernameReq + emailReq;
+
+                        // TODO: reimport 
+                        // ObservableUnityWebRequest
+                        //     .GetAsObservable(fullUrl)
+                        //     .Subscribe(responseBody =>
+                        //     {
+                        //         UserDebug user = JsonUtility.FromJson<UserDebug>(responseBody);
+                        //         _sessionOpts.User.LocalId = user.LocalId;
+                        //         _sessionOpts.User.Name = user.Name;
+
+                        //         Main._.Game.DataService.UpdateUser(_sessionOpts.User);
+                        //         Main._.Game.LoadUser();
+
+                        //         UpdateHighScore();
+                        //     });
+                        return;
+                    }
+
+                    UpdateHighScore();
+                }
             }
         });
     }
 
-    private void TryUpdateLatestWeekScore(WeekDetails week, int points)
+    private void UpdateToiletPaper()
     {
-        WeekScore weekScore = Main._.Game.DataService.GetHighestWeekScore(week.Id);
-        if (weekScore == null)
+        User deviceUser = Main._.Game.DeviceUser();
+        Main._.Game.DataService.AddToiletPaper(deviceUser.LocalId, deviceUser.ToiletPaper + _sessionOpts.ToiletPaper);
+        Main._.Game.LoadUser();
+    }
+
+    private void TryUpdateChallengerScore(Score score)
+    {
+        ChallengerResult challengerResult = Main._.Game.DataService.GetChallengerScore(score.UserLocalId);
+        if (challengerResult != null)
         {
-            weekScore = new WeekScore()
+            if (score.Points > challengerResult.Points)
             {
-                Id = week.Id,
-                Points = points,
-                Year = week.Year,
-                Week = week.Nr,
-                UserId = Main._.Game.DeviceUser().Id
-            };
-            Main._.Game.DataService.AddWeekHighScore(weekScore);
+                Main._.Game.DataService.UpdateChallengerScore(challengerResult.Id, score.Id);
+            }
         }
         else
         {
-            if (weekScore.Points >= points)
-            {
-                Debug.Log("weekScore: " + weekScore.Points);
-            }
-            else
-            {
-                weekScore.Points = points;
-                Main._.Game.DataService.UpdateWeekHighScore(weekScore);
-            }
+            Main._.Game.DataService.AddChallengerScore(score);
         }
     }
 
-    private void UpdateHighScore(WeekDetails week, SessionOpts sessionOpts)
+    private void UpdateHighScore()
     {
-        HighScore highScore = new HighScore()
+        // If player wants to save points
+        // If he has enough toilet paper
+
+        // Get the points saved in the database
+
+        // Send them to SERVER for first check
+
+        // then -> move the player to Ranked Ladder View
+        // there the second check on the SERVER for authenticity
+    }
+
+    private bool TryUpdateWeekScore(User deviceUser, Score score)
+    {
+        League league = __data.GetThisWeeksLeague();
+        WeekScoreResult weekScoreResult = Main._.Game.DataService.GetHighestScoreThisWeek(deviceUser.LocalId, league);
+
+        if (weekScoreResult != null)
         {
-            Points = sessionOpts.Points,
-            Type = sessionOpts.HighScoreType,
-            WeekId = week.Id,
-            UserId = sessionOpts.User.Id,
-            UserName = sessionOpts.User.Name
-        };
-        Main._.Game.DataService.AddHighScore(highScore);
+            if (score.Points > weekScoreResult.Points)
+            {
+                WeekScore weekScore = new WeekScore()
+                {
+                    Id = weekScoreResult.Id,
+                    ScoreId = score.Id
+                };
+                Main._.Game.DataService.UpdateWeekScore(weekScore);
+                return true;
+            }
+        }
+        else
+        {
+            WeekScore weekScore = new WeekScore()
+            {
+                ScoreId = score.Id
+            };
+            Main._.Game.DataService.AddWeekScore(weekScore);
+            return true;
+        }
+        return false;
     }
 }

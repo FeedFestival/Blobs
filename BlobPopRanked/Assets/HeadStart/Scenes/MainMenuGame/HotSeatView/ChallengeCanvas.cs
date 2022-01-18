@@ -2,14 +2,14 @@ using System.Collections.Generic;
 using Assets.Scripts.utils;
 using UnityEngine;
 
-public class HotSeatCanvas : MonoBehaviour
+public class ChallengeCanvas : MonoBehaviour
 {
-    public GsTable HotSeatTable;
+    public GsTable ChallengeTable;
     private bool _isInitialized;
 
     void Awake()
     {
-        HotSeatTable.gameObject.SetActive(false);
+        ChallengeTable.gameObject.SetActive(false);
     }
 
     public void Init(Transform TLPoint, Transform BRPoint)
@@ -31,7 +31,7 @@ public class HotSeatCanvas : MonoBehaviour
             Init(TLPoint, BRPoint);
         }
 
-        List<HighScore> highscores = Main._.Game.DataService.GetHotSeatScores();
+        List<HighScore> highscores = Main._.Game.DataService.GetChallengersHighscores();
 
         if (highscores == null || highscores.Count == 0)
         {
@@ -46,14 +46,14 @@ public class HotSeatCanvas : MonoBehaviour
             {
                 Values = new List<string>() {
                     orderNr.ToString(),
-                    hs.UserName.ToString(),
+                    hs.Name.ToString(),
                     hs.Points.ToString()
                 }
             });
             orderNr++;
         }
 
-        HotSeatTable.gameObject.SetActive(true);
-        HotSeatTable.SetData(tableData);
-    }    
+        ChallengeTable.gameObject.SetActive(true);
+        ChallengeTable.SetData(tableData);
+    }
 }

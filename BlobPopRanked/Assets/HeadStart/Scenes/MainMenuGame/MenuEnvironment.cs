@@ -79,25 +79,29 @@ public class MenuEnvironment : MonoBehaviour
                 _moveCameraTo.y,
                 Main._.CoreCamera.transform.position.z
             );
+            __.Time.RxWait(() => { Views[View].OnFocussed(); }, 1);
             return;
         }
 
         playCameraTransition();
     }
 
-    internal void SetHotseatSession(SessionOpts sessionOpts)
+    internal void SetChallengeSession(SessionOpts sessionOpts)
     {
         _sessionOpts = sessionOpts;
     }
 
-    internal SessionOpts GetHotseatSession()
+    internal void UpdateSessionUserId(int userLocalId)
     {
-        var copy = _sessionOpts;
-        ClearHotseatSession();
-        return copy;
+        _sessionOpts.User.LocalId = userLocalId;
     }
 
-    internal void ClearHotseatSession()
+    internal SessionOpts GetChallengeSession()
+    {
+        return _sessionOpts;
+    }
+
+    internal void ClearChallengeSession()
     {
         _sessionOpts = null;
     }
@@ -107,7 +111,7 @@ public class MenuEnvironment : MonoBehaviour
         switch (view)
         {
             case VIEW.HighScore:
-            case VIEW.HotSeat:
+            case VIEW.Challenge:
                 _history.Clear();
                 _history.Push(VIEW.MainMenu);
                 break;
@@ -119,7 +123,6 @@ public class MenuEnvironment : MonoBehaviour
     internal void Back()
     {
         VIEW lastView = _history.Pop();
-        Debug.Log("_history.Depth(): " + _history.Depth());
         SwitchView(lastView, storeHistory: false);
     }
 
@@ -131,6 +134,10 @@ public class MenuEnvironment : MonoBehaviour
             MOVE_CAMERA_TIME
         ).id;
         LeanTween.descr(_moveCameraTwid.Value).setEase(LeanTweenType.easeInOutQuart);
+        LeanTween.descr(_moveCameraTwid.Value).setOnComplete(() =>
+        {
+            Views[View].OnFocussed();
+        });
 
         _scaleCameraTwid = LeanTween.value(
             Main._.CoreCamera.gameObject,
@@ -160,10 +167,6 @@ public class MenuEnvironment : MonoBehaviour
 
     private void playBackgroundAnimations()
     {
-        if (Ellipses == null || Ellipses.Length == 0)
-        {
-            return;
-        }
         __.Time.AsyncForEach(Ellipses, (object obj) =>
         {
             obj.As<EnvEllipse>().Play();

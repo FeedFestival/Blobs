@@ -2,6 +2,7 @@
 
 namespace Assets.HeadStart.Core.Player
 {
+
     public class Player : MonoBehaviour
     {
         void Start()
