@@ -3,9 +3,11 @@ using UnityEngine;
 
 public class PointerArea : MonoBehaviour
 {
+    private EvtPackage _evtPackage;
+
     void Start()
     {
-        __.Event.On(Evt.ACTIVATE_POINTER_AREA, (bool active) =>
+        _evtPackage = __.Event.On(Evt.ACTIVATE_POINTER_AREA, (bool active) =>
         {
             gameObject.SetActive(active);
         });
@@ -13,6 +15,7 @@ public class PointerArea : MonoBehaviour
 
     void OnDestroy()
     {
-        // __.Event.Un
+        _evtPackage.disposable.Dispose();
+        // __.Event.Unregister(Evt.ACTIVATE_POINTER_AREA);
     }
 }

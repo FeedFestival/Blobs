@@ -7,15 +7,17 @@ public class SwitchController : MonoBehaviour
 {
     public SwitchSettings SwitchSettings;
     private BlobPopPlayer _player;
+    private EvtPackage _switchEvtPackage;
+    private EvtPackage _makeEvtPackage;
 
     void Start()
     {
-        __.Event.On(Evt.SWITCH_BLOBS, () =>
+        _switchEvtPackage = __.Event.On(Evt.SWITCH_BLOBS, () =>
         {
             switchBlob();
         });
 
-        __.Event.On(Evt.MAKE_ANOTHER_BLOB, () =>
+        _makeEvtPackage = __.Event.On(Evt.MAKE_ANOTHER_BLOB, () =>
         {
             makeAnotherBlob();
         });
@@ -78,5 +80,13 @@ public class SwitchController : MonoBehaviour
             __.Event.Emit(Evt.ACTIVATE_POINTER_AREA, true);
 
         }, SwitchSettings.MakeShootableBlobDebounceTime);
+    }
+    
+    void OnDestroy()
+    {
+        // __.Event.Unregister(Evt.SWITCH_BLOBS);
+        // __.Event.Unregister(Evt.MAKE_ANOTHER_BLOB);
+        _switchEvtPackage.disposable.Dispose();
+        _makeEvtPackage.disposable.Dispose();
     }
 }
