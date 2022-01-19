@@ -1,0 +1,18 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2276256ab37e8b6438fcd11bd7a7b923, type: 3}
+  m_Name: BrownBigExplosion
+  m_EditorClassIdentifier: 
+  MinExplosion: {r: 1, g: 0, b: 0.4490509, a: 1}
+  MaxExplosion: {r: 1, g: 0.050943315, b: 0.16295104, a: 1}
+  MinDebris: {r: 0.31764707, g: 0.09411766, b: 0.1254902, a: 1}
+  MaxDebris: {r: 0.21960786, g: 0.13333334, b: 0.18823531, a: 1}
