@@ -1,8 +1,0 @@
-public enum Evt
-{
-    SWITCH_BLOBS,
-    STOP_SHOOTING,
-    MAKE_ANOTHER_BLOB,
-    ACTIVATE_POINTER_AREA,
-    SET_POINTS
-}
