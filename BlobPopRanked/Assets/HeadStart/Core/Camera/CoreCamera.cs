@@ -15,7 +15,7 @@ public class CoreCamera : MonoBehaviour
     private float _currentCameraSize;
     private float _toCameraSize;
     private int? _alignCameraToHelperTwid;
-    public const float CAMERA_SETUP_TIME = 4.4f;
+    public const float CAMERA_SETUP_TIME = 1.0f;    // 4.4f
     private bool _foundTheSweetSpot;
     private bool _debugActivated;
 

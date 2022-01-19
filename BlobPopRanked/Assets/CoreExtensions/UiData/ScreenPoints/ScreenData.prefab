@@ -29,7 +29,6 @@ RectTransform:
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: -0.000061035156}
   m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 244015790208843506}
   m_RootOrder: 1
@@ -128,7 +127,6 @@ RectTransform:
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 244015790208843506}
   m_RootOrder: 0
@@ -175,7 +173,6 @@ RectTransform:
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 432}
   m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 244015788809897579}
   - {fileID: 747438532}
@@ -233,9 +230,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e913812dbfa72e94c8b9867384959723, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  Points: 0
+  RealPoints: 0
   _holderT: {fileID: 244015788809897579}
   PointsText: {fileID: 747438534}
-  PointTextPrefab: {fileID: 4472081050924165608, guid: 25a11c0dc4e6f2741932b95b12b101ba,
-    type: 3}
-  PointsEnlargeDurationS: 0.3
+  PointTextPrefab: {fileID: 4472081050924165608, guid: 25a11c0dc4e6f2741932b95b12b101ba, type: 3}
+  PointIconPrefab: {fileID: 4472081050924165608, guid: 68d3520f639ed8c4aa03b5649a6854f7, type: 3}

@@ -87,6 +87,7 @@ namespace Assets.BlobPopClassic
 
         internal void OnGameOver()
         {
+
             __.Event.Emit(Evt.ACTIVATE_POINTER_AREA, false);
             PauseGame();
             DialogOptions options = new DialogOptions()
@@ -106,6 +107,11 @@ namespace Assets.BlobPopClassic
                 }
             };
             __.Dialog.Show(options);
+
+            __.Time.RxWait(() =>
+            {
+                __.Event.Emit(Evt.ACTIVATE_POINTER_AREA, false);
+            }, 1f);
         }
 
         void PlayBackgroundMusic()

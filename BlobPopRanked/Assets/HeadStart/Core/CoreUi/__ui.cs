@@ -20,5 +20,10 @@ namespace Assets.HeadStart.CoreUi
         {
             _uiCoreDependencies.Add(dependency, uiDependency);
         }
+
+        public static void SetUnavailable(UiDependency dependency)
+        {
+            _uiCoreDependencies.Remove(dependency);
+        }
     }
 }

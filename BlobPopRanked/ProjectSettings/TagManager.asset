@@ -5,8 +5,8 @@ TagManager:
   serializedVersion: 2
   tags:
   - Blob
-  - ReflectSurface
   - StickySurface
+  - ReflectSurface
   - END_GAME
   layers:
   - Default

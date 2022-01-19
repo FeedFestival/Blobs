@@ -89,7 +89,7 @@ public class DataService
         _connection.DropTable<Score>();
         _connection.DropTable<WeekScore>();
         _connection.DropTable<ChallengerScore>();
-        Debug.Log("Dropped Tables: User, WeekScore, WeekScore, ChallengerScore");
+        Debug.Log("Dropped Tables: User, Score, WeekScore, ChallengerScore");
     }
 
     public void CreateDB()
@@ -98,7 +98,7 @@ public class DataService
         _connection.CreateTable<Score>();
         _connection.CreateTable<WeekScore>();
         _connection.CreateTable<ChallengerScore>();
-        Debug.Log("Created Tables: User, WeekScore, WeekScore, ChallengerScore");
+        Debug.Log("Created Tables: User, Score, WeekScore, ChallengerScore");
     }
 
     public void CreateDBIfNotExists()
@@ -111,6 +111,24 @@ public class DataService
         {
             Debug.LogWarning(ex.Message);
             _connection.CreateTable<User>();
+        }
+        try
+        {
+            _connection.Table<Score>().Where(x => x.Id == 1).FirstOrDefault();
+        }
+        catch (Exception ex)
+        {
+            Debug.LogWarning(ex.Message);
+            _connection.CreateTable<Score>();
+        }
+        try
+        {
+            _connection.Table<ChallengerScore>().Where(x => x.Id == 1).FirstOrDefault();
+        }
+        catch (Exception ex)
+        {
+            Debug.LogWarning(ex.Message);
+            _connection.CreateTable<ChallengerScore>();
         }
         try
         {

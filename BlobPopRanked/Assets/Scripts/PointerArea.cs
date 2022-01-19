@@ -10,4 +10,9 @@ public class PointerArea : MonoBehaviour
             gameObject.SetActive(active);
         });
     }
+
+    void OnDestroy()
+    {
+        // __.Event.Un
+    }
 }

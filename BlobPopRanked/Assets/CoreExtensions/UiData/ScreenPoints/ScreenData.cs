@@ -116,6 +116,8 @@ namespace Assets.CoreExtensions.ScreenData
             {
                 GenerateNewPoint(i);
             }
+            // one should be enough
+            GenerateNewPointIcon(0);
         }
 
         public void ShowPoints(ScreenPointBlob screenPointBlob)
@@ -150,7 +152,7 @@ namespace Assets.CoreExtensions.ScreenData
         public void UpdateToiletPaperScreenData(int toAdd, BlobColor blobColor)
         {
             Debug.Log("toAdd: " + toAdd);
-            
+
             // for now 
             CoreSession._.SessionOpts.ToiletPaper += toAdd;
 
@@ -317,6 +319,11 @@ namespace Assets.CoreExtensions.ScreenData
             var rect = go.GetComponent<RectTransform>();
             rect.localScale = Vector3.one;
             return go;
+        }
+
+        void OnDestroy()
+        {
+            __ui.SetUnavailable(UiDependency.ScreenData);
         }
     }
 }
